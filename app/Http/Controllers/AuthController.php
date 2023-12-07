@@ -15,6 +15,11 @@ class AuthController extends Controller
         $this->_userRepository = $userRepository;
     }
 
+    public function index()
+    {
+        return view("auth.index");
+    }
+
     public function create()
     {
         return view("auth.create");

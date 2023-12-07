@@ -68,4 +68,18 @@ class AuthControllerTest extends TestCase
             ["password", "confirm_password", "email_verified_at", "terms"]
         ));
     }
+
+    /**
+     * deve ter status 200 e view auth.index
+     *
+     * @return void
+     */
+    public function test_index_action(): void
+    {
+        $this->get(route("auth.index"))
+            ->assertOk()
+            ->assertViewIs("auth.index");
+    }
+
+    
 }
