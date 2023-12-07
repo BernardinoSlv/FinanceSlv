@@ -18,8 +18,7 @@ Route::controller(AuthController::class)
     ->prefix("auth")
     ->name("auth.")
     ->group(function () {
-        Route::get("/", function () {
-        })->name("index");
+        Route::get("/", "index")->name("index");
         Route::get("signup", "create")->name("create");
         Route::post("signup", "store")->name("store");
     });
