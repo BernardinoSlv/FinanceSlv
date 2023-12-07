@@ -23,23 +23,24 @@
                 @include('includes.alerts')
 
                 <div class="mb-3 form-floating">
-                    <input type="text" name="name" class="form-control" {{ old('name') }} placeholder="">
+                    <input type="text" name="name" class="form-control" value="{{ old('name') }}"
+                        placeholder="">
                     <label for="">Nome</label>
                     <div class="form-text">Nome e sobrenome</div>
                 </div>
                 <div class="mb-3 form-floating">
-                    <input type="email" name="email" class="form-control" {{ old('email') }} placeholder="">
+                    <input type="email" name="email" class="form-control" value="{{ old('email') }}"
+                        placeholder="">
                     <label for="" class="">E-mail</label>
                     <div class="form-text">Seu melhor e-mail</div>
                 </div>
                 <div class="mb-3 form-floating">
-                    <input type="password" name="password" class="form-control" {{ old('password') }} placeholder="">
+                    <input type="password" name="password" class="form-control" placeholder="">
                     <label for="">Senha</label>
                     <div class="form-text">Deve conter no mínimo 8 caracteres</div>
                 </div>
                 <div class="mb-3 form-floating">
-                    <input type="password" name="confirm_password" class="form-control" {{ old('confirm_password') }}
-                        placeholder="">
+                    <input type="password" name="confirm_password" class="form-control" placeholder="">
                     <label for="">Confirme sua senha</label>
                 </div>
                 <div class="mb-3 form-check">
