@@ -40,6 +40,7 @@
                     <button class="btn btn-primary">Cadastrar</button>
                 </div>
             </form>
+            <p>Ainda não tem conta? <a href="{{ route('auth.create') }}">clique aqui</a></p>
         </div>
     </div>
 
