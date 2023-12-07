@@ -18,7 +18,10 @@
         <div class="m-auto" style="max-width: 600px; width: 100%;">
             <h1 class="fs-4 text-center">Seja bem vindo! <i class="fas fa-door-open"></i></h1>
             <h2 class="fs-5 mb-4 text-muted text-center">Preencha os dados para fazer parte</h2>
-            <form action="">
+            <form action="{{ route('auth.store') }}" method="POST">
+                @csrf
+                @include('includes.alerts')
+
                 <div class="mb-3 form-floating">
                     <input type="text" name="name" class="form-control" {{ old('name') }} placeholder="">
                     <label for="">Nome</label>
