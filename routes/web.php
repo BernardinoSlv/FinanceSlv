@@ -19,6 +19,10 @@ Route::controller(AuthController::class)
     ->name("auth.")
     ->group(function () {
         Route::get("/", "index")->name("index");
+        Route::post("/", "indexStore")->name("index_store");
         Route::get("signup", "create")->name("create");
         Route::post("signup", "store")->name("store");
     });
+
+Route::get("dashboard", function () {
+})->name("dashboard.index");
