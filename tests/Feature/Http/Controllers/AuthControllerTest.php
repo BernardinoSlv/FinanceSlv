@@ -81,5 +81,68 @@ class AuthControllerTest extends TestCase
             ->assertViewIs("auth.index");
     }
 
-    
+    /**
+     * deve redirecionar com erros de validação
+     *
+     * @return void
+     */
+    public function test_index_action_without_data(): void
+    {
+        $this->post(route("auth.index_store"))
+            ->assertStatus(302)
+            ->assertSessionHasErrors([
+                "email",
+                "password"
+            ]);
+    }
+
+    /**
+     * deve redirecionar com erro de credencials
+     *
+     * @return void
+     */
+    public function test_index_action_incorrect_credentials(): void
+    {
+        $user = User::factory()->create();
+
+        // password incorreto
+        $this->post(route("auth.index_store"), [
+            "email" => $user->email,
+            "password" => "incorrect"
+        ])
+            ->assertRedirect(route("auth.index"))
+            ->assertSessionHas([
+                "alert_type" => "danger",
+                "alert_text" => "E-mail e/ou senha incorretos."
+            ]);
+        // email incorreto
+        $this->post(route("auth.index_store"), [
+            "email" => "incorrect@email.com",
+            "password" => "password"
+        ])
+            ->assertRedirect(route("auth.index"))
+            ->assertSessionHas([
+                "alert_type" => "danger",
+                "alert_text" => "E-mail e/ou senha incorretos."
+            ]);
+    }
+
+    /**
+     * deve autenticar e redirecionar para dashboard.index
+     *
+     * @return void
+     */
+    public function test_index_store_action(): void
+    {
+        $user = User::factory()->create();
+
+        $this->post(route("auth.index_store"), [
+            "email" => $user->email,
+            "password" => "password",
+            "remember" => ""
+        ])
+            ->assertRedirect(route("dashboard.index"));
+
+        $this->assertAuthenticated();
+    }
 }

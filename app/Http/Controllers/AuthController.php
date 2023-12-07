@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\Alert;
 use App\Repositories\Contracts\UserRepositoryContract;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -19,6 +20,26 @@ class AuthController extends Controller
     {
         return view("auth.index");
     }
+
+    public function indexStore(Request $request)
+    {
+        $data = $request->validate([
+            "email" => ["required", "email"],
+            "password" => ["required", "min:8", "max:256"]
+        ]);
+
+        if (!Auth::attempt(
+            $data,
+            $request->remember ? true : false
+        )) {
+            return redirect()->route("auth.index")->with(
+                Alert::danger("E-mail e/ou senha incorretos.")
+            )->withInput();
+        }
+
+        return redirect()->route("dashboard.index");
+    }
+
 
     public function create()
     {
