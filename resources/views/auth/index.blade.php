@@ -18,7 +18,7 @@
         <div class="m-auto" style="max-width: 600px; width: 100%;">
             <h1 class="fs-4 text-center">Quase lá! <i class="fas fa-sign-in-alt"></i></h1>
             <h2 class="fs-5 mb-4 text-muted text-center">Basta informar seu e-mail e senha</h2>
-            <form action="" method="POST">
+            <form action="{{ route('auth.index_store') }}" method="POST">
                 @csrf
                 @include('includes.alerts')
 
@@ -32,9 +32,9 @@
                     <label for="">Senha</label>
                 </div>
                 <div class="mb-3 form-check form-switch">
-                    <input type="checkbox" name="terms" class="form-check-input" {{ old('terms') ? 'checked' : '' }}
-                        id="terms">
-                    <label for="terms" class="form-check-label">Lembrar de mim</label>
+                    <input type="checkbox" name="remember" class="form-check-input"
+                        {{ old('remember') ? 'checked' : '' }} id="remember">
+                    <label for="remember" class="form-check-label">Lembrar de mim</label>
                 </div>
                 <div class="text-end">
                     <button class="btn btn-primary">Cadastrar</button>
