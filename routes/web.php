@@ -16,13 +16,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::controller(AuthController::class)
-    ->prefix("auth")
+    ->prefix("autenticacao")
     ->name("auth.")
     ->group(function () {
         Route::get("/", "index")->name("index");
         Route::post("/", "indexStore")->name("index_store");
-        Route::get("signup", "create")->name("create");
-        Route::post("signup", "store")->name("store");
+        Route::get("cadastrar", "create")->name("create");
+        Route::post("cadastrar", "store")->name("store");
+        Route::get("/sair", "logout")->name("logout");
     });
 
 // rotas protegidas
