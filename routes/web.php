@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,5 +25,11 @@ Route::controller(AuthController::class)
         Route::post("signup", "store")->name("store");
     });
 
-Route::get("dashboard", function () {
-})->name("dashboard.index");
+// rotas protegidas
+Route::middleware("checkAuth")->group(function () {
+    Route::controller(DashboardController::class)
+        ->as("dashboard.")
+        ->group(function () {
+            Route::get("/", "index")->name("index");
+        });
+});
