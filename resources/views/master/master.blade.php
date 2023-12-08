@@ -4,27 +4,27 @@
 <head>
 
     <meta charset="utf-8" />
-    <title>Dashboard | Adminto - Responsive Admin Dashboard Template</title>
+    <title>Dashboard | Finance Slv</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
     <meta content="Coderthemes" name="author" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <!-- App favicon -->
-    <link rel="shortcut icon" href="../assets/images/favicon.ico">
+    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}">
 
     <!-- App css -->
-    <link href="../assets/css/config/default/bootstrap.min.css" rel="stylesheet" type="text/css"
+    <link href="{{ asset('assets/css/config/default/bootstrap.min.css') }}" rel="stylesheet" type="text/css"
         id="bs-default-stylesheet" />
-    <link href="../assets/css/config/default/app.min.css" rel="stylesheet" type="text/css"
+    <link href="{{ asset('assets/css/config/default/app.min.css') }}" rel="stylesheet" type="text/css"
         id="app-default-stylesheet" />
 
-    <link href="../assets/css/config/default/bootstrap-dark.min.css" rel="stylesheet" type="text/css"
+    <link href="{{ asset('assets/css/config/default/bootstrap-dark.min.css') }}" rel="stylesheet" type="text/css"
         id="bs-dark-stylesheet" disabled="disabled" />
-    <link href="../assets/css/config/default/app-dark.min.css" rel="stylesheet" type="text/css" id="app-dark-stylesheet"
-        disabled="disabled" />
+    <link href="{{ asset('assets/css/config/default/app-dark.min.css') }}" rel="stylesheet" type="text/css"
+        id="app-dark-stylesheet" disabled="disabled" />
 
     <!-- icons -->
-    <link href="../assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
 
 </head>
 
@@ -181,9 +181,9 @@
                         <div class="dropdown-divider"></div>
 
                         <!-- item-->
-                        <a href="auth-logout.html" class="dropdown-item notify-item">
+                        <a href="{{ route('auth.logout') }}" class="dropdown-item notify-item">
                             <i class="fe-log-out"></i>
-                            <span>Logout</span>
+                            <span>Sair</span>
                         </a>
 
                     </div>
@@ -240,7 +240,7 @@
                         class="rounded-circle img-thumbnail avatar-md">
                     <div class="dropdown">
                         <a href="#" class="user-name dropdown-toggle h5 mt-2 mb-1 d-block"
-                            data-bs-toggle="dropdown" aria-expanded="false">Nowak Helme</a>
+                            data-bs-toggle="dropdown" aria-expanded="false">{{ auth()->user()->name }}</a>
                         <div class="dropdown-menu user-pro-dropdown">
 
                             <!-- item-->
@@ -262,15 +262,15 @@
                             </a>
 
                             <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item notify-item">
+                            <a href="{{ route('auth.logout') }}" class="dropdown-item notify-item">
                                 <i class="fe-log-out me-1"></i>
-                                <span>Logout</span>
+                                <span>Sair</span>
                             </a>
 
                         </div>
                     </div>
 
-                    <p class="text-muted left-user-info">Admin Head</p>
+                    {{-- <p class="text-muted left-user-info">Admin Head</p> --}}
 
                     <ul class="list-inline">
                         <li class="list-inline-item">
@@ -280,7 +280,7 @@
                         </li>
 
                         <li class="list-inline-item">
-                            <a href="#">
+                            <a href="{{ route('auth.logout') }}">
                                 <i class="mdi mdi-power"></i>
                             </a>
                         </li>
@@ -295,44 +295,154 @@
                         <li class="menu-title">Navigation</li>
 
                         <li>
-                            <a href="index.html">
+                            <a href="{{ route('dashboard.index') }}">
                                 <i class="mdi mdi-view-dashboard"></i>
                                 <span> Dashboard </span>
                             </a>
                         </li>
 
-                        <li class="menu-title mt-2">Apps</li>
-
                         <li>
-                            <a href="apps-calendar.html">
-                                <i class="mdi mdi-calendar"></i>
-                                <span> Calendar </span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="apps-chat.html">
-                                <i class="mdi mdi-forum"></i>
-                                <span> Chat </span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="#email" data-bs-toggle="collapse">
+                            <a href="#operations" data-bs-toggle="collapse">
                                 <i class="mdi mdi-email"></i>
-                                <span> Email </span>
+                                <span> Operações </span>
                                 <span class="menu-arrow"></span>
                             </a>
-                            <div class="collapse" id="email">
+                            <div class="collapse" id="operations">
                                 <ul class="nav-second-level">
                                     <li>
-                                        <a href="email-inbox.html">Inbox</a>
+                                        <a href="#entries-collapse" data-bs-toggle="collapse">
+                                            <span>Entradas</span>
+                                            <span class="menu-arrow"></span>
+                                        </a>
+                                        <div class="collapse" id="entries-collapse">
+                                            <ul class="nav-second-level">
+                                                <li>
+                                                    <a href="#">Todas</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Criar</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Deletadas</a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </li>
                                     <li>
-                                        <a href="email-templates.html">Email Templates</a>
+                                        <a href="#exits-collapse" data-bs-toggle="collapse">
+                                            <span>Saídas</span>
+                                            <span class="menu-arrow"></span>
+                                        </a>
+                                        <div class="collapse" id="exits-collapse">
+                                            <ul class="nav-second-level">
+                                                <li>
+                                                    <a href="#">Todas</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Criar</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Deletadas</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="#expenses-collapse" data-bs-toggle="collapse">
+                                            <span>Despesas</span>
+                                            <span class="menu-arrow"></span>
+                                        </a>
+                                        <div class="collapse" id="expenses-collapse">
+                                            <ul class="nav-second-level">
+                                                <li>
+                                                    <a href="#">Todas</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Criar</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Deletadas</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="#debts-collapse" data-bs-toggle="collapse">
+                                            <span>Dívidas</span>
+                                            <span class="menu-arrow"></span>
+                                        </a>
+                                        <div class="collapse" id="debts-collapse">
+                                            <ul class="nav-second-level">
+                                                <li>
+                                                    <a href="#">Todas</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Criar</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Deletadas</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="#debtors-collapse" data-bs-toggle="collapse">
+                                            <span>Devedores</span>
+                                            <span class="menu-arrow"></span>
+                                        </a>
+                                        <div class="collapse" id="debtors-collapse">
+                                            <ul class="nav-second-level">
+                                                <li>
+                                                    <a href="#">Todas</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Criar</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Deletadas</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="#investiments-collapse" data-bs-toggle="collapse">
+                                            <span>Investimentos</span>
+                                            <span class="menu-arrow"></span>
+                                        </a>
+                                        <div class="collapse" id="investiments-collapse">
+                                            <ul class="nav-second-level">
+                                                <li>
+                                                    <a href="#">Todas</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Criar</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Deletadas</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="#needs-collapse" data-bs-toggle="collapse">
+                                            <span>Necessidades</span>
+                                            <span class="menu-arrow"></span>
+                                        </a>
+                                        <div class="collapse" id="needs-collapse">
+                                            <ul class="nav-second-level">
+                                                <li>
+                                                    <a href="#">Todas</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Criar</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#">Deletadas</a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </li>
                                 </ul>
-                            </div>
                         </li>
 
                         <li>
