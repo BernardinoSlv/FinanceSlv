@@ -62,4 +62,14 @@ class AuthController extends Controller
             Alert::success("Cadastro realizado com sucesso.")
         );
     }
+
+    public function logout()
+    {
+        if (Auth::check()) {
+            Auth::logout();
+        }
+        return redirect()->route("auth.index")->with(
+            Alert::success("Volte sempre.")
+        );
+    }
 }
