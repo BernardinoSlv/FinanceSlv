@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EntryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,8 +29,17 @@ Route::controller(AuthController::class)
 
 // rotas protegidas
 Route::middleware("checkAuth")->group(function () {
+    // dashboard
     Route::controller(DashboardController::class)
         ->as("dashboard.")
+        ->group(function () {
+            Route::get("/", "index")->name("index");
+        });
+
+    // entry
+    Route::controller(EntryController::class)
+        ->prefix("entradas")
+        ->as("entry.")
         ->group(function () {
             Route::get("/", "index")->name("index");
         });
