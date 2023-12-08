@@ -13,6 +13,10 @@ use Tests\TestCase;
 
 class UserRepositoryTest extends TestCase
 {
+    use RefreshDatabase;
+
+    protected $seeds = true;
+
     /**
      * deve retornar um nove usuário
      *

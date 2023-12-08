@@ -9,6 +9,8 @@ use Tests\TestCase;
 
 class DashboardControllerTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * deve redirecionar para a página de login
      *
