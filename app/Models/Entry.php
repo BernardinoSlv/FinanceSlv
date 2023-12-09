@@ -16,13 +16,4 @@ class Entry extends Model
         "description",
         "amount",
     ];
-
-    public function amount(): Attribute
-    {
-        return Attribute::make(
-            set: function(mixed $value) {
-                $this->attributes["amount"] = ToFloatParser::parse($value);
-            }
-        );
-    }
 }
