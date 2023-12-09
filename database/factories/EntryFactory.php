@@ -20,7 +20,7 @@ class EntryFactory extends Factory
         return [
             "user_id" => User::factory()->create()->id,
             "title" => fake("pt_BR")->title(),
-            "description" => "",
+            "description" => null,
             "amount" => 10000
         ];
     }
