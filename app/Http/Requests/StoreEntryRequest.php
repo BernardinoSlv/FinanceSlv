@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Src\Parsers\ToFloatParser;
 
 class StoreEntryRequest extends FormRequest
 {
@@ -24,7 +25,7 @@ class StoreEntryRequest extends FormRequest
     {
         return [
             "title" => ["required", "min:3", "max:256"],
-            "amount" => ["required", "numeric"],
+            "amount" => ["required", "regex:/((\d{1,2},)*)?\d{1,3},\d{1,2}/"],
             "description" => ["nullable"]
         ];
     }
