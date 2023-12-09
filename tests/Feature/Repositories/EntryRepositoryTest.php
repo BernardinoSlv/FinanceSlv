@@ -75,6 +75,31 @@ class EntryRepositoryTest extends TestCase
         ]);
     }
 
+    /**
+     * deve criar a entrada mesmo enviando o amount como uma moeda de real
+     *
+     * @return void
+     */
+    public function test_create_method_using_amount_with_real_currency_formating(): void
+    {
+        $user = User::factory()->create();
+        $data = Entry::factory()->make([
+            "amount" => 125.25
+        ])->toArray();
+
+        $this->assertNotNull($this->_repository()->create(
+            $user->id,
+            [
+                ...$data,
+                "amount" => "125,25"
+            ]
+        ));
+        $this->assertDatabaseHas("entries", [
+            ...$data,
+            "user_id" => $user->id,
+        ]);
+    }
+
     protected function _repository(): EntryRepositoryContract
     {
         return App::make(EntryRepositoryContract::class);
