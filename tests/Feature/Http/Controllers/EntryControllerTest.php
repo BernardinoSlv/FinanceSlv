@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\Http\Controllers;
 
+use App\Models\Entry;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Arr;
 use Tests\TestCase;
 
 class EntryControllerTest extends TestCase
@@ -60,5 +62,59 @@ class EntryControllerTest extends TestCase
         $this->actingAs($user)->get(route("entry.create"))
             ->assertOk()
             ->assertViewIs("entry.create");
+    }
+
+    /**
+     * deve redirecionar para o página de login
+     *
+     * @return void
+     */
+    public function test_store_action_unauthenticated(): void
+    {
+        $data = Entry::factory()->make()->toArray();
+
+        $this->post(route("entry.store"), $data)
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve redirecionar com erros de validação
+     *
+     * @return void
+     */
+    public function test_store_action_without_data(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post(route("entry.store"))
+            ->assertStatus(302)
+            ->assertSessionHasErrors([
+                "title",
+                "amount"
+            ]);
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     *
+     * @return void
+     */
+    public function test_store_action(): void
+    {
+        $user = User::factory()->create();
+        $data = Entry::factory()->make([
+            "description" => "Apenas um teste"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("entry.store"), $data)
+            ->assertRedirect(route("entry.index"))
+            ->assertSessionHas([
+                "alert_type" => "success",
+                "alert_text" => "Entrada criada com sucesso."
+            ]);
+        $this->assertDatabaseHas("entries", [
+            ...$data,
+            "user_id" => $user->id,
+        ]);
     }
 }
