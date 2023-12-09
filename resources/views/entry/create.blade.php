@@ -1,6 +1,8 @@
 @extends('master.master')
 
 @section('content')
+    @include('includes.alerts')
+
     <form action="{{ route('entry.store') }}" method="POST">
         @csrf
         <div class="row gy-3 mb-4">
@@ -12,6 +14,7 @@
             <div class="col-sm-4">
                 <label for="" class="form-label">Valor</label>
                 <input type="text" name="amount" class="form-control" value="{{ old('amount') }}">
+                <div class="form-text">Ex: 125,50</div>
             </div>
             <div class="col-12">
                 <label for="" class="form-label">Descrição</label>

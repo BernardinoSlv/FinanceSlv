@@ -6,6 +6,7 @@ use App\Helpers\Alert;
 use App\Http\Requests\StoreEntryRequest;
 use App\Repositories\Contracts\EntryRepositoryContract;
 use Illuminate\Http\Request;
+use Src\Parsers\RealToFloatParser;
 
 class EntryController extends Controller
 {
@@ -33,7 +34,10 @@ class EntryController extends Controller
 
     public function store(StoreEntryRequest $request)
     {
-        $this->_entryRepository->create(auth()->user()->id, $request->validated());
+        $this->_entryRepository->create(auth()->user()->id, [
+            ...$request->validated(),
+            "amount" => RealToFloatParser::parse($request->amount)
+        ]);
         return redirect(route("entry.index"))->with(
             Alert::success("Entrada criada com sucesso.")
         );

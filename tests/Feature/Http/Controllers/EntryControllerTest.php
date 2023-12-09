@@ -95,7 +95,7 @@ class EntryControllerTest extends TestCase
     }
 
     /**
-     * deve redirecionar com mensagem de sucesso
+     * deve criar e redirecionar com mensagem de sucesso
      *
      * @return void
      */
@@ -103,6 +103,7 @@ class EntryControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $data = Entry::factory()->make([
+            "amount" => '125,55',
             "description" => "Apenas um teste"
         ])->toArray();
 
@@ -115,6 +116,32 @@ class EntryControllerTest extends TestCase
         $this->assertDatabaseHas("entries", [
             ...$data,
             "user_id" => $user->id,
+            "amount" => 125.55
+        ]);
+    }
+
+    /**
+     * deve criar e redirecionar com mensagem de sucesso
+     *
+     * @return void
+     */
+    public function test_store_action_with_amount_real_formatting(): void
+    {
+        $user = User::factory()->create();
+        $data = Entry::factory()->make([
+            "amount" => "192.125,25"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("entry.store"), $data)
+            ->assertRedirect(route("entry.index"))
+            ->assertSessionHas([
+                "alert_type" => "success",
+                "alert_text" => "Entrada criada com sucesso."
+            ]);
+        $this->assertDatabaseHas("entries", [
+            ...$data,
+            "user_id" => $user->id,
+            "amount" => 192125.25
         ]);
     }
 }
