@@ -36,4 +36,29 @@ class EntryControllerTest extends TestCase
             ->assertViewIs("entry.index")
             ->assertViewHas("entries");
     }
+
+    /**
+     * deve redirecionar para página de login
+     *
+     * @return void
+     */
+    public function test_create_action_unauthenticated(): void
+    {
+        $this->get(route("entry.create"))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 200 e view entry.create
+     *
+     * @return void
+     */
+    public function test_create_action(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->get(route("entry.create"))
+            ->assertOk()
+            ->assertViewIs("entry.create");
+    }
 }

@@ -23,4 +23,9 @@ class EntryController extends Controller
             "entries"
         ));
     }
+
+    public function create()
+    {
+        return view("entry.create");
+    }
 }
