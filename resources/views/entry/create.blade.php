@@ -1,7 +1,7 @@
 @extends('master.master')
 
 @section('content')
-    <form action="" method="POST">
+    <form action="{{ route('entry.store') }}" method="POST">
         @csrf
         <div class="row gy-3 mb-4">
             <div class="col-sm-8">
@@ -15,7 +15,7 @@
             </div>
             <div class="col-12">
                 <label for="" class="form-label">Descrição</label>
-                <textarea name="description" class="form-control" style="height: 140px"></textarea>
+                <textarea name="description" class="form-control" style="height: 140px">{{ old('description') }}</textarea>
             </div>
         </div>
         <div class="text-end">
