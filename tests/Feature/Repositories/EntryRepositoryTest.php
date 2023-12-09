@@ -58,6 +58,23 @@ class EntryRepositoryTest extends TestCase
         $this->assertCount(2, $this->_repository()->allByUser($user->id));
     }
 
+    /**
+     * deve criar a entrada corretamente
+     *
+     * @return void
+     */
+    public function test_create_method(): void
+    {
+        $user = User::factory()->create();
+        $data = Entry::factory()->make()->toArray();
+
+        $this->assertNotNull($this->_repository()->create($user->id, $data));
+        $this->assertDatabaseHas("entries", [
+            ...$data,
+            "user_id" => $user->id,
+        ]);
+    }
+
     protected function _repository(): EntryRepositoryContract
     {
         return App::make(EntryRepositoryContract::class);

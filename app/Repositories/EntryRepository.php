@@ -19,4 +19,12 @@ class EntryRepository extends BaseRepository implements EntryRepositoryContract
     {
         return $this->_model->query()->where("user_id", $id)->get();
     }
+
+    public function create(int $userId, array $attributes): Entry
+    {
+        $entry = new Entry($attributes);
+        $entry->user_id = $userId;
+        $entry->save();
+        return $entry;
+    }
 }
