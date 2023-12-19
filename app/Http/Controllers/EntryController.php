@@ -34,10 +34,10 @@ class EntryController extends Controller
 
     public function store(StoreEntryRequest $request)
     {
-        $this->_entryRepository->create(auth()->user()->id, [
-            ...$request->validated(),
-            "amount" => RealToFloatParser::parse($request->amount)
-        ]);
+        $this->_entryRepository->create(
+            auth()->user()->id,
+            $request->validated(),
+        );
         return redirect(route("entry.index"))->with(
             Alert::success("Entrada criada com sucesso.")
         );
