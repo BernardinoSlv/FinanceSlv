@@ -25,7 +25,7 @@ class StoreEntryRequest extends FormRequest
     {
         return [
             "title" => ["required", "min:3", "max:256"],
-            "amount" => ["required", "regex:/((\d{1,2},)*)?\d{1,3},\d{1,2}/"],
+            "amount" => ["required", "regex:/^(\d{1,3}\.)*\d{1,3},\d{1,2}$/"],
             "description" => ["nullable"]
         ];
     }
