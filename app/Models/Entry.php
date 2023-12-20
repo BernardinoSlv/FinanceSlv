@@ -18,12 +18,12 @@ class Entry extends Model
         "amount",
     ];
 
-    public function amount(): Attribute
-    {
-        return Attribute::make(
-            set: function (mixed $value) {
-                $this->attributes["amount"] = RealToFloatParser::parse($value);
-            }
-        );
-    }
+    // public function amount(): Attribute
+    // {
+    //     return Attribute::make(
+    //         set: function (mixed $value) {
+    //             $this->attributes["amount"] = RealToFloatParser::parse($value);
+    //         }
+    //     );
+    // }
 }

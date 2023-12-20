@@ -132,6 +132,7 @@ class EntryControllerTest extends TestCase
             "amount" => "192.125,25"
         ])->toArray();
 
+
         $this->actingAs($user)->post(route("entry.store"), $data)
             ->assertRedirect(route("entry.index"))
             ->assertSessionHas([

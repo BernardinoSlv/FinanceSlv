@@ -11,5 +11,5 @@ interface ParserContract
     /**
      * @return mixed
      */
-    public static function parse(mixed $value): mixed;
+    public static function parse(mixed $value);
 }
