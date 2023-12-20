@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Alert;
 use App\Http\Requests\StoreEntryRequest;
+use App\Models\Entry;
 use App\Repositories\Contracts\EntryRepositoryContract;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
 class EntryController extends Controller
@@ -41,5 +43,16 @@ class EntryController extends Controller
         return redirect(route("entry.index"))->with(
             Alert::success("Entrada criada com sucesso.")
         );
+    }
+
+    public function edit(Entry $entry)
+    {
+        if (!Gate::allows("entry-edit", $entry)) {
+            abort(404);
+        }
+
+        return view("entry.edit", compact(
+            "entry"
+        ));
     }
 }

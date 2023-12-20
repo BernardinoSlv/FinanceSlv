@@ -132,7 +132,6 @@ class EntryControllerTest extends TestCase
             "amount" => "192.125,25"
         ])->toArray();
 
-
         $this->actingAs($user)->post(route("entry.store"), $data)
             ->assertRedirect(route("entry.index"))
             ->assertSessionHas([
@@ -144,5 +143,63 @@ class EntryControllerTest extends TestCase
             "user_id" => $user->id,
             "amount" => 192125.25
         ]);
+    }
+
+    /**
+     * deve redirecionar para página de login
+     */
+    public function test_edit_action_unauthenticated(): void
+    {
+        $entry = Entry::factory()->create();
+
+        $this->get(route("entry.edit", [
+            "entry" => $entry->id
+        ]))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_nonexistent(): void
+    {
+        $user = User::factory()->create();
+
+        $this->get(route("entry.edit", [
+            "entry" => 0
+        ]))
+            ->assertStatus(404);
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $entry = Entry::factory()->create();
+
+        $this->actingAs($user)->get(route("entry.edit", [
+            "entry" => $entry->id
+        ]))
+            ->assertStatus(404);
+    }
+
+    /**
+     * deve ter status 200 e view entry.edit
+     */
+    public function test_edit_action(): void
+    {
+        $user = User::factory()->create();
+        $entry = Entry::factory()->create([
+            "user_id" => $user->id
+        ]);
+
+        $this->actingAs($user)->get(route("entry.edit", [
+            "entry" => $entry->id
+        ]))
+            ->assertOk()
+            ->assertViewIs("entry.edit")
+            ->assertViewHas("entry");
     }
 }
