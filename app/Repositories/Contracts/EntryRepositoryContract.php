@@ -9,17 +9,10 @@ use Illuminate\Database\Eloquent\Collection;
 
 interface EntryRepositoryContract
 {
-    /**
-     *
-     * @param integer $id
-     * @return Collection
-     */
     public function allByUser(int $id): Collection;
 
-    /**
-     * @param integer $userId
-     * @param array $attributes
-     * @return Entry
-     */
     public function create(int $userId,  array $attributes): Entry;
+
+    public function update(int $id, array $attributes): bool;
+
 }

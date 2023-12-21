@@ -14,4 +14,14 @@ abstract class BaseRepository
     {
         $this->_model = $model;
     }
+
+    public function update(int $id, array $attributes): bool
+    {
+        if (!($entity = $this->_model->find($id))) {
+            return false;
+        }
+        $entity->fill($attributes);
+        $entity->save();
+        return true;
+    }
 }
