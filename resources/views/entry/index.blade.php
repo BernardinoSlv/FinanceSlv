@@ -25,7 +25,12 @@
                         <td>R$ {{ $entry->amount }}</td>
                         <td><span class="badge text-white bg-black">Padrão</span></td>
                         <td>{{ $entry->created_at }}</td>
-                        <td></td>
+                        <td>
+                            <a class="btn btn-outline-primary btn-sm"
+                                href="{{ route('entry.edit', [
+                                    'entry' => $entry->id,
+                                ]) }}"><i class="fas fa-edit"></i></a>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
