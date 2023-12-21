@@ -202,4 +202,96 @@ class EntryControllerTest extends TestCase
             ->assertViewIs("entry.edit")
             ->assertViewHas("entry");
     }
+
+    /**
+     * deve redirecionar para página de login
+     */
+    public function test_update_action_unauthenticated(): void
+    {
+        $entry = Entry::factory()->create();
+        $data = Entry::factory()->make()->toArray();
+
+        $this->put(route("entry.update", [
+            "entry" => $entry->id
+        ]), $data)
+            ->assertRedirect(route("auth.index"));
+    }
+
+    public function test_update_action_nonexistent(): void
+    {
+        $user = User::factory()->create();
+        $data = Entry::factory()->make()->toArray();
+
+        $this->actingAs($user)->put(route("entry.update", [
+            "entry" => 0
+        ]), $data)
+            ->assertStatus(404);
+    }
+
+    /**
+     * deve redirecionar com erros de validação -
+     */
+    public function test_update_action_without_data(): void
+    {
+        $user = User::factory()->create();
+        $entry = Entry::factory()->create([
+            "user_id" => $user->id
+        ]);
+
+        $this->actingAs($user)->put(route("entry.update", [
+            "entry" => $entry->id
+        ]))
+            ->assertStatus(302)
+            ->assertSessionHasErrors([
+                "title",
+                "amount"
+            ]);
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $entry = Entry::factory()->create();
+        $data = Entry::factory()->make([
+            "amount" => "5.000,00"
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("entry.update", [
+            "entry" => $entry->id
+        ]), $data)
+            ->assertStatus(404);
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_update_action(): void
+    {
+        $user = User::factory()->create();
+        $entry = Entry::factory()->create([
+            "user_id" => $user->id
+        ]);
+        $data = Entry::factory()->make([
+            "amount" => "5.000,00"
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("entry.update", [
+            "entry" => $entry->id
+        ]), $data)
+            ->assertRedirect(route("entry.edit", [
+                "entry" => $entry->id
+            ]))
+            ->assertSessionHas([
+                "alert_type" => "success"
+            ]);
+        $this->assertDatabaseHas("entries", [
+            ...$data,
+            "amount" => 5000.00,
+            "id" => $entry->id,
+            "user_id" => $entry->user_id,
+        ]);
+    }
 }

@@ -10,7 +10,7 @@ namespace Src\Parsers;
 class RealToFloatParser implements ParserContract
 {
     /**
-     * @param mixed $value
+     * @param string $value
      * @return float
      */
     public static function parse(mixed $value): mixed

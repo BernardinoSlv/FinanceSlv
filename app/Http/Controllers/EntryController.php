@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Alert;
 use App\Http\Requests\StoreEntryRequest;
+use App\Http\Requests\UpdateEntryRequest;
 use App\Models\Entry;
 use App\Repositories\Contracts\EntryRepositoryContract;
 use Illuminate\Http\Request;
@@ -54,5 +55,21 @@ class EntryController extends Controller
         return view("entry.edit", compact(
             "entry"
         ));
+    }
+
+    public function update(UpdateEntryRequest $request, Entry $entry)
+    {
+        if (!Gate::allows("entry-edit", $entry)) {
+            abort(404);
+        }
+        $this->_entryRepository->update($entry->id, [
+            ...$request->validated(),
+            "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+        return redirect()->route("entry.edit", [
+            "entry" => $entry->id,
+        ])->with(
+            Alert::success("Entrada atualizada")
+        );
     }
 }

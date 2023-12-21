@@ -45,5 +45,6 @@ Route::middleware("checkAuth")->group(function () {
             Route::get("criar", "create")->name("create");
             Route::post("criar", "store")->name("store");
             Route::get("{entry}/editar", "edit")->name("edit");
+            Route::put("{entry}/editar", "update")->name("update");
         });
 });
