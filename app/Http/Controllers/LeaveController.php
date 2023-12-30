@@ -7,6 +7,7 @@ use App\Http\Requests\StoreLeaveRequest;
 use App\Http\Requests\UpdateLeaveRequest;
 use App\Models\Leave;
 use App\Repositories\Contracts\LeaveRepositoryContract;
+use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
 class LeaveController extends Controller
@@ -66,7 +67,13 @@ class LeaveController extends Controller
      */
     public function edit(Leave $leave)
     {
-        //
+        if (!Gate::allows("leave-edit", $leave)) {
+            abort(404);
+        }
+
+        return view("leave.edit", compact(
+            "leave"
+        ));
     }
 
     /**

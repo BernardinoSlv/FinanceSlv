@@ -97,4 +97,51 @@ class LeaveControllerTest extends TestCase
             "user_id" => $user->id
         ]);
     }
+
+    /**
+     * deve redirecionar para página de login
+     */
+    public function test_edit_unauthenticated(): void
+    {
+        $leave = Leave::factory()->create();
+
+        $this->get(route("leaves.edit", $leave->id))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_nonexistent(): void
+    {
+        $this->actingAs($this->_user())->get(route("leaves.edit", 0))
+            ->assertStatus(404);
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_is_not_owner(): void
+    {
+        $leave = Leave::factory()->create();
+
+        $this->actingAs($this->_user())->get(route("leaves.edit", $leave->id))
+            ->assertStatus(404);
+    }
+
+    /**
+     * deve ter status 200 e view leave.edit
+     */
+    public function test_edit(): void
+    {
+        $user = $this->_user();
+        $leave = Leave::factory()->create([
+            "user_id" => $user->id
+        ]);
+
+        $this->actingAs($user)->get(route("leaves.edit", $leave->id))
+            ->assertOk()
+            ->assertViewIs("leave.edit")
+            ->assertViewHas("leave");
+    }
 }
