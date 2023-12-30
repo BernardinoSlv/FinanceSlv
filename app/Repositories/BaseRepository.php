@@ -24,4 +24,13 @@ abstract class BaseRepository
         $entity->save();
         return true;
     }
+
+    public function delete(int $id): bool
+    {
+        if (!($entity = $this->_model->query()->find($id))) {
+            return false;
+        }
+        $entity->delete();
+        return true;
+    }
 }

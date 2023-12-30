@@ -10,6 +10,8 @@ use Tests\TestCase;
 
 class BaseRepositoryTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * deve retornar false
      */
@@ -30,6 +32,27 @@ class BaseRepositoryTest extends TestCase
             ...$data,
             "id" => $entry->id,
             "user_id" => $entry->user_id
+        ]);
+    }
+
+    /**
+     * deve retornar false
+     */
+    public function test_delete_nonexistent(): void
+    {
+        $this->assertFalse($this->_repository()->delete(0));
+    }
+
+    /**
+     * deve remover a entrada
+     */
+    public function test_delete(): void
+    {
+        $entry = Entry::factory()->create();
+
+        $this->assertTrue($this->_repository()->delete($entry->id));
+        $this->assertDatabaseMissing("entries", [
+            "id" => $entry->id
         ]);
     }
 
