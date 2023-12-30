@@ -145,4 +145,36 @@ class AuthControllerTest extends TestCase
 
         $this->assertAuthenticated();
     }
+
+    /**
+     * deve redirecionar para página de login
+     *
+     * @return void
+     */
+    public function test_logout_action_unauthenticated(): void
+    {
+        $this->get(route("auth.logout"))
+            ->assertSessionMissing([
+                "alert_type" => "alert_success",
+                "alert_text" => "Volte sempre"
+            ]);
+    }
+
+    /**
+     * deve redirecionar para página de login com mensagem de sucesso
+     *
+     * @return void
+     */
+    public function test_logout_action(): void
+    {
+        $user = User::factory()->create();
+
+        $this->be($user);
+        $this->get(route("auth.logout"))
+            ->assertSessionMissing([
+                "alert_type" => "alert_success",
+                "alert_text" => "Volte sempre"
+            ]);
+        $this->assertGuest();
+    }
 }

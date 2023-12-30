@@ -13,6 +13,10 @@ use Tests\TestCase;
 
 class UserRepositoryTest extends TestCase
 {
+    use RefreshDatabase;
+
+    protected $seeds = true;
+
     /**
      * deve retornar um nove usuário
      *
@@ -33,6 +37,6 @@ class UserRepositoryTest extends TestCase
 
     protected function _repository(): UserRepositoryContract
     {
-        return App::make(UserRepositoryContract::class, [new User]);
+        return App::make(UserRepositoryContract::class);
     }
 }

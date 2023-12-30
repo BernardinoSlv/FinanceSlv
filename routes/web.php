@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EntryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,20 +17,35 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::controller(AuthController::class)
-    ->prefix("auth")
+    ->prefix("autenticacao")
     ->name("auth.")
     ->group(function () {
         Route::get("/", "index")->name("index");
         Route::post("/", "indexStore")->name("index_store");
-        Route::get("signup", "create")->name("create");
-        Route::post("signup", "store")->name("store");
+        Route::get("cadastrar", "create")->name("create");
+        Route::post("cadastrar", "store")->name("store");
+        Route::get("/sair", "logout")->name("logout");
     });
 
 // rotas protegidas
 Route::middleware("checkAuth")->group(function () {
+    // dashboard
     Route::controller(DashboardController::class)
         ->as("dashboard.")
         ->group(function () {
             Route::get("/", "index")->name("index");
+        });
+
+    // entry
+    Route::controller(EntryController::class)
+        ->prefix("entradas")
+        ->as("entry.")
+        ->group(function () {
+            Route::get("/", "index")->name("index");
+            Route::get("criar", "create")->name("create");
+            Route::post("criar", "store")->name("store");
+            Route::get("{entry}/editar", "edit")->name("edit");
+            Route::put("{entry}/editar", "update")->name("update");
+            Route::delete("{entry}", "destroy")->name("destroy");
         });
 });
