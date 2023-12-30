@@ -41,5 +41,6 @@ Route::middleware("checkAuth")->group(function () {
     Route::resource("entries", EntryController::class);
 
     // leaves
-    Route::resource("leaves", LeaveController::class);
+    Route::resource("leaves", LeaveController::class)
+        ->parameter("leaves", "leave");
 });

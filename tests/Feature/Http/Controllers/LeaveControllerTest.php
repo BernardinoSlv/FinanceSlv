@@ -52,4 +52,49 @@ class LeaveControllerTest extends TestCase
             ->assertOk()
             ->assertViewIs("leave.create");
     }
+
+    /**
+     * deve redirecionar para página de login
+     */
+    public function test_store_unauthenticated(): void
+    {
+        $this->post(route("leaves.store"))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve redirecionar com erros de validação
+     */
+    public function test_store_without_data(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post(route("leaves.store"))
+            ->assertStatus(302)
+            ->assertSessionHasErrors([
+                "title",
+                "amount"
+            ])
+            ->assertSessionDoesntHaveErrors("description");
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_store(): void
+    {
+        $user = User::factory()->create();
+        $data = Leave::factory()->make([
+            "amount" => "15,99"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("leaves.store"), $data)
+            ->assertRedirect(route("leaves.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("leaves", [
+            ...$data,
+            "amount" => 15.99,
+            "user_id" => $user->id
+        ]);
+    }
 }

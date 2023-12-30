@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Alert;
 use App\Http\Requests\StoreLeaveRequest;
 use App\Http\Requests\UpdateLeaveRequest;
 use App\Models\Leave;
 use App\Repositories\Contracts\LeaveRepositoryContract;
+use Src\Parsers\RealToFloatParser;
 
 class LeaveController extends Controller
 {
@@ -41,7 +43,14 @@ class LeaveController extends Controller
      */
     public function store(StoreLeaveRequest $request)
     {
-        //
+        $this->_leaveRepository->create(auth()->user()->id, [
+            ...$request->validated(),
+            "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+
+        return redirect()->route("leaves.index")->with(
+            Alert::success("Saída criada com sucesso.")
+        );
     }
 
     /**
