@@ -23,7 +23,7 @@ class EntryController extends Controller
 
     public function index()
     {
-        $entries = $this->_entryRepository->allByUser(auth()->user()->id);
+        $entries = $this->_entryRepository->allByUser(auth()->user()->id, true);
 
         return view("entry.index", compact(
             "entries"

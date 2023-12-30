@@ -59,6 +59,27 @@ class EntryRepositoryTest extends TestCase
     }
 
     /**
+     * deve retornar apenas as entradas do mês atual
+     *
+     * @return void
+     */
+    public function test_all_by_user_passing_only_current_month_true(): void
+    {
+        Entry::factory(20)->create();
+        $user = User::factory()->create();
+        // do usuário , do mês anterior
+        Entry::factory(10)->create([
+            "user_id" => $user->id,
+            "created_at" => date("Y-m-d", strtotime("-31 days"))
+        ]);
+        Entry::factory(2)->create([
+            "user_id" => $user->id
+        ]);
+
+        $this->assertCount(2, $this->_repository()->allByUser($user->id, true));
+    }
+
+    /**
      * deve criar a entrada corretamente
      *
      * @return void
