@@ -16,16 +16,6 @@ class EntryRepository extends BaseRepository implements EntryRepositoryContract
         parent::__construct($entry);
     }
 
-    public function allByUser(int $id, bool $onlyCurrentMonth = false): Collection
-    {
-        return $this->_model->query()
-            ->when($onlyCurrentMonth, function (Builder $query): void {
-                $query->whereYear("created_at", date("Y"))
-                    ->whereMonth("created_at", (date("m")));
-            })
-            ->where("user_id", $id)
-            ->get();
-    }
 
     public function create(int $userId, array $attributes): Entry
     {

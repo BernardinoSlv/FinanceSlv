@@ -15,6 +15,17 @@ abstract class BaseRepository
         $this->_model = $model;
     }
 
+    public function allByUser(int $id, bool $onlyCurrentMonth = false): Collection
+    {
+        return $this->_model->query()
+            ->when($onlyCurrentMonth, function (Builder $query): void {
+                $query->whereYear("created_at", date("Y"))
+                    ->whereMonth("created_at", (date("m")));
+            })
+            ->where("user_id", $id)
+            ->get();
+    }
+
     public function update(int $id, array $attributes): bool
     {
         if (!($entity = $this->_model->find($id))) {
