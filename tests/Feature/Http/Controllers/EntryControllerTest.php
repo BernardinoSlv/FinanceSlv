@@ -294,4 +294,65 @@ class EntryControllerTest extends TestCase
             "user_id" => $entry->user_id,
         ]);
     }
+
+    /**
+     * deve redirecionar para página de login
+     */
+    public function test_destroy_unauthenticated(): void
+    {
+        $entry = Entry::factory()->create();
+
+        $this->delete(route("entry.destroy", [
+            "entry" => $entry->id
+        ]))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_nonexistent(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->delete(route("entry.destroy", [
+            "entry" => 0
+        ]))
+            ->assertStatus(404);
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $entry = Entry::factory()->create();
+
+        $this->actingAs($user)->delete(route("entry.destroy", [
+            "entry" => $entry->id
+        ]))
+            ->assertStatus(404);
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_destroy(): void
+    {
+        $user = User::factory()->create();
+        $entry = Entry::factory()->create([
+            "user_id" => $user->id
+        ]);
+
+        $this->actingAs($user)->delete(route("entry.destroy", [
+            "entry" => $entry->id
+        ]))
+            ->assertRedirect(route("entry.index"))
+            ->assertSessionHas("alert_type", "success");
+
+        $this->assertDatabaseMissing("entries", [
+            "id" => $entry->id
+        ]);
+    }
 }

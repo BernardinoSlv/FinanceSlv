@@ -72,4 +72,16 @@ class EntryController extends Controller
             Alert::success("Entrada atualizada")
         );
     }
+
+    public function destroy(Entry $entry)
+    {
+        if (!Gate::allows("entry-edit", $entry)) {
+            abort(404);
+        }
+        $this->_entryRepository->delete($entry->id);
+
+        return redirect()->route("entry.index")->with(
+            Alert::success("Entrada excluída com sucesso")
+        );
+    }
 }

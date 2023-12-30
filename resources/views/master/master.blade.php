@@ -324,9 +324,6 @@
                                                 <li>
                                                     <a href="{{ route('entry.create') }}">Criar</a>
                                                 </li>
-                                                <li>
-                                                    <a href="#">Deletadas</a>
-                                                </li>
                                             </ul>
                                         </div>
                                     </li>
