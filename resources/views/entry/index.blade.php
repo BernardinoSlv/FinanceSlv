@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="text-end mb-3">
-        <a href="{{ route('entry.create') }}" class="btn btn-primary">Criar nova</a>
+        <a href="{{ route('entries.create') }}" class="btn btn-primary">Criar nova</a>
     </div>
 
     <h3>{{ date('m/Y') }}</h3>
@@ -30,12 +30,12 @@
                         <td>{{ $entry->created_at_formated }}</td>
                         <td align="right">
                             <a class="btn btn-outline-primary btn-sm"
-                                href="{{ route('entry.edit', [
+                                href="{{ route('entries.edit', [
                                     'entry' => $entry->id,
                                 ]) }}"><i
                                     class="fas fa-edit"></i></a>
                             <form
-                                action="{{ route('entry.destroy', [
+                                action="{{ route('entries.destroy', [
                                     'entry' => $entry->id,
                                 ]) }}"
                                 method="POST" class="d-inline-block">

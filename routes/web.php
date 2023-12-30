@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EntryController;
+use App\Http\Controllers\LeaveController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -39,7 +40,7 @@ Route::middleware("checkAuth")->group(function () {
     // entry
     Route::controller(EntryController::class)
         ->prefix("entradas")
-        ->as("entry.")
+        ->as("entries.")
         ->group(function () {
             Route::get("/", "index")->name("index");
             Route::get("criar", "create")->name("create");
@@ -48,4 +49,9 @@ Route::middleware("checkAuth")->group(function () {
             Route::put("{entry}/editar", "update")->name("update");
             Route::delete("{entry}", "destroy")->name("destroy");
         });
+
+    // leave
+    // Route::controller(LeaveController::class)
+    //     ->prefix("saidas")
+    //     ->as("liaves")
 });

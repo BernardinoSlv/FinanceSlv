@@ -319,10 +319,10 @@
                                         <div class="collapse" id="entries-collapse">
                                             <ul class="nav-second-level">
                                                 <li>
-                                                    <a href="{{ route('entry.index') }}">Todas</a>
+                                                    <a href="{{ route('entries.index') }}">Todas</a>
                                                 </li>
                                                 <li>
-                                                    <a href="{{ route('entry.create') }}">Criar</a>
+                                                    <a href="{{ route('entries.create') }}">Criar</a>
                                                 </li>
                                             </ul>
                                         </div>
