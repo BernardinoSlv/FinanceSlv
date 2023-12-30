@@ -37,21 +37,9 @@ Route::middleware("checkAuth")->group(function () {
             Route::get("/", "index")->name("index");
         });
 
-    // entry
-    Route::controller(EntryController::class)
-        ->prefix("entradas")
-        ->as("entries.")
-        ->group(function () {
-            Route::get("/", "index")->name("index");
-            Route::get("criar", "create")->name("create");
-            Route::post("criar", "store")->name("store");
-            Route::get("{entry}/editar", "edit")->name("edit");
-            Route::put("{entry}/editar", "update")->name("update");
-            Route::delete("{entry}", "destroy")->name("destroy");
-        });
+    // entries
+    Route::resource("entries", EntryController::class);
 
-    // leave
-    // Route::controller(LeaveController::class)
-    //     ->prefix("saidas")
-    //     ->as("liaves")
+    // leaves
+    Route::resource("leaves", LeaveController::class);
 });

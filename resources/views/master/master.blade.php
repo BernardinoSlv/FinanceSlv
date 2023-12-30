@@ -335,13 +335,10 @@
                                         <div class="collapse" id="exits-collapse">
                                             <ul class="nav-second-level">
                                                 <li>
-                                                    <a href="#">Todas</a>
+                                                    <a href="{{ route("leaves.index") }}">Todas</a>
                                                 </li>
                                                 <li>
                                                     <a href="#">Criar</a>
-                                                </li>
-                                                <li>
-                                                    <a href="#">Deletadas</a>
                                                 </li>
                                             </ul>
                                         </div>
@@ -359,9 +356,6 @@
                                                 <li>
                                                     <a href="#">Criar</a>
                                                 </li>
-                                                <li>
-                                                    <a href="#">Deletadas</a>
-                                                </li>
                                             </ul>
                                         </div>
                                     </li>
@@ -377,9 +371,6 @@
                                                 </li>
                                                 <li>
                                                     <a href="#">Criar</a>
-                                                </li>
-                                                <li>
-                                                    <a href="#">Deletadas</a>
                                                 </li>
                                             </ul>
                                         </div>
@@ -397,9 +388,6 @@
                                                 <li>
                                                     <a href="#">Criar</a>
                                                 </li>
-                                                <li>
-                                                    <a href="#">Deletadas</a>
-                                                </li>
                                             </ul>
                                         </div>
                                     </li>
@@ -416,9 +404,6 @@
                                                 <li>
                                                     <a href="#">Criar</a>
                                                 </li>
-                                                <li>
-                                                    <a href="#">Deletadas</a>
-                                                </li>
                                             </ul>
                                         </div>
                                     </li>
@@ -434,9 +419,6 @@
                                                 </li>
                                                 <li>
                                                     <a href="#">Criar</a>
-                                                </li>
-                                                <li>
-                                                    <a href="#">Deletadas</a>
                                                 </li>
                                             </ul>
                                         </div>
