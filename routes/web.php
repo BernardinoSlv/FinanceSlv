@@ -38,9 +38,28 @@ Route::middleware("checkAuth")->group(function () {
         });
 
     // entries
-    Route::resource("entries", EntryController::class);
+    Route::resource("entradas", EntryController::class)
+        ->parameter("entradas", "entry")
+        ->names([
+            "index" => "entries.index",
+            "create" => "entries.create",
+            "store" => "entries.store",
+            "show" => "entries.show",
+            "edit" => "entries.edit",
+            "update" => "entries.update",
+            "destroy" => "entries.destroy",
+        ]);
 
     // leaves
-    Route::resource("leaves", LeaveController::class)
-        ->parameter("leaves", "leave");
+    Route::resource("saidas", LeaveController::class)
+        ->parameter("saidas", "leave")
+        ->names([
+            "index" => "leaves.index",
+            "create" => "leaves.create",
+            "store" => "leaves.store",
+            "show" => "leaves.show",
+            "edit" => "leaves.edit",
+            "update" => "leaves.update",
+            "destroy" => "leaves.destroy",
+        ]);
 });
