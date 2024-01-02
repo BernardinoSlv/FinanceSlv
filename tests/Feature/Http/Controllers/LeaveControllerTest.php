@@ -220,4 +220,51 @@ class LeaveControllerTest extends TestCase
             "user_id" => $user->id
         ]);
     }
+
+    /**
+     * deve redirecionar para página de login
+     */
+    public function test_destroy_unauthenticated(): void
+    {
+        $leave = Leave::factory()->create();
+
+        $this->delete(route("leaves.destroy", $leave->id))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_nonexistent(): void
+    {
+        $this->actingAs($this->_user())->delete(route("leaves.destroy", 0))
+            ->assertStatus(404);
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_is_not_owner(): void
+    {
+        $leave = Leave::factory()->create();
+
+        $this->actingAs($this->_user())->delete(route("leaves.destroy", $leave->id))
+            ->assertStatus(404);
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_destroy(): void
+    {
+        $user = $this->_user();
+        $leave = Leave::factory()->create([
+            "user_id" => $user->id
+        ]);
+
+        $this->actingAs($user)->delete(route("leaves.destroy", $leave->id))
+            ->assertRedirect(route("leaves.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertSoftDeleted($leave);
+    }
 }

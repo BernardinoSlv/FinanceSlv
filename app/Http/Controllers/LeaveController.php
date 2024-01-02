@@ -85,11 +85,11 @@ class LeaveController extends Controller
         if (!Gate::allows("leave-edit", $leave)) {
             abort(404);
         }
-
         $this->_leaveRepository->update($leave->id, [
             ...$request->validated(),
             "amount" => RealToFloatParser::parse($request->input("amount"))
         ]);
+
         return redirect()->route("leaves.index")->with(
             Alert::success("Saída atualizada com sucesso.")
         );
@@ -100,6 +100,13 @@ class LeaveController extends Controller
      */
     public function destroy(Leave $leave)
     {
-        //
+        if (!Gate::allows("leave-edit", $leave)) {
+            abort(404);
+        }
+        $this->_leaveRepository->delete($leave->id);
+
+        return redirect()->route("leaves.index")->with(
+            Alert::success("Saída excluída com sucesso.")
+        );
     }
 }
