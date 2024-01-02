@@ -26,4 +26,22 @@ class ExpenseControllerTest extends TestCase
             ->assertViewIs("expense.index")
             ->assertViewHas("expenses");
     }
+
+    /**
+     * deve redirecionar para página de login
+     */
+    public function test_create_unathenticated(): void
+    {
+        $this->get(route("expenses.create"))->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 200 e view expense.create
+     */
+    public function test_create(): void
+    {
+        $this->actingAs($this->_user())->get(route("expenses.create"))
+            ->assertOk()
+            ->assertViewIs("expense.create");
+    }
 }
