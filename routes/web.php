@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EntryController;
+use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\LeaveController;
 use Illuminate\Support\Facades\Route;
 
@@ -61,5 +62,18 @@ Route::middleware("checkAuth")->group(function () {
             "edit" => "leaves.edit",
             "update" => "leaves.update",
             "destroy" => "leaves.destroy",
+        ]);
+
+    // expenses
+    Route::resource("despesas", ExpenseController::class)
+        ->parameter("despesas", "expense")
+        ->names([
+            "index" => "expenses.index",
+            "create" => "expenses.create",
+            "store" => "expenses.store",
+            "show" => "expenses.show",
+            "edit" => "expenses.edit",
+            "update" => "expenses.update",
+            "destroy" => "expenses.destroy",
         ]);
 });
