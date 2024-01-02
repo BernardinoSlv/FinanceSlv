@@ -3,7 +3,9 @@
 @section('content')
     @include('includes.alerts')
 
-    <form action="" method="POST">
+    <form action="{{ route("entries.update", [
+        "entry" => $entry->id
+    ]) }}" method="POST">
         @method('PUT')
         @csrf
         <div class="row gy-3 mb-4">

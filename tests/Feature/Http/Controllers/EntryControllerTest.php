@@ -20,7 +20,7 @@ class EntryControllerTest extends TestCase
      */
     public function test_index_action_unauthenticated(): void
     {
-        $this->get(route("entry.index"))
+        $this->get(route("entries.index"))
             ->assertRedirect(route("auth.index"));
     }
 
@@ -33,7 +33,7 @@ class EntryControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->get(route("entry.index"))
+        $this->actingAs($user)->get(route("entries.index"))
             ->assertOk()
             ->assertViewIs("entry.index")
             ->assertViewHas("entries");
@@ -46,7 +46,7 @@ class EntryControllerTest extends TestCase
      */
     public function test_create_action_unauthenticated(): void
     {
-        $this->get(route("entry.create"))
+        $this->get(route("entries.create"))
             ->assertRedirect(route("auth.index"));
     }
 
@@ -59,7 +59,7 @@ class EntryControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->get(route("entry.create"))
+        $this->actingAs($user)->get(route("entries.create"))
             ->assertOk()
             ->assertViewIs("entry.create");
     }
@@ -73,7 +73,7 @@ class EntryControllerTest extends TestCase
     {
         $data = Entry::factory()->make()->toArray();
 
-        $this->post(route("entry.store"), $data)
+        $this->post(route("entries.store"), $data)
             ->assertRedirect(route("auth.index"));
     }
 
@@ -86,7 +86,7 @@ class EntryControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->post(route("entry.store"))
+        $this->actingAs($user)->post(route("entries.store"))
             ->assertStatus(302)
             ->assertSessionHasErrors([
                 "title",
@@ -107,8 +107,8 @@ class EntryControllerTest extends TestCase
             "description" => "Apenas um teste"
         ])->toArray();
 
-        $this->actingAs($user)->post(route("entry.store"), $data)
-            ->assertRedirect(route("entry.index"))
+        $this->actingAs($user)->post(route("entries.store"), $data)
+            ->assertRedirect(route("entries.index"))
             ->assertSessionHas([
                 "alert_type" => "success",
                 "alert_text" => "Entrada criada com sucesso."
@@ -132,8 +132,8 @@ class EntryControllerTest extends TestCase
             "amount" => "192.125,25"
         ])->toArray();
 
-        $this->actingAs($user)->post(route("entry.store"), $data)
-            ->assertRedirect(route("entry.index"))
+        $this->actingAs($user)->post(route("entries.store"), $data)
+            ->assertRedirect(route("entries.index"))
             ->assertSessionHas([
                 "alert_type" => "success",
                 "alert_text" => "Entrada criada com sucesso."
@@ -152,7 +152,7 @@ class EntryControllerTest extends TestCase
     {
         $entry = Entry::factory()->create();
 
-        $this->get(route("entry.edit", [
+        $this->get(route("entries.edit", [
             "entry" => $entry->id
         ]))
             ->assertRedirect(route("auth.index"));
@@ -165,7 +165,7 @@ class EntryControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->get(route("entry.edit", [
+        $this->get(route("entries.edit", [
             "entry" => 0
         ]))
             ->assertStatus(404);
@@ -179,7 +179,7 @@ class EntryControllerTest extends TestCase
         $user = User::factory()->create();
         $entry = Entry::factory()->create();
 
-        $this->actingAs($user)->get(route("entry.edit", [
+        $this->actingAs($user)->get(route("entries.edit", [
             "entry" => $entry->id
         ]))
             ->assertStatus(404);
@@ -195,7 +195,7 @@ class EntryControllerTest extends TestCase
             "user_id" => $user->id
         ]);
 
-        $this->actingAs($user)->get(route("entry.edit", [
+        $this->actingAs($user)->get(route("entries.edit", [
             "entry" => $entry->id
         ]))
             ->assertOk()
@@ -211,7 +211,7 @@ class EntryControllerTest extends TestCase
         $entry = Entry::factory()->create();
         $data = Entry::factory()->make()->toArray();
 
-        $this->put(route("entry.update", [
+        $this->put(route("entries.update", [
             "entry" => $entry->id
         ]), $data)
             ->assertRedirect(route("auth.index"));
@@ -222,7 +222,7 @@ class EntryControllerTest extends TestCase
         $user = User::factory()->create();
         $data = Entry::factory()->make()->toArray();
 
-        $this->actingAs($user)->put(route("entry.update", [
+        $this->actingAs($user)->put(route("entries.update", [
             "entry" => 0
         ]), $data)
             ->assertStatus(404);
@@ -238,7 +238,7 @@ class EntryControllerTest extends TestCase
             "user_id" => $user->id
         ]);
 
-        $this->actingAs($user)->put(route("entry.update", [
+        $this->actingAs($user)->put(route("entries.update", [
             "entry" => $entry->id
         ]))
             ->assertStatus(302)
@@ -259,7 +259,7 @@ class EntryControllerTest extends TestCase
             "amount" => "5.000,00"
         ])->toArray();
 
-        $this->actingAs($user)->put(route("entry.update", [
+        $this->actingAs($user)->put(route("entries.update", [
             "entry" => $entry->id
         ]), $data)
             ->assertStatus(404);
@@ -278,10 +278,10 @@ class EntryControllerTest extends TestCase
             "amount" => "5.000,00"
         ])->toArray();
 
-        $this->actingAs($user)->put(route("entry.update", [
+        $this->actingAs($user)->put(route("entries.update", [
             "entry" => $entry->id
         ]), $data)
-            ->assertRedirect(route("entry.edit", [
+            ->assertRedirect(route("entries.edit", [
                 "entry" => $entry->id
             ]))
             ->assertSessionHas([
@@ -302,7 +302,7 @@ class EntryControllerTest extends TestCase
     {
         $entry = Entry::factory()->create();
 
-        $this->delete(route("entry.destroy", [
+        $this->delete(route("entries.destroy", [
             "entry" => $entry->id
         ]))
             ->assertRedirect(route("auth.index"));
@@ -315,7 +315,7 @@ class EntryControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->delete(route("entry.destroy", [
+        $this->actingAs($user)->delete(route("entries.destroy", [
             "entry" => 0
         ]))
             ->assertStatus(404);
@@ -329,7 +329,7 @@ class EntryControllerTest extends TestCase
         $user = User::factory()->create();
         $entry = Entry::factory()->create();
 
-        $this->actingAs($user)->delete(route("entry.destroy", [
+        $this->actingAs($user)->delete(route("entries.destroy", [
             "entry" => $entry->id
         ]))
             ->assertStatus(404);
@@ -345,10 +345,10 @@ class EntryControllerTest extends TestCase
             "user_id" => $user->id
         ]);
 
-        $this->actingAs($user)->delete(route("entry.destroy", [
+        $this->actingAs($user)->delete(route("entries.destroy", [
             "entry" => $entry->id
         ]))
-            ->assertRedirect(route("entry.index"))
+            ->assertRedirect(route("entries.index"))
             ->assertSessionHas("alert_type", "success");
 
         $this->assertDatabaseMissing("entries", [

@@ -3,8 +3,9 @@
 @section('content')
     @include('includes.alerts')
 
-    <form action="{{ route('entries.store') }}" method="POST">
+    <form action="{{ route('leaves.store') }}" method="POST">
         @csrf
+        
         <div class="row gy-3 mb-4">
             <div class="col-sm-8">
                 <label for="" class="form-label">Título</label>

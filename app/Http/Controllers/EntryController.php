@@ -41,7 +41,7 @@ class EntryController extends Controller
             ...$request->validated(),
             "amount" => RealToFloatParser::parse($request->input("amount"))
         ]);
-        return redirect(route("entry.index"))->with(
+        return redirect(route("entries.index"))->with(
             Alert::success("Entrada criada com sucesso.")
         );
     }
@@ -66,7 +66,7 @@ class EntryController extends Controller
             ...$request->validated(),
             "amount" => RealToFloatParser::parse($request->input("amount"))
         ]);
-        return redirect()->route("entry.edit", [
+        return redirect()->route("entries.edit", [
             "entry" => $entry->id,
         ])->with(
             Alert::success("Entrada atualizada")
@@ -80,7 +80,7 @@ class EntryController extends Controller
         }
         $this->_entryRepository->delete($entry->id);
 
-        return redirect()->route("entry.index")->with(
+        return redirect()->route("entries.index")->with(
             Alert::success("Entrada excluída com sucesso")
         );
     }

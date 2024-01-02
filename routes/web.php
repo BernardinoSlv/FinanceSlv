@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EntryController;
+use App\Http\Controllers\LeaveController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -36,16 +37,29 @@ Route::middleware("checkAuth")->group(function () {
             Route::get("/", "index")->name("index");
         });
 
-    // entry
-    Route::controller(EntryController::class)
-        ->prefix("entradas")
-        ->as("entry.")
-        ->group(function () {
-            Route::get("/", "index")->name("index");
-            Route::get("criar", "create")->name("create");
-            Route::post("criar", "store")->name("store");
-            Route::get("{entry}/editar", "edit")->name("edit");
-            Route::put("{entry}/editar", "update")->name("update");
-            Route::delete("{entry}", "destroy")->name("destroy");
-        });
+    // entries
+    Route::resource("entradas", EntryController::class)
+        ->parameter("entradas", "entry")
+        ->names([
+            "index" => "entries.index",
+            "create" => "entries.create",
+            "store" => "entries.store",
+            "show" => "entries.show",
+            "edit" => "entries.edit",
+            "update" => "entries.update",
+            "destroy" => "entries.destroy",
+        ]);
+
+    // leaves
+    Route::resource("saidas", LeaveController::class)
+        ->parameter("saidas", "leave")
+        ->names([
+            "index" => "leaves.index",
+            "create" => "leaves.create",
+            "store" => "leaves.store",
+            "show" => "leaves.show",
+            "edit" => "leaves.edit",
+            "update" => "leaves.update",
+            "destroy" => "leaves.destroy",
+        ]);
 });
