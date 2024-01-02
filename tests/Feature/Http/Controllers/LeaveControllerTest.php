@@ -144,4 +144,80 @@ class LeaveControllerTest extends TestCase
             ->assertViewIs("leave.edit")
             ->assertViewHas("leave");
     }
+
+    /**
+     * deve redirecionar para página de login
+     */
+    public function test_update_unauthenticated(): void
+    {
+        $leave = Leave::factory()->create();
+
+        $this->put(route("leaves.update", $leave->id))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_nonexistent(): void
+    {
+        $this->actingAs($this->_user())->put(route("leaves.update", 0))
+            ->assertStatus(404);
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_is_not_owner(): void
+    {
+        $leave = Leave::factory()->create();
+        $data = Leave::factory()->make([
+            "amount" => "100,00"
+        ])->toArray();
+
+        $this->actingAs($this->_user())->put(route("leaves.update", $leave->id), $data)
+            ->assertStatus(404);
+    }
+
+    /**
+     * deve redirecionar com erros de validação
+     */
+    public function test_update_without_data(): void
+    {
+        $user = $this->_user();
+        $leave = Leave::factory()->create([
+            "user_id" => $user->id
+        ]);
+
+        $this->actingAs($this->_user())->put(route("leaves.update", $leave->id))
+            ->assertStatus(302)
+            ->assertSessionHasErrors([
+                "title",
+                "amount"
+            ])
+            ->assertSessionDoesntHaveErrors("description");
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_update(): void
+    {
+        $user = $this->_user();
+        $leave = Leave::factory()->create([
+            "user_id" => $user->id
+        ]);
+        $data = Leave::factory()->make([
+            "amount" => "100,00"
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("leaves.update", $leave->id), $data)
+            ->assertRedirect(route("leaves.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("leaves", [
+            ...$data,
+            "amount" => 100.00,
+            "user_id" => $user->id
+        ]);
+    }
 }

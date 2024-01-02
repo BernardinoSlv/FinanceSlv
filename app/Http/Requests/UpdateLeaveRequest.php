@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\RegexEnum;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateLeaveRequest extends FormRequest
@@ -11,7 +12,7 @@ class UpdateLeaveRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +23,9 @@ class UpdateLeaveRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "title" => ["required", "min:1", "max:256"],
+            "amount" => ["required", "regex:" . RegexEnum::AMOUNT->value],
+            "description" => ["nullable"]
         ];
     }
 }

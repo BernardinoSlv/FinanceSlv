@@ -7,6 +7,7 @@ use App\Http\Requests\StoreLeaveRequest;
 use App\Http\Requests\UpdateLeaveRequest;
 use App\Models\Leave;
 use App\Repositories\Contracts\LeaveRepositoryContract;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
@@ -81,7 +82,17 @@ class LeaveController extends Controller
      */
     public function update(UpdateLeaveRequest $request, Leave $leave)
     {
-        //
+        if (!Gate::allows("leave-edit", $leave)) {
+            abort(404);
+        }
+
+        $this->_leaveRepository->update($leave->id, [
+            ...$request->validated(),
+            "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+        return redirect()->route("leaves.index")->with(
+            Alert::success("Saída atualizada com sucesso.")
+        );
     }
 
     /**
