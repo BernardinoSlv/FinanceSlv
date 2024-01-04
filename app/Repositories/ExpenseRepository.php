@@ -13,4 +13,12 @@ class ExpenseRepository extends BaseRepository implements ExpenseRepositoryContr
     {
         parent::__construct($expense);
     }
+
+    public function create(int $userId, array $attributes): Expense
+    {
+        $expense = $this->_model->fill($attributes);
+        $expense->user_id = $userId;
+        $expense->save();
+        return $expense;
+    }
 }
