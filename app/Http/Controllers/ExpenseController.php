@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Alert;
 use App\Http\Requests\StoreExpenseRequest;
 use App\Http\Requests\UpdateExpenseRequest;
 use App\Models\Expense;
 use App\Repositories\Contracts\ExpenseRepositoryContract;
+use Carbon\Carbon;
+use Src\Parsers\RealToFloatParser;
 
 class ExpenseController extends Controller
 {
@@ -39,7 +42,15 @@ class ExpenseController extends Controller
      */
     public function store(StoreExpenseRequest $request)
     {
-        //
+        $this->_expenseRepository->create(auth()->user()->id, [
+            ...$request->validated(),
+            "amount" => RealToFloatParser::parse($request->input("amount")),
+            "effetive_at" => $request->input("effetive_at") ?? Carbon::now(),
+        ]);
+
+        return redirect()->route("expenses.index")->with(
+            Alert::success("Despesa criada com sucesso.")
+        );
     }
 
     /**

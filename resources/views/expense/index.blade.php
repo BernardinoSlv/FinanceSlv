@@ -15,7 +15,8 @@
                     <th>#</th>
                     <th>Título</th>
                     <th>Valor</th>
-                    <th>Tipo</th>
+                    <th>Qnt.</th>
+                    <th>Status</th>
                     <th>Data</th>
                     <th>Ações</th>
                 </tr>
@@ -26,9 +27,18 @@
                         <td>{{ $expense->id }}</td>
                         <td>{{ $expense->title }}</td>
                         <td>R$ {{ $expense->amount }}</td>
-                        <td><span class="badge text-white bg-black">Padrão</span></td>
+                        <td>
+                            @if ($expense->quantity)
+                                {{ $expense->quantity }} vezes
+                            @else
+                                <span class="fw-bold">
+                                    indeterminada
+                                </span>
+                            @endif
+                        </td>
+                        <td><span class="badge bg-success">Ativo</span></td>
                         <td>{{ $expense->created_at_formated }}</td>
-                        <td align="right">
+                        <td >
                             <a class="btn btn-outline-primary btn-sm"
                                 href="{{ route('expenses.edit', [
                                     'expense' => $expense->id,

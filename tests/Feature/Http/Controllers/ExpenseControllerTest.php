@@ -2,8 +2,11 @@
 
 namespace Tests\Feature\Http\Controllers;
 
+use App\Models\Expense;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Arr;
 use Tests\TestCase;
 
 class ExpenseControllerTest extends TestCase
@@ -43,5 +46,122 @@ class ExpenseControllerTest extends TestCase
         $this->actingAs($this->_user())->get(route("expenses.create"))
             ->assertOk()
             ->assertViewIs("expense.create");
+    }
+
+    /**
+     * deve redirecionar para página de login
+     */
+    public function test_store_unauthenticated(): void
+    {
+        $this->post(route("expenses.store"))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve redirecionar com erros de validação
+     */
+    public function test_store_without_data(): void
+    {
+        $this->actingAs($this->_user())->post(route("expenses.store"))
+            ->assertStatus(302)
+            ->assertSessionHasErrors([
+                "title",
+                "amount"
+            ])
+            ->assertSessionDoesntHaveErrors([
+                "quantity",
+                "description",
+                "effetive_at"
+            ]);
+    }
+
+    /**
+     * deve redirecionar com erro no campo title
+     */
+    public function test_store_duplicated_title(): void
+    {
+        $user = $this->_user();
+
+        $expense = Expense::factory()->create([
+            "user_id" => $user->id
+        ]);
+        $data = [
+            "title" => $expense->title,
+            "amount" => "10,00",
+        ];
+
+        $this->actingAs($user)->post(route("expenses.store"), $data)
+            ->assertStatus(302)
+            ->assertSessionHasErrors("title")
+            ->assertSessionDoesntHaveErrors([
+                "amount",
+                "quantity",
+                "description",
+                "effetive_at"
+            ]);
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_store(): void
+    {
+        $user = $this->_user();
+        $data = Expense::factory()->make([
+            "amount" => "100,00"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("expenses.store"), $data)
+            ->assertRedirect(route("expenses.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("expenses", [
+            ...Arr::except($data, "user_id"),
+            "user_id" => $user->id,
+            "amount" => 100.00
+        ]);
+    }
+
+    /**
+     * deve persistir mesmo se existir mesmo titúlo de despesa, desde que ela seja de outro usuário
+     */
+    public function test_store_duplicated_title_of_the_other_user(): void
+    {
+        $user = $this->_user();
+        $expenseOtherUser = Expense::factory()->create();
+        $data = Expense::factory()->make([
+            "title" => $expenseOtherUser->title,
+            "amount" => "100,00"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("expenses.store"), $data)
+            ->assertRedirect(route("expenses.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("expenses", [
+            ...Arr::except($data, "user_id"),
+            "user_id" => $user->id,
+            "amount" => 100.00
+        ]);
+    }
+
+    /**
+     * deve persistir com o effetive_at sendo o horário atual
+     */
+    public function test_store_without_effetive_at_input(): void
+    {
+        $user = $this->_user();
+        $data = Expense::factory()->make([
+            "amount" => "100,00",
+        ])->toArray();
+        $data = Arr::except($data, "effetive_at");
+
+        $this->assertArrayNotHasKey("effetive_at", $data);
+        $this->actingAs($user)->post(route("expenses.store"), $data)
+            ->assertRedirect(route("expenses.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("expenses", [
+            ...Arr::except($data, "user_id"),
+            "user_id" => $user->id,
+            "amount" => 100.00
+        ]);
     }
 }
