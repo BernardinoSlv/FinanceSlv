@@ -20,7 +20,7 @@ class ExpenseFactory extends Factory
     {
         return [
             "user_id" => User::factory()->create()->id,
-            "title" => fake()->title(),
+            "title" => fake()->word() . time() . rand(0, 1000) . rand(0, 1000),
             "amount" => 10,
             // "description" => ,
             "quantity" => 10,

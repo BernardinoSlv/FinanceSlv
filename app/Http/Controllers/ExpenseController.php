@@ -78,7 +78,17 @@ class ExpenseController extends Controller
      */
     public function update(UpdateExpenseRequest $request, Expense $expense)
     {
-        //
+        if (Gate::denies("expense-edit", $expense)) {
+            abort(404);
+        }
+        $this->_expenseRepository->update($expense->id, [
+            ...$request->validated(),
+            "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+
+        return redirect()->route("expenses.edit", $expense)->with(
+            Alert::success("Despesa atualizada com sucesso.")
+        );
     }
 
     /**

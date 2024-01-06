@@ -213,4 +213,124 @@ class ExpenseControllerTest extends TestCase
                 "expense"
             ]);
     }
+
+    /**
+     * deve redirecionar para página de login
+     */
+    public function test_update_action_unauthenticated(): void
+    {
+        $expense = Expense::factory()->create();
+
+        $this->put(route("expenses.update", $expense))->assertRedirect(route("auth.index"));
+    }
+
+    public function test_update_action_nonexistent(): void
+    {
+        $this->actingAs($this->_user())->put(route("expenses.update", 0))
+            ->assertStatus(404);
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_action_is_not_owner(): void
+    {
+        $expense = Expense::factory()->create();
+        $data = Expense::factory()->make([
+            "amount" => "10,00"
+        ])->toArray();
+
+        $this->actingAs($this->_user())->put(route("expenses.update", $expense), $data)
+            ->assertStatus(404);
+    }
+
+    /**
+     * deve redirecionar com erros de validação
+     */
+    public function test_update_action_without_data(): void
+    {
+        $expense = Expense::factory()->create();
+
+        $this->actingAs($this->_user())->put(route("expenses.update", $expense))
+            ->assertStatus(302)
+            ->assertSessionHasErrors([
+                "title",
+                "amount",
+            ])
+            ->assertSessionDoesntHaveErrors([
+                "quantity",
+                "description",
+                "effetive_at",
+            ]);
+    }
+
+    /**
+     * deve redirecionar com erro no campo title
+     */
+    public function test_update_action_duplicated_title(): void
+    {
+        $user = $this->_user();
+        $otherExpense = Expense::factory()->create([
+            "user_id" => $user->id
+        ]);
+        $expense = Expense::factory()->create();
+        $data = Expense::factory()->make([
+            "amount" => "10,00",
+            "title" => $otherExpense->title
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("expenses.update", $expense), $data)
+            ->assertStatus(302)
+            ->assertSessionHasErrors("title")
+            ->assertSessionDoesntHaveErrors([
+                "amount",
+                "quantity",
+                "description",
+                "effetive_at",
+            ]);
+    }
+
+    /**
+     * deve atualizar despesa
+     */
+    public function test_update_action(): void
+    {
+        $user = $this->_user();
+        $expense = Expense::factory()->create([
+            "user_id" => $user->id
+        ]);
+        $data = Expense::factory()->make([
+            "amount" => "99,00",
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("expenses.update", $expense), $data)
+            ->assertRedirect(route("expenses.edit", $expense))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("expenses", [
+            ...$data,
+            "amount" => 99,
+            "user_id" => $user->id
+        ]);
+    }
+
+    public function test_update_action_same_title(): void
+    {
+        $user = $this->_user();
+        $expense = Expense::factory()->create([
+            "user_id" => $user->id
+        ]);
+        $data = Expense::factory()->make([
+            "amount" => "99,00",
+            "title" => $expense->title,
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("expenses.update", $expense), $data)
+            ->assertRedirect(route("expenses.edit", $expense))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("expenses", [
+            ...$data,
+            "amount" => 99,
+            "user_id" => $user->id
+        ]);
+    }
 }
