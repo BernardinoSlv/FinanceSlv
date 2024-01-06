@@ -164,4 +164,53 @@ class ExpenseControllerTest extends TestCase
             "amount" => 100.00
         ]);
     }
+
+    /**
+     * deve redirecionar para página de login
+     */
+    public function test_edit_action_unauthenticated(): void
+    {
+        $expense = Expense::factory()->create();
+
+        $this->get(route("expenses.edit", $expense->id))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_nonexistent(): void
+    {
+        $this->actingAs($this->_user())->get(route("expenses.edit", 0))
+            ->assertStatus(404);
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_is_not_owner(): void
+    {
+        $expense = Expense::factory()->create();
+
+        $this->actingAs($this->_user())->get(route("expenses.edit", $expense->id))
+            ->assertStatus(404);
+    }
+
+    /**
+     * deve ter status 200 e view expense.edit
+     */
+    public function test_edit_action(): void
+    {
+        $user = $this->_user();
+        $expense = Expense::factory()->create([
+            "user_id" => $user->id
+        ]);
+
+        $this->actingAs($user)->get(route("expenses.edit", $expense))
+            ->assertOk()
+            ->assertViewIs("expense.edit")
+            ->assertViewHas([
+                "expense"
+            ]);
+    }
 }

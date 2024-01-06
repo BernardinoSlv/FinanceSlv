@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateExpenseRequest;
 use App\Models\Expense;
 use App\Repositories\Contracts\ExpenseRepositoryContract;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
 class ExpenseController extends Controller
@@ -66,7 +67,10 @@ class ExpenseController extends Controller
      */
     public function edit(Expense $expense)
     {
-        //
+        if (Gate::denies("expense-edit", $expense)) {
+            abort(404);
+        }
+        return view("expense.edit", compact("expense"));
     }
 
     /**
