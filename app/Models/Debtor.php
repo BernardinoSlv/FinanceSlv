@@ -12,4 +12,11 @@ class Debtor extends Model
     use HasFactory;
     use SoftDeletes;
     use DatetimeFormated;
+
+    protected $fillable = [
+        "title",
+        "amount",
+        "description",
+        "effetive_at"
+    ];
 }
