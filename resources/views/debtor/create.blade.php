@@ -3,7 +3,7 @@
 @section('content')
     @include('includes.alerts')
 
-    <form action="{{ route('expenses.store') }}" method="POST">
+    <form action="{{ route('debtors.store') }}" method="POST">
         @csrf
 
         <div class="row gy-3 mb-4">
@@ -16,11 +16,6 @@
                 <label for="" class="form-label">Valor</label>
                 <input type="text" name="amount" class="form-control" value="{{ old('amount') }}">
                 <div class="form-text">Ex: 125,50</div>
-            </div>
-            <div class="col-sm-4">
-                <label for="" class="form-label">Data de efetivação</label>
-                <input type="date" name="effetive_at" class="form-control" value="{{ old('effetive_at') }}">
-                <div class="form-text"></div>
             </div>
             <div></div>
             <div class="col-12">

@@ -36,7 +36,6 @@ class StoreDebtorRequest extends FormRequest
                     })
             ],
             "amount" => ["required", "regex:" . RegexEnum::AMOUNT->value],
-            "effetive_at" => ["nullable", "date"],
             "description" => ["nullable"],
         ];
     }

@@ -64,7 +64,6 @@ class DebtorControllerTest extends TestCase
             ])
             ->assertSessionDoesntHaveErrors([
                 "description",
-                "effetive_at"
             ]);
     }
 
@@ -88,7 +87,6 @@ class DebtorControllerTest extends TestCase
             ->assertSessionDoesntHaveErrors([
                 "amonut",
                 "description",
-                "effetive_at"
             ]);
     }
 
@@ -132,5 +130,52 @@ class DebtorControllerTest extends TestCase
             "amount" => 99.00,
             "user_id" => $user->id
         ]);
+    }
+
+    /**
+     * deve redirecionar para página de login
+     */
+    public function test_edit_action_unauthenticated(): void
+    {
+        $debtor = Debtor::factory()->create();
+
+        $this->get(route("debtors.edit", $debtor))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_nonexistent(): void
+    {
+        $this->actingAs($this->_user())->get(route("debtors.edit", 0))
+            ->assertStatus(404);
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_is_not_owner(): void
+    {
+        $debtor = Debtor::factory()->create();
+
+        $this->actingAs($this->_user())->get(route("debtors.edit", $debtor))
+            ->assertStatus(404);
+    }
+
+    /**
+     * deve acessar normalmente
+     */
+    public function test_edit_action(): void
+    {
+        $user = $this->_user();
+        $debtor = Debtor::factory()->create([
+            "user_id" => $user->id
+        ]);
+
+        $this->actingAs($user)->get(route("debtors.edit", $debtor))
+            ->assertOk()
+            ->assertViewIs("debtor.edit")
+            ->assertViewHas("debtor");
     }
 }

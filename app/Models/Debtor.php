@@ -17,6 +17,5 @@ class Debtor extends Model
         "title",
         "amount",
         "description",
-        "effetive_at"
     ];
 }

@@ -7,6 +7,7 @@ use App\Http\Requests\StoreDebtorRequest;
 use App\Http\Requests\UpdateDebtorRequest;
 use App\Models\Debtor;
 use App\Repositories\Contracts\DebtorRepositoryContract;
+use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
 class DebtorController extends Controller
@@ -65,7 +66,11 @@ class DebtorController extends Controller
      */
     public function edit(Debtor $debtor)
     {
-        //
+        if (Gate::denies("debtor-edit", $debtor)) {
+            abort(404);
+        }
+
+        return view("debtor.edit", compact("debtor"));
     }
 
     /**
