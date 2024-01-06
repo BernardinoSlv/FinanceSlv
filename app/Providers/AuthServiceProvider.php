@@ -5,6 +5,7 @@ namespace App\Providers;
 // use Illuminate\Support\Facades\Gate;
 
 use App\Models\Entry;
+use App\Models\Expense;
 use App\Models\Leave;
 use App\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -32,6 +33,10 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::define("leave-edit", function (User $user, Leave $leave): bool {
             return $user->id === $leave->user_id;
+        });
+
+        Gate::define("expense-edit", function(User $user, Expense $expense): bool {
+            return $user->id === $expense->user_id;
         });
     }
 }

@@ -335,10 +335,10 @@
                                         <div class="collapse" id="exits-collapse">
                                             <ul class="nav-second-level">
                                                 <li>
-                                                    <a href="{{ route("leaves.index") }}">Todas</a>
+                                                    <a href="{{ route('leaves.index') }}">Todas</a>
                                                 </li>
                                                 <li>
-                                                    <a href="#">Criar</a>
+                                                    <a href="{{ route('leaves.create') }}">Criar</a>
                                                 </li>
                                             </ul>
                                         </div>
@@ -351,10 +351,10 @@
                                         <div class="collapse" id="expenses-collapse">
                                             <ul class="nav-second-level">
                                                 <li>
-                                                    <a href="#">Todas</a>
+                                                    <a href="{{ route('expenses.index') }}">Todas</a>
                                                 </li>
                                                 <li>
-                                                    <a href="#">Criar</a>
+                                                    <a href="{{ route('expenses.create') }}">Criar</a>
                                                 </li>
                                             </ul>
                                         </div>
