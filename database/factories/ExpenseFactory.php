@@ -24,7 +24,7 @@ class ExpenseFactory extends Factory
             "amount" => 10,
             // "description" => ,
             "quantity" => 10,
-            "effetive_at" => Carbon::now(),
+            "effetive_at" => date("Y-m-d"),
         ];
     }
 }
