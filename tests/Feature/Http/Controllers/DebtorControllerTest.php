@@ -26,4 +26,22 @@ class DebtorControllerTest extends TestCase
             ->assertOk()
             ->assertViewIs("debtor.index");
     }
+
+    /**
+     * deve redirecionara para página de login
+     */
+    public function test_create_action_unauthenticated(): void
+    {
+        $this->get(route("debtors.create"))->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status code 200
+     */
+    public function test_create_action(): void
+    {
+        $this->actingAs($this->_user())->get(route("debtors.create"))
+            ->assertOk()
+            ->assertViewIs("debtor.create");
+    }
 }

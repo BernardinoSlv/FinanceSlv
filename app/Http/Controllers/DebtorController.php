@@ -32,7 +32,7 @@ class DebtorController extends Controller
      */
     public function create()
     {
-        //
+        return view("debtor.create");
     }
 
     /**
