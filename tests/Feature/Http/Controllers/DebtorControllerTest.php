@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers;
 
+use App\Models\Debtor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -43,5 +44,93 @@ class DebtorControllerTest extends TestCase
         $this->actingAs($this->_user())->get(route("debtors.create"))
             ->assertOk()
             ->assertViewIs("debtor.create");
+    }
+
+    /**
+     * deve redirecionar para página de login
+     */
+    public function test_store_action_unauthenticated(): void
+    {
+        $this->post(route("debtors.store"))->assertRedirect(route("auth.index"));
+    }
+
+    public function test_store_action_without_data(): void
+    {
+        $this->actingAs($this->_user())->post(route("debtors.store"))
+            ->assertStatus(302)
+            ->assertSessionHasErrors([
+                "title",
+                "amount"
+            ])
+            ->assertSessionDoesntHaveErrors([
+                "description",
+                "effetive_at"
+            ]);
+    }
+
+    /**
+     * deve redirecionar com erros de validação
+     */
+    public function test_store_action_duplicated_title(): void
+    {
+        $user = $this->_user();
+        $debtor = Debtor::factory()->create([
+            "user_id" => $user->id
+        ]);
+        $data = Debtor::factory()->make([
+            "title" => $debtor->title,
+            "amount" => "99,30"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("debtors.store"), $data)
+            ->assertStatus(302)
+            ->assertSessionHasErrors("title")
+            ->assertSessionDoesntHaveErrors([
+                "amonut",
+                "description",
+                "effetive_at"
+            ]);
+    }
+
+    /**
+     * deve criar o registro
+     */
+    public function test_store_action(): void
+    {
+        $user = $this->_user();
+        $data = Debtor::factory()->make([
+            "amount" => "10.000,00"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("debtors.store"), $data)
+            ->assertRedirect(route("debtors.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("debtors", [
+            ...$data,
+            "amount" => 10000.00,
+            "user_id" => $user->id
+        ]);
+    }
+
+    /**
+     * deve criar registro com título repetido, desde que não seja do usuário
+     */
+    public function test_store_action_same_title_of_the_other_user(): void
+    {
+        $user = $this->_user();
+        $debtor = Debtor::factory()->create();
+        $data = Debtor::factory()->make([
+            "title" => $debtor->title,
+            "amount" => "99,00"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("debtors.store"), $data)
+            ->assertRedirect(route("debtors.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("debtors", [
+            ...$data,
+            "amount" => 99.00,
+            "user_id" => $user->id
+        ]);
     }
 }
