@@ -333,4 +333,50 @@ class ExpenseControllerTest extends TestCase
             "user_id" => $user->id
         ]);
     }
+
+    /**
+     * deve redirecionar para página de login
+     */
+    public function test_destroy_action_unauthenticated(): void
+    {
+        $expense = Expense::factory()->create();
+
+        $this->delete(route("expenses.destroy", $expense))->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_nonexistent(): void
+    {
+        $this->actingAs($this->_user())->delete(route("expenses.destroy", 0))
+            ->assertStatus(404);
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_is_not_owner(): void
+    {
+        $expense = Expense::factory()->create();
+
+        $this->actingAs($this->_user())->delete(route("expenses.destroy", $expense))
+            ->assertStatus(404);
+    }
+
+    /**
+     * deve deletar a despesa
+     */
+    public function test_destroy_action(): void
+    {
+        $user = $this->_user();
+        $expense = Expense::factory()->create([
+            "user_id" => $user->id
+        ]);
+
+        $this->actingAs($user)->delete(route("expenses.destroy", $expense))
+            ->assertRedirect(route("expenses.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertSoftDeleted($expense);
+    }
 }

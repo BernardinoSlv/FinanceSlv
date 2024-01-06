@@ -14,4 +14,6 @@ interface ExpenseRepositoryContract
     public function create(int $userId, array $attributes): Expense;
 
     public function update(int $userId, array $attributes): bool;
+
+    public function delete(int $id): bool;
 }

@@ -96,6 +96,13 @@ class ExpenseController extends Controller
      */
     public function destroy(Expense $expense)
     {
-        //
+        if (Gate::denies("expense-edit", $expense)) {
+            abort(404);
+        }
+        $this->_expenseRepository->delete($expense->id);
+
+        return redirect()->route("expenses.index")->with(
+            Alert::success("Despesa removida com sucesso")
+        );
     }
 }

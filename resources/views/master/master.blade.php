@@ -354,7 +354,7 @@
                                                     <a href="{{ route('expenses.index') }}">Todas</a>
                                                 </li>
                                                 <li>
-                                                    <a href="#">Criar</a>
+                                                    <a href="{{ route('expenses.create') }}">Criar</a>
                                                 </li>
                                             </ul>
                                         </div>
