@@ -207,6 +207,20 @@ class DebtorControllerTest extends TestCase
     }
 
     /**
+     * deve ter status 404
+     *
+     */
+    public function test_update_nonexistent(): void
+    {
+        $data = Debtor::factory()->make([
+            "amount" => "29,90"
+        ])->toArray();
+
+        $this->actingAs($this->_user())->put(route("debtors.update", 0), $data)
+            ->assertNotFound();
+    }
+
+    /**
      * deve redirecionar com erros de validação
      */
     public function test_update_action_without_data(): void
@@ -295,5 +309,49 @@ class DebtorControllerTest extends TestCase
             "user_id" => $user->id,
             "amount" => 500
         ]);
+    }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_destroy_action_unauthenticated(): void
+    {
+        $debtor = Debtor::factory()->create();
+
+        $this->delete(route("debtors.destroy", $debtor))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    public function test_destroy_action_is_not_owner(): void
+    {
+        $debtor = Debtor::factory()->create();
+
+        $this->actingAs($this->_user())->delete(route("debtors.destroy", $debtor))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_non_existent(): void
+    {
+        $this->actingAs($this->_user())->delete(route("debtors.destroy", 0))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_destroy_action(): void
+    {
+        $user = $this->_user();
+        $debtor = Debtor::factory()->create([
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->delete(route("debtors.destroy", $debtor))
+        ->assertRedirect(route("debtors.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertSoftDeleted($debtor);
     }
 }

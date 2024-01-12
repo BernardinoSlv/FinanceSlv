@@ -14,4 +14,6 @@ interface DebtorRepositoryContract
     public function create(int $userId, array $attributes): Debtor;
 
     public function update(int $id, array $attributes): bool;
+
+    public function delete(int $id): bool;
 }
