@@ -3,8 +3,9 @@
 @section('content')
     @include('includes.alerts')
 
-    <form action="{{ route('entries.store') }}" method="POST">
+    <form action="{{ route('expenses.store') }}" method="POST">
         @csrf
+
         <div class="row gy-3 mb-4">
             <div class="col-sm-8">
                 <label for="" class="form-label">Título</label>
@@ -16,6 +17,17 @@
                 <input type="text" name="amount" class="form-control" value="{{ old('amount') }}">
                 <div class="form-text">Ex: 125,50</div>
             </div>
+            <div class="col-sm-4">
+                <label for="" class="form-label">Quantidade</label>
+                <input type="number" name="quantity" class="form-control" value="{{ old('quantity') }}">
+                <div class="form-text">Vazio para despesas sem fim</div>
+            </div>
+            <div class="col-sm-4">
+                <label for="" class="form-label">Data de início</label>
+                <input type="date" name="effetive_at" class="form-control" value="{{ old('effetive_at') }}">
+                <div class="form-text"></div>
+            </div>
+            <div></div>
             <div class="col-12">
                 <label for="" class="form-label">Descrição</label>
                 <textarea name="description" class="form-control" style="height: 140px">{{ old('description') }}</textarea>

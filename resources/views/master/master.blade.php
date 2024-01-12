@@ -319,10 +319,10 @@
                                         <div class="collapse" id="entries-collapse">
                                             <ul class="nav-second-level">
                                                 <li>
-                                                    <a href="{{ route('entry.index') }}">Todas</a>
+                                                    <a href="{{ route('entries.index') }}">Todas</a>
                                                 </li>
                                                 <li>
-                                                    <a href="{{ route('entry.create') }}">Criar</a>
+                                                    <a href="{{ route('entries.create') }}">Criar</a>
                                                 </li>
                                             </ul>
                                         </div>
@@ -335,13 +335,10 @@
                                         <div class="collapse" id="exits-collapse">
                                             <ul class="nav-second-level">
                                                 <li>
-                                                    <a href="#">Todas</a>
+                                                    <a href="{{ route('leaves.index') }}">Todas</a>
                                                 </li>
                                                 <li>
-                                                    <a href="#">Criar</a>
-                                                </li>
-                                                <li>
-                                                    <a href="#">Deletadas</a>
+                                                    <a href="{{ route('leaves.create') }}">Criar</a>
                                                 </li>
                                             </ul>
                                         </div>
@@ -354,13 +351,10 @@
                                         <div class="collapse" id="expenses-collapse">
                                             <ul class="nav-second-level">
                                                 <li>
-                                                    <a href="#">Todas</a>
+                                                    <a href="{{ route('expenses.index') }}">Todas</a>
                                                 </li>
                                                 <li>
-                                                    <a href="#">Criar</a>
-                                                </li>
-                                                <li>
-                                                    <a href="#">Deletadas</a>
+                                                    <a href="{{ route('expenses.create') }}">Criar</a>
                                                 </li>
                                             </ul>
                                         </div>
@@ -378,9 +372,6 @@
                                                 <li>
                                                     <a href="#">Criar</a>
                                                 </li>
-                                                <li>
-                                                    <a href="#">Deletadas</a>
-                                                </li>
                                             </ul>
                                         </div>
                                     </li>
@@ -392,13 +383,10 @@
                                         <div class="collapse" id="debtors-collapse">
                                             <ul class="nav-second-level">
                                                 <li>
-                                                    <a href="#">Todas</a>
+                                                    <a href="{{ route('debtors.index') }}">Todas</a>
                                                 </li>
                                                 <li>
-                                                    <a href="#">Criar</a>
-                                                </li>
-                                                <li>
-                                                    <a href="#">Deletadas</a>
+                                                    <a href="{{ route('debtors.create') }}">Criar</a>
                                                 </li>
                                             </ul>
                                         </div>
@@ -416,9 +404,6 @@
                                                 <li>
                                                     <a href="#">Criar</a>
                                                 </li>
-                                                <li>
-                                                    <a href="#">Deletadas</a>
-                                                </li>
                                             </ul>
                                         </div>
                                     </li>
@@ -434,9 +419,6 @@
                                                 </li>
                                                 <li>
                                                     <a href="#">Criar</a>
-                                                </li>
-                                                <li>
-                                                    <a href="#">Deletadas</a>
                                                 </li>
                                             </ul>
                                         </div>

@@ -3,8 +3,9 @@
 @section('content')
     @include('includes.alerts')
 
-    <form action="{{ route('entries.store') }}" method="POST">
+    <form action="{{ route('debtors.store') }}" method="POST">
         @csrf
+
         <div class="row gy-3 mb-4">
             <div class="col-sm-8">
                 <label for="" class="form-label">Título</label>
@@ -16,6 +17,7 @@
                 <input type="text" name="amount" class="form-control" value="{{ old('amount') }}">
                 <div class="form-text">Ex: 125,50</div>
             </div>
+            <div></div>
             <div class="col-12">
                 <label for="" class="form-label">Descrição</label>
                 <textarea name="description" class="form-control" style="height: 140px">{{ old('description') }}</textarea>
