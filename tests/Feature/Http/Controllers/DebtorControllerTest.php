@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Debtor;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -177,5 +178,122 @@ class DebtorControllerTest extends TestCase
             ->assertOk()
             ->assertViewIs("debtor.edit")
             ->assertViewHas("debtor");
+    }
+
+    /**
+     * deve redirecionar para página de login
+     */
+    public function test_update_action_unauthenticated(): void
+    {
+        $debtor = Debtor::factory()->create();
+
+        $this->put(route("debtors.update", $debtor))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_action_is_not_owner(): void
+    {
+        $debtor = Debtor::factory()->create();
+        $data = Debtor::factory()->make([
+            "amount" => "200,00"
+        ])->toArray();
+
+
+        $this->actingAs($this->_user())->put(route("debtors.update", $debtor), $data)
+            ->assertNotFound();
+    }
+
+    /**
+     * deve redirecionar com erros de validação
+     */
+    public function test_update_action_without_data(): void
+    {
+        $user = $this->_user();
+        $debtor = Debtor::factory()->create([
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->put(route("debtors.update", $debtor))
+            ->assertFound()
+            ->assertSessionHasErrors([
+                "title",
+                "amount"
+            ])
+            ->assertSessionDoesntHaveErrors("description");
+    }
+
+    /**
+     * deve redirecionar com erro de validação no campo title
+     */
+    public function test_update_action_duplicated_title(): void
+    {
+        $user = $this->_user();
+        $outherdebtor = Debtor::factory()->create([
+            "user_id" => $user
+        ]);
+        $debtor = Debtor::factory()->create([
+            "user_id" => $user
+        ]);
+        $data = Debtor::factory()->make([
+            "title" => $outherdebtor->title,
+            "amount" => "29,90"
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("debtors.update", $debtor), $data)
+            ->assertFound()
+            ->assertSessionHasErrors("title")
+            ->assertSessionDoesntHaveErrors([
+                "amount",
+                "description"
+            ]);
+    }
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_update_action(): void
+    {
+        $user = $this->_user();
+        $debtor = Debtor::factory()->create([
+            "user_id" => $user
+        ]);
+        $data = Debtor::factory()->make([
+            "amount" => "500,00"
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("debtors.update", $debtor), $data)
+            ->assertRedirect(route("debtors.edit", $debtor))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("debtors", [
+            ...$data,
+            "user_id" => $user->id,
+            "amount" => 500
+        ]);
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_update_action_same_title(): void
+    {
+        $user = $this->_user();
+        $debtor = Debtor::factory()->create([
+            "user_id" => $user
+        ]);
+        $data = Debtor::factory()->make([
+            "amount" => "500,00",
+            "title" => $debtor->title
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("debtors.update", $debtor), $data)
+            ->assertRedirect(route("debtors.edit", $debtor))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("debtors", [
+            ...$data,
+            "user_id" => $user->id,
+            "amount" => 500
+        ]);
     }
 }

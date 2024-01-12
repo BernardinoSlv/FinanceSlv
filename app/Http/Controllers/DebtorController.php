@@ -78,7 +78,18 @@ class DebtorController extends Controller
      */
     public function update(UpdateDebtorRequest $request, Debtor $debtor)
     {
-        //
+        if (Gate::denies("debtor-edit", $debtor)) {
+            abort(404);
+        }
+
+        $this->_debtorRepository->update($debtor->id, [
+            ...$request->validated(),
+            "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+
+        return redirect()->route("debtors.edit", $debtor)->with(
+            Alert::success("Atualização realizada com sucesso.")
+        );
     }
 
     /**

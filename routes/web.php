@@ -78,6 +78,7 @@ Route::middleware("checkAuth")->group(function () {
             "destroy" => "expenses.destroy",
         ]);
 
+    // debtors
     Route::resource("devedores", DebtorController::class)
         ->parameter("devedores", "debtor")
         ->names([
