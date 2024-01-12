@@ -3,11 +3,13 @@
 namespace App\Providers;
 
 use App\Repositories\Contracts\DebtorRepositoryContract;
+use App\Repositories\Contracts\DebtRepositoryContract;
 use App\Repositories\Contracts\EntryRepositoryContract;
 use App\Repositories\Contracts\ExpenseRepositoryContract;
 use App\Repositories\Contracts\LeaveRepositoryContract;
 use App\Repositories\Contracts\UserRepositoryContract;
 use App\Repositories\DebtorRepository;
+use App\Repositories\DebtRepository;
 use App\Repositories\EntryRepository;
 use App\Repositories\ExpenseRepository;
 use App\Repositories\LeaveRepository;
@@ -44,6 +46,11 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             DebtorRepositoryContract::class,
             DebtorRepository::class
+        );
+
+        $this->app->bind(
+            DebtRepositoryContract::class,
+            DebtRepository::class
         );
     }
 
