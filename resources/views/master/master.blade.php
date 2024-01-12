@@ -383,10 +383,10 @@
                                         <div class="collapse" id="debtors-collapse">
                                             <ul class="nav-second-level">
                                                 <li>
-                                                    <a href="#">Todas</a>
+                                                    <a href="{{ route('debtors.index') }}">Todas</a>
                                                 </li>
                                                 <li>
-                                                    <a href="#">Criar</a>
+                                                    <a href="{{ route('debtors.create') }}">Criar</a>
                                                 </li>
                                             </ul>
                                         </div>

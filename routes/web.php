@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DebtorController;
 use App\Http\Controllers\EntryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\LeaveController;
@@ -75,5 +76,18 @@ Route::middleware("checkAuth")->group(function () {
             "edit" => "expenses.edit",
             "update" => "expenses.update",
             "destroy" => "expenses.destroy",
+        ]);
+
+    // debtors
+    Route::resource("devedores", DebtorController::class)
+        ->parameter("devedores", "debtor")
+        ->names([
+            "index" => "debtors.index",
+            "create" => "debtors.create",
+            "store" => "debtors.store",
+            "show" => "debtors.show",
+            "edit" => "debtors.edit",
+            "update" => "debtors.update",
+            "destroy" => "debtors.destroy",
         ]);
 });
