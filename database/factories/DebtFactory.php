@@ -22,7 +22,7 @@ class DebtFactory extends Factory
             "title" => fake()->word() . time() . rand(0, 100),
             "amount" => 10,
             "description" => fake()->text(100),
-            "effetive_at" => date("Y-m-d")
+            "start_at" => date("Y-m-d")
         ];
     }
 }
