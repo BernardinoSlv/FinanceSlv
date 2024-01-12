@@ -32,7 +32,7 @@ class DebtController extends Controller
      */
     public function create()
     {
-        //
+        return view("debt.create");
     }
 
     /**

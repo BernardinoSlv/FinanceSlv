@@ -36,4 +36,22 @@ class DebtControllerTest extends TestCase
                 return $debts->count() === 5;
             });
     }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_create_action_unauthenticated(): void
+    {
+        $this->get(route("debts.index"))->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 200 e view debt.create
+     */
+    public function test_create_action(): void
+    {
+        $this->actingAs($this->_user())->get(route("debts.create"))
+            ->assertOk()
+            ->assertViewIs("debt.create");
+    }
 }
