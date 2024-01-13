@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Alert;
 use App\Http\Requests\StoreInvestimentRequest;
 use App\Http\Requests\UpdateInvestimentRequest;
 use App\Models\Investiment;
 use App\Repositories\Contracts\InvestimentRepositoryContract;
+use Src\Parsers\RealToFloatParser;
 
 class InvestimentController extends Controller
 {
@@ -39,7 +41,14 @@ class InvestimentController extends Controller
      */
     public function store(StoreInvestimentRequest $request)
     {
-        //
+        $this->_investimentRepository->create(auth()->user()->id, [
+            ...$request->validated(),
+            "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+
+        return redirect()->route("investiments.index")->with(
+            Alert::success("Investimento criado com sucesso.")
+        );
     }
 
     /**
