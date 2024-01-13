@@ -13,4 +13,12 @@ class DebtRepository extends BaseRepository implements DebtRepositoryContract
     {
         parent::__construct($debt);
     }
+
+    public function create(int $userId, array $attributes): Debt
+    {
+        $this->_model->fill($attributes);
+        $this->_model->user_id = $userId;
+        $this->_model->save();
+        return $this->_model;
+    }
 }
