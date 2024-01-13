@@ -79,7 +79,18 @@ class InvestimentController extends Controller
      */
     public function update(UpdateInvestimentRequest $request, Investiment $investiment)
     {
-        //
+        if (Gate::denies("investiment-edit", $investiment)) {
+            abort(404);
+        }
+
+        $this->_investimentRepository->update($investiment->id, [
+            ...$request->validated(),
+            "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+
+        return redirect()->route("investiments.index")->with(
+            Alert::success("Registro atualizado com sucesso.")
+        );
     }
 
     /**
