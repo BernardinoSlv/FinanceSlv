@@ -13,7 +13,7 @@
             <div class="col-sm-8">
                 <label for="" class="form-label">Título</label>
                 <input type="text" name="title" class="form-control" value="{{ old('title', $leave->title) }}">
-                <div class="form-text">Ex: Pagamento do fulano</div>
+                <div class="form-text"></div>
             </div>
             <div class="col-sm-4">
                 <label for="" class="form-label">Valor</label>
