@@ -36,4 +36,22 @@ class InvestimentControllerTest extends TestCase
                 return $investiments->count() === 10;
             });
     }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_create_action_unauthenticated(): void
+    {
+        $this->get(route("investiments.create"))->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 200 e view investiment.create
+     */
+    public function test_create_action(): void
+    {
+        $this->actingAs($this->_user())->get(route("investiments.create"))
+            ->assertOk()
+            ->assertViewIs("investiment.create");
+    }
 }
