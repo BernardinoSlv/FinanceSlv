@@ -98,6 +98,14 @@ class DebtController extends Controller
      */
     public function destroy(Debt $debt)
     {
-        //
+        if (Gate::denies("debt-edit", $debt)) {
+            abort(404);
+        }
+
+        $this->_debtRepository->delete($debt->id);
+
+        return redirect()->route("debts.index")->with(
+            Alert::success("Registro removido com sucesso.")
+        );
     }
 }
