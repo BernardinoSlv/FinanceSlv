@@ -6,6 +6,7 @@ use App\Http\Controllers\DebtController;
 use App\Http\Controllers\DebtorController;
 use App\Http\Controllers\EntryController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\InvestimentController;
 use App\Http\Controllers\LeaveController;
 use Illuminate\Support\Facades\Route;
 
@@ -103,5 +104,18 @@ Route::middleware("checkAuth")->group(function () {
             "edit" => "debts.edit",
             "update" => "debts.update",
             "destroy" => "debts.destroy",
+        ]);
+
+    // investiments
+    Route::resource("investimentos", InvestimentController::class)
+        ->parameter("investimentos", "investiment")
+        ->names([
+            "index" => "investiments.index",
+            "create" => "investiments.create",
+            "store" => "investiments.store",
+            "show" => "investiments.show",
+            "edit" => "investiments.edit",
+            "update" => "investiments.update",
+            "destroy" => "investiments.destroy",
         ]);
 });
