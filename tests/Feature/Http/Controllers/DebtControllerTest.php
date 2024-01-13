@@ -54,4 +54,97 @@ class DebtControllerTest extends TestCase
             ->assertOk()
             ->assertViewIs("debt.create");
     }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_store_action_unauthenticated(): void
+    {
+        $this->post(route("debts.store"))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve redirecionar com erros de validação
+     */
+    public function test_store_action_without_data(): void
+    {
+        $this->actingAs($this->_user())->post(route("debts.store"))
+            ->assertFound()
+            ->assertSessionHasErrors([
+                "title",
+                "amount",
+                "start_at"
+            ])
+            ->assertSessionDoesntHaveErrors([
+                "description"
+            ]);
+    }
+
+    /**
+     * deve redirecinoar com erro de validação no campo title
+     */
+    public function test_store_action_duplicated_title(): void
+    {
+        $user = $this->_user();
+        $debt = Debt::factory()->create([
+            "user_id" => $user
+        ]);
+        $data = Debt::factory()->make([
+            "title" => $debt->title,
+            "amount" => "70,00"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("debts.store"), $data)
+            ->assertFound()
+            ->assertSessionHasErrors([
+                "title",
+            ])
+            ->assertSessionDoesntHaveErrors([
+                "description",
+                "amount",
+                "start_at"
+            ]);
+    }
+
+    /**
+     * deve redirecionar com  mensagem de sucesso
+     */
+    public function test_store_action(): void
+    {
+        $user = $this->_user();
+        $data = Debt::factory()->make([
+            "amount" => "70,00"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("debts.store"), $data)
+            ->assertRedirect(route("debts.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("debts", [
+            ...$data,
+            "amount" => 70.00,
+            "user_id" => $user->id
+        ]);
+    }
+
+    /**
+     * deve criar registro com mesmo title, no entanto o existente deve pertencer a outro usuário
+     */
+    public function test_store_action_same_title_but_other_user(): void
+    {
+        $user = $this->_user();
+        $data = Debt::factory()->make([
+            "title" => Debt::factory()->create()->title,
+            "amount" => "70,00"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("debts.store"), $data)
+            ->assertRedirect(route("debts.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("debts", [
+            ...$data,
+            "amount" => 70.00,
+            "user_id" => $user->id
+        ]);
+    }
 }

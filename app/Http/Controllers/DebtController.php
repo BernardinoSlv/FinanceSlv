@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Alert;
 use App\Http\Requests\StoreDebtRequest;
 use App\Http\Requests\UpdateDebtRequest;
 use App\Models\Debt;
 use App\Repositories\Contracts\DebtRepositoryContract;
+use Src\Parsers\RealToFloatParser;
 
 class DebtController extends Controller
 {
@@ -40,7 +42,14 @@ class DebtController extends Controller
      */
     public function store(StoreDebtRequest $request)
     {
-        //
+        $this->_debtRepository->create(auth()->user()->id, [
+            ...$request->validated(),
+            "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+
+        return redirect()->route("debts.index")->with(
+            Alert::success("Registro criado com sucesso.")
+        );
     }
 
     /**
