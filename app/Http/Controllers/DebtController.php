@@ -7,6 +7,7 @@ use App\Http\Requests\StoreDebtRequest;
 use App\Http\Requests\UpdateDebtRequest;
 use App\Models\Debt;
 use App\Repositories\Contracts\DebtRepositoryContract;
+use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
 class DebtController extends Controller
@@ -65,7 +66,13 @@ class DebtController extends Controller
      */
     public function edit(Debt $debt)
     {
-        //
+        if (Gate::denies("debt-edit", $debt)) {
+            abort(404);
+        }
+
+        return view("debt.edit", compact(
+            "debt"
+        ));
     }
 
     /**

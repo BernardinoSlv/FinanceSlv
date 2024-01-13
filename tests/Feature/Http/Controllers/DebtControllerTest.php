@@ -147,4 +147,50 @@ class DebtControllerTest extends TestCase
             "user_id" => $user->id
         ]);
     }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_edit_action_unauthenticated(): void
+    {
+        $debt = Debt::factory()->create();
+
+        $this->get(route("debts.edit", $debt))->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_is_not_owner(): void
+    {
+        $debt = Debt::factory()->create();
+
+        $this->actingAs($this->_user())->get(route("debts.edit", $debt))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_nonexistent(): void
+    {
+        $this->actingAs($this->_user())->get(route("debts.edit", 0))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 200 e view debt.edit
+     */
+    public function test_edit_action(): void
+    {
+        $user = $this->_user();
+        $debt = Debt::factory()->create([
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->get(route("debts.edit", $debt))
+            ->assertOk()
+            ->assertViewIs("debt.edit")
+            ->assertViewHas("debt");
+    }
 }
