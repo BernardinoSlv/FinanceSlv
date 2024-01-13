@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Investiment;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -142,5 +143,51 @@ class InvestimentControllerTest extends TestCase
             "user_id" => $user->id,
             "amount" => 1000.00
         ]);
+    }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_edit_action_unauthenticated(): void
+    {
+        $investiment = Investiment::factory()->create();
+
+        $this->get(route("investiments.edit", $investiment))->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_nonexistent(): void
+    {
+        $this->actingAs($this->_user())->get(route("investiments.edit", 0))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_is_not_owner(): void
+    {
+        $investiment = Investiment::factory()->create();
+
+        $this->actingAs($this->_user())->get(route("investiments.edit", $investiment))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 200 e view investiment.edit
+     */
+    public function test_edit_action(): void
+    {
+        $user = $this->_user();
+        $investiment = Investiment::factory()->create([
+            "user_id" => $user->id
+        ]);
+
+        $this->actingAs($user)->get(route("investiments.edit", $investiment))
+            ->assertOk()
+            ->assertViewIs("investiment.edit")
+            ->assertViewHas("investiment");
     }
 }

@@ -7,6 +7,7 @@ use App\Http\Requests\StoreInvestimentRequest;
 use App\Http\Requests\UpdateInvestimentRequest;
 use App\Models\Investiment;
 use App\Repositories\Contracts\InvestimentRepositoryContract;
+use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
 class InvestimentController extends Controller
@@ -64,7 +65,13 @@ class InvestimentController extends Controller
      */
     public function edit(Investiment $investiment)
     {
-        //
+        if (Gate::denies("investiment-edit", $investiment)) {
+            abort(404);
+        }
+
+        return view("investiment.edit", compact(
+            "investiment"
+        ));
     }
 
     /**
