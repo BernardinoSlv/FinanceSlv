@@ -11,6 +11,8 @@ use Tests\TestCase;
 
 class InvestimentControllerTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * deve redirecionar para login
      */
@@ -333,5 +335,52 @@ class InvestimentControllerTest extends TestCase
             "user_id" => $user->id,
             "amount" => 5000.00
         ]);
+    }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_destroy_action_unauthenticated(): void
+    {
+        $investiment = Investiment::factory()->create();
+
+        $this->delete(route("investiments.destroy", $investiment))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_nonexistent(): void
+    {
+        $this->delete(route("investiments.destroy", 0))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_is_not_owner(): void
+    {
+        $investiment = Investiment::factory()->create();
+
+        $this->actingAs($this->_user())->delete(route("investiments.destroy", $investiment))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_destroy_action(): void
+    {
+        $user = $this->_user();
+        $investiment = Investiment::factory()->create([
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->delete(route("investiments.destroy", $investiment))
+            ->assertRedirect(route("investiments.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertSoftDeleted($investiment);
     }
 }

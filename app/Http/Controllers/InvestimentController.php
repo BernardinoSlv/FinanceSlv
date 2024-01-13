@@ -7,6 +7,7 @@ use App\Http\Requests\StoreInvestimentRequest;
 use App\Http\Requests\UpdateInvestimentRequest;
 use App\Models\Investiment;
 use App\Repositories\Contracts\InvestimentRepositoryContract;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
@@ -98,6 +99,14 @@ class InvestimentController extends Controller
      */
     public function destroy(Investiment $investiment)
     {
-        //
+        if (Gate::denies("investiment-edit", $investiment)) {
+            abort(404);
+        }
+
+        $this->_investimentRepository->delete($investiment->id);
+
+        return redirect()->route("investiments.index")->with(
+            Alert::success("Investimento removido com sucesso.")
+        );
     }
 }
