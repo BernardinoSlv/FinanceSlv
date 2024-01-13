@@ -80,7 +80,17 @@ class DebtController extends Controller
      */
     public function update(UpdateDebtRequest $request, Debt $debt)
     {
-        //
+        if (Gate::denies("debt-edit", $debt)) {
+            abort(404);
+        }
+        $this->_debtRepository->update($debt->id, [
+            ...$request->validated(),
+            "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+
+        return redirect()->route("debts.index")->with(
+            Alert::success("Registro atualizado com sucesso.")
+        );
     }
 
     /**

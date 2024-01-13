@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Debt;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -192,5 +193,124 @@ class DebtControllerTest extends TestCase
             ->assertOk()
             ->assertViewIs("debt.edit")
             ->assertViewHas("debt");
+    }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_update_action_unauthenticated(): void
+    {
+        $debt = Debt::factory()->create();
+
+        $this->put(route("debts.update", $debt))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve redirecionar com erros de validação
+     */
+    public function test_update_action_without_data(): void
+    {
+        $user = User::factory()->create();
+        $debt = Debt::factory()->create([
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->put(route("debts.update", $debt))
+            ->assertFound()
+            ->assertSessionHasErrors([
+                "title",
+                "amount",
+                "start_at"
+            ])
+            ->assertSessionDoesntHaveErrors("description");
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_action_is_not_owner(): void
+    {
+        $debt = Debt::factory()->create();
+        $data = Debt::factory()->make([
+            "amount" => "75,00"
+        ])->toArray();
+
+        $this->actingAs($this->_user())->put(route("debts.update", $debt), $data)
+            ->assertNotFound();
+    }
+
+    /**
+     * deve redirecionar com erro no campo title
+     */
+    public function test_update_action_duplicated_title(): void
+    {
+        $user = $this->_user();
+        $debt = Debt::factory()->create([
+            "user_id" => $user
+        ]);
+        $otherDebt = Debt::factory()->create([
+            "user_id" => $user
+        ]);
+        $data = Debt::factory()->make([
+            "title" => $otherDebt->title,
+            "amount" => "55,00"
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("debts.update", $debt), $data)
+            ->assertFound()
+            ->assertSessionHasErrors("title")
+            ->assertSessionDoesntHaveErrors([
+                "amount",
+                "description",
+                "start_at"
+            ]);
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_update_action(): void
+    {
+        $user = $this->_user();
+        $debt = Debt::factory()->create([
+            "user_id" => $user
+        ]);
+        $data = Debt::factory()->make([
+            "amount" => "200,00"
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("debts.update", $debt), $data)
+            ->assertRedirectToRoute("debts.index")
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("debts", [
+            ...$data,
+            "user_id" => $user->id,
+            "amount" => 200
+        ]);
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_update_action_same_title(): void
+    {
+        $user = $this->_user();
+        $debt = Debt::factory()->create([
+            "user_id" => $user
+        ]);
+        $data = Debt::factory()->make([
+            "title" => $debt->title,
+            "amount" => "200,00"
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("debts.update", $debt), $data)
+            ->assertRedirectToRoute("debts.index")
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("debts", [
+            ...$data,
+            "user_id" => $user->id,
+            "amount" => 200
+        ]);
     }
 }
