@@ -135,4 +135,51 @@ class NeedControllerTest extends TestCase
             "user_id" => $user->id
         ]);
     }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_edit_action_unauthenticated(): void
+    {
+        $need = Need::factory()->create();
+
+        $this->get(route("needs.edit", $need))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_nonexistent(): void
+    {
+        $this->actingAs($this->_user())->get(route("needs.edit", 0))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_is_not_owner(): void
+    {
+        $need = Need::factory()->create();
+
+        $this->actingAs($this->_user())->get(route("needs.edit", $need))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 200
+     */
+    public function test_edit_action(): void
+    {
+        $user = $this->_user();
+        $need = Need::factory()->create([
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->get(route("needs.edit", $need))
+            ->assertOk()
+            ->assertViewIs("needs.edit")
+            ->assertViewHas("need");
+    }
 }

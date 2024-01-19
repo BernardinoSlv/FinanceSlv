@@ -7,6 +7,7 @@ use App\Http\Requests\StoreNeedRequest;
 use App\Http\Requests\UpdateNeedRequest;
 use App\Models\Need;
 use App\Repositories\Contracts\NeedRepositoryContract;
+use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
 class NeedController extends Controller
@@ -64,7 +65,13 @@ class NeedController extends Controller
      */
     public function edit(Need $need)
     {
-        //
+        if (Gate::denies("need-edit", $need)) {
+            abort(404);
+        }
+
+        return view("needs.edit", compact(
+            "need"
+        ));
     }
 
     /**
