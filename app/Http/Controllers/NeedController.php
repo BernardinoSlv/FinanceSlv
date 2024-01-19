@@ -79,7 +79,16 @@ class NeedController extends Controller
      */
     public function update(UpdateNeedRequest $request, Need $need)
     {
-        //
+        if (Gate::denies("need-edit", $need)) {
+            abort(404);
+        }
+        $this->_needRepository->update($need->id, [
+            ...$request->validated(),
+            "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+        return redirect()->route("needs.edit", $need)->with(
+            Alert::success("Registro atualizado com sucesso.")
+        );
     }
 
     /**
