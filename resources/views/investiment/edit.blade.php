@@ -4,6 +4,7 @@
     @include('includes.alerts')
 
     <form action="{{ route('investiments.update', $investiment) }}" method="POST">
+        @method('PUT')
         @csrf
         <div class="row gy-3 mb-4">
             <div class="col-sm-8">

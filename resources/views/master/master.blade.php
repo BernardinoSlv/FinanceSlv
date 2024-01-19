@@ -383,7 +383,7 @@
                                         <div class="collapse" id="debtors-collapse">
                                             <ul class="nav-second-level">
                                                 <li>
-                                                    <a href="{{ route('debtors.index') }}">Todas</a>
+                                                    <a href="{{ route('debtors.index') }}">Todos</a>
                                                 </li>
                                                 <li>
                                                     <a href="{{ route('debtors.create') }}">Criar</a>
@@ -399,10 +399,10 @@
                                         <div class="collapse" id="investiments-collapse">
                                             <ul class="nav-second-level">
                                                 <li>
-                                                    <a href="#">Todas</a>
+                                                    <a href="{{ route('investiments.index') }}">Todos</a>
                                                 </li>
                                                 <li>
-                                                    <a href="#">Criar</a>
+                                                    <a href="{{ route('investiments.create') }}">Criar</a>
                                                 </li>
                                             </ul>
                                         </div>

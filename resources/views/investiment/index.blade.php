@@ -5,8 +5,6 @@
         <a href="{{ route('investiments.create') }}" class="btn btn-primary">Criar nova</a>
     </div>
 
-    <h3>{{ date('m/Y') }}</h3>
-
     @include('includes.alerts')
     <div class="table-responsive">
         <table class="table table-hover" style="min-width: 700px">
