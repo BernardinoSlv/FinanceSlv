@@ -13,4 +13,12 @@ class NeedRepository extends BaseRepository implements NeedRepositoryContract
     {
         parent::__construct($need);
     }
+
+    public function create(int $userId, array $attributes): Need
+    {
+        $need = $this->_model->fill($attributes);
+        $need->user_id = $userId;
+        $need->save();
+        return $need;
+    }
 }
