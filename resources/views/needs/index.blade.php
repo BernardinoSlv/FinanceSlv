@@ -26,9 +26,9 @@
                         <td>R$ {{ $need->amount }}</td>
                         <td>
                             @if ($need->completed)
-                                <span class="badge badge-success">Concluído</span>
+                                <span class="badge text-white bg-success">Concluído</span>
                             @else
-                                <span class="badge badge-primary">Pendente</span>
+                                <span class="badge text-white bg-black">Pendente</span>
                             @endif
                         </td>
                         <td>{{ $need->created_at_formated }}</td>
