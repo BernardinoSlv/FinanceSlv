@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers;
 
+use App\Models\Need;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -45,5 +46,93 @@ class NeedControllerTest extends TestCase
         $this->actingAs($this->_user())->get(route("needs.create"))
             ->assertOk()
             ->assertViewIs("needs.create");
+    }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_store_action_unauthenticated(): void
+    {
+        $this->post(route("needs.store"))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve redirecionar com erros de validação
+     */
+    public function test_store_action_without_data(): void
+    {
+        $this->actingAs($this->_user())->post(route("needs.store"))
+            ->assertFound()
+            ->assertSessionHasErrors([
+                "title",
+                "amount"
+            ])
+            ->assertSessionDoesntHaveErrors("description");
+    }
+
+    /**
+     * deve redirecionar com erro no campo title
+     */
+    public function test_store_action_duplicated_title(): void
+    {
+        $user = $this->_user();
+        $need = Need::factory()->create([
+            "user_id" => $user
+        ]);
+        $data = Need::factory()->make([
+            "title" => $need->title,
+            "amount" => "50,00"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("needs.store"), $data)
+            ->assertFound()
+            ->assertSessionHasErrors("title")
+            ->assertSessionDoesntHaveErrors([
+                "amount",
+                "description"
+            ]);
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_store_action(): void
+    {
+        $user = $this->_user();
+        $data = Need::factory()->make([
+            "amount" => "100,00"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("needs.store"), $data)
+            ->assertRedirectToRoute("needs.index")
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("needs", [
+            ...$data,
+            "amount" => 100.00,
+            "user_id" => $user->id
+        ]);
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_store_action_same_title_of_the_other_user(): void
+    {
+        $user = $this->_user();
+        $otherUserNeed = Need::factory()->create();
+        $data = Need::factory()->make([
+            "title" => $otherUserNeed->title,
+            "amount" => "100,00"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("needs.store"), $data)
+            ->assertRedirectToRoute("needs.index")
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("needs", [
+            ...$data,
+            "amount" => 100.00,
+            "user_id" => $user->id
+        ]);
     }
 }
