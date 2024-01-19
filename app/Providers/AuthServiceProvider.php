@@ -10,6 +10,7 @@ use App\Models\Entry;
 use App\Models\Expense;
 use App\Models\Investiment;
 use App\Models\Leave;
+use App\Models\Need;
 use App\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -52,6 +53,10 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::define("investiment-edit", function(User $user, Investiment $investiment): bool {
             return $user->id === $investiment->user_id;
+        });
+
+        Gate::define("need-edit", function(User $user, Need $need): bool {
+            return $user->id === $need->user_id;
         });
     }
 }

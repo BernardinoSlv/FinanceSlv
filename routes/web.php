@@ -8,6 +8,7 @@ use App\Http\Controllers\EntryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InvestimentController;
 use App\Http\Controllers\LeaveController;
+use App\Http\Controllers\NeedController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -117,5 +118,17 @@ Route::middleware("checkAuth")->group(function () {
             "edit" => "investiments.edit",
             "update" => "investiments.update",
             "destroy" => "investiments.destroy",
+        ]);
+
+    Route::resource("necessidades", NeedController::class)
+        ->parameter("necessidades", "need")
+        ->names([
+            "index" => "needs.index",
+            "create" => "needs.create",
+            "store" => "needs.store",
+            "show" => "needs.show",
+            "edit" => "needs.edit",
+            "update" => "needs.update",
+            "destroy" => "needs.destroy",
         ]);
 });
