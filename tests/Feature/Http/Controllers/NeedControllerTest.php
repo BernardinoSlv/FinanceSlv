@@ -27,4 +27,23 @@ class NeedControllerTest extends TestCase
             ->assertViewIs("needs.index")
             ->assertViewHas("needs");
     }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_create_action_unauthenticated(): void
+    {
+        $this->get(route("needs.create"))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 200
+     */
+    public function test_create_action(): void
+    {
+        $this->actingAs($this->_user())->get(route("needs.create"))
+            ->assertOk()
+            ->assertViewIs("needs.create");
+    }
 }

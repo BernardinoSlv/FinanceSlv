@@ -31,7 +31,7 @@ class NeedController extends Controller
      */
     public function create()
     {
-        //
+        return view("needs.create");
     }
 
     /**
