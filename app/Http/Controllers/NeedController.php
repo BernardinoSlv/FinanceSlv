@@ -12,6 +12,7 @@ use Src\Parsers\RealToFloatParser;
 
 class NeedController extends Controller
 {
+
     public function __construct(
         protected NeedRepositoryContract $_needRepository
     ) {
@@ -82,6 +83,7 @@ class NeedController extends Controller
         if (Gate::denies("need-edit", $need)) {
             abort(404);
         }
+
         $this->_needRepository->update($need->id, [
             ...$request->validated(),
             "amount" => RealToFloatParser::parse($request->input("amount"))
@@ -96,6 +98,13 @@ class NeedController extends Controller
      */
     public function destroy(Need $need)
     {
-        //
+        if (Gate::denies("need-edit", $need)) {
+            abort(404);
+        }
+
+        $need->delete();
+        return redirect()->route("needs.index")->with(
+            Alert::success("Registro removido com sucesso")
+        );
     }
 }

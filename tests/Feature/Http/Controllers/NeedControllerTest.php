@@ -3,12 +3,15 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Need;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class NeedControllerTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * deve redirecionar para login
      */
@@ -309,5 +312,52 @@ class NeedControllerTest extends TestCase
             "amount" => 120.00,
             "user_id" => $user->id
         ]);
+    }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_destroy_action_unauthenticated(): void
+    {
+        $need = Need::factory()->create();
+
+        $this->delete(route("needs.destroy", $need))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_nonexistent(): void
+    {
+        $this->actingAs($this->_user())->delete(route("needs.destroy", 0))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_without_permission(): void
+    {
+        $need = Need::factory()->create();
+
+        $this->actingAs($this->_user())->delete(route("needs.destroy", $need))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_destroy_action(): void
+    {
+        $user = User::factory()->create();
+        $need = Need::factory()->create([
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->delete(route("needs.destroy", $need))
+            ->assertRedirectToRoute("needs.index")
+            ->assertSessionHas("alert_type", "success");
+        $this->assertSoftDeleted($need);
     }
 }
