@@ -25,7 +25,7 @@ class InvestimentController extends Controller
     {
         $investiments = $this->_investimentRepository->allByUser(auth()->user()->id);
 
-        return view("investiment.index", compact(
+        return view("investiments.index", compact(
             "investiments"
         ));
     }
@@ -35,7 +35,7 @@ class InvestimentController extends Controller
      */
     public function create()
     {
-        return view("investiment.create");
+        return view("investiments.create");
     }
 
     /**
@@ -70,7 +70,7 @@ class InvestimentController extends Controller
             abort(404);
         }
 
-        return view("investiment.edit", compact(
+        return view("investiments.edit", compact(
             "investiment"
         ));
     }

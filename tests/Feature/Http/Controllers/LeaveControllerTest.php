@@ -28,7 +28,7 @@ class LeaveControllerTest extends TestCase
 
         $this->actingAs($user)->get(route("leaves.index"))
             ->assertOk()
-            ->assertViewIs("leave.index")
+            ->assertViewIs("leaves.index")
             ->assertViewHas("leaves");
     }
 
@@ -50,7 +50,7 @@ class LeaveControllerTest extends TestCase
 
         $this->actingAs($user)->get(route("leaves.create"))
             ->assertOk()
-            ->assertViewIs("leave.create");
+            ->assertViewIs("leaves.create");
     }
 
     /**
@@ -141,7 +141,7 @@ class LeaveControllerTest extends TestCase
 
         $this->actingAs($user)->get(route("leaves.edit", $leave->id))
             ->assertOk()
-            ->assertViewIs("leave.edit")
+            ->assertViewIs("leaves.edit")
             ->assertViewHas("leave");
     }
 

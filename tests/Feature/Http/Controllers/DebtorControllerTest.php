@@ -20,13 +20,13 @@ class DebtorControllerTest extends TestCase
     }
 
     /**
-     * deve ter status 200 e view debtor.index
+     * deve ter status 200 e view debtors.index
      */
     public function test_index_action(): void
     {
         $this->actingAs($this->_user())->get(route("debtors.index"))
             ->assertOk()
-            ->assertViewIs("debtor.index");
+            ->assertViewIs("debtors.index");
     }
 
     /**
@@ -44,7 +44,7 @@ class DebtorControllerTest extends TestCase
     {
         $this->actingAs($this->_user())->get(route("debtors.create"))
             ->assertOk()
-            ->assertViewIs("debtor.create");
+            ->assertViewIs("debtors.create");
     }
 
     /**
@@ -176,7 +176,7 @@ class DebtorControllerTest extends TestCase
 
         $this->actingAs($user)->get(route("debtors.edit", $debtor))
             ->assertOk()
-            ->assertViewIs("debtor.edit")
+            ->assertViewIs("debtors.edit")
             ->assertViewHas("debtor");
     }
 
@@ -350,7 +350,7 @@ class DebtorControllerTest extends TestCase
         ]);
 
         $this->actingAs($user)->delete(route("debtors.destroy", $debtor))
-        ->assertRedirect(route("debtors.index"))
+            ->assertRedirect(route("debtors.index"))
             ->assertSessionHas("alert_type", "success");
         $this->assertSoftDeleted($debtor);
     }

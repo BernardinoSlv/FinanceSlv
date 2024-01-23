@@ -22,7 +22,7 @@ class InvestimentControllerTest extends TestCase
     }
 
     /**
-     * deve ter status 200 e view investiment.index
+     * deve ter status 200 e view investiments.index
      */
     public function test_index_action(): void
     {
@@ -34,7 +34,7 @@ class InvestimentControllerTest extends TestCase
 
         $this->actingAs($user)->get(route("investiments.index"))
             ->assertOk()
-            ->assertViewIs("investiment.index")
+            ->assertViewIs("investiments.index")
             ->assertViewHas("investiments", function (Collection $investiments): bool {
                 return $investiments->count() === 10;
             });
@@ -49,13 +49,13 @@ class InvestimentControllerTest extends TestCase
     }
 
     /**
-     * deve ter status 200 e view investiment.create
+     * deve ter status 200 e view investiments.create
      */
     public function test_create_action(): void
     {
         $this->actingAs($this->_user())->get(route("investiments.create"))
             ->assertOk()
-            ->assertViewIs("investiment.create");
+            ->assertViewIs("investiments.create");
     }
 
     /**
@@ -178,7 +178,7 @@ class InvestimentControllerTest extends TestCase
     }
 
     /**
-     * deve ter status 200 e view investiment.edit
+     * deve ter status 200 e view investiments.edit
      */
     public function test_edit_action(): void
     {
@@ -189,7 +189,7 @@ class InvestimentControllerTest extends TestCase
 
         $this->actingAs($user)->get(route("investiments.edit", $investiment))
             ->assertOk()
-            ->assertViewIs("investiment.edit")
+            ->assertViewIs("investiments.edit")
             ->assertViewHas("investiment");
     }
 

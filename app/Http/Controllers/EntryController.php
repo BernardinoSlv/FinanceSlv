@@ -25,14 +25,14 @@ class EntryController extends Controller
     {
         $entries = $this->_entryRepository->allByUser(auth()->user()->id, true);
 
-        return view("entry.index", compact(
+        return view("entries.index", compact(
             "entries"
         ));
     }
 
     public function create()
     {
-        return view("entry.create");
+        return view("entries.create");
     }
 
     public function store(StoreEntryRequest $request)
@@ -52,7 +52,7 @@ class EntryController extends Controller
             abort(404);
         }
 
-        return view("entry.edit", compact(
+        return view("entries.edit", compact(
             "entry"
         ));
     }

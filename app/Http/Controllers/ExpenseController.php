@@ -27,7 +27,7 @@ class ExpenseController extends Controller
     {
         $expenses = $this->_expenseRepository->allByUser(auth()->user()->id);
 
-        return view("expense.index", compact("expenses"));
+        return view("expenses.index", compact("expenses"));
     }
 
     /**
@@ -35,7 +35,7 @@ class ExpenseController extends Controller
      */
     public function create()
     {
-        return view("expense.create");
+        return view("expenses.create");
     }
 
     /**
@@ -70,7 +70,7 @@ class ExpenseController extends Controller
         if (Gate::denies("expense-edit", $expense)) {
             abort(404);
         }
-        return view("expense.edit", compact("expense"));
+        return view("expenses.edit", compact("expense"));
     }
 
     /**

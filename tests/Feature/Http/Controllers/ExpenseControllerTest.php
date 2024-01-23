@@ -26,7 +26,7 @@ class ExpenseControllerTest extends TestCase
     {
         $this->actingAs($this->_user())->get(route("expenses.index"))
             ->assertOk()
-            ->assertViewIs("expense.index")
+            ->assertViewIs("expenses.index")
             ->assertViewHas("expenses");
     }
 
@@ -45,7 +45,7 @@ class ExpenseControllerTest extends TestCase
     {
         $this->actingAs($this->_user())->get(route("expenses.create"))
             ->assertOk()
-            ->assertViewIs("expense.create");
+            ->assertViewIs("expenses.create");
     }
 
     /**
@@ -208,7 +208,7 @@ class ExpenseControllerTest extends TestCase
 
         $this->actingAs($user)->get(route("expenses.edit", $expense))
             ->assertOk()
-            ->assertViewIs("expense.edit")
+            ->assertViewIs("expenses.edit")
             ->assertViewHas([
                 "expense"
             ]);

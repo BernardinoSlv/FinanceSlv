@@ -25,7 +25,7 @@ class EntryControllerTest extends TestCase
     }
 
     /**
-     * deve ter status 200 e view entry.index
+     * deve ter status 200 e view entries.index
      *
      * @return void
      */
@@ -35,7 +35,7 @@ class EntryControllerTest extends TestCase
 
         $this->actingAs($user)->get(route("entries.index"))
             ->assertOk()
-            ->assertViewIs("entry.index")
+            ->assertViewIs("entries.index")
             ->assertViewHas("entries");
     }
 
@@ -51,7 +51,7 @@ class EntryControllerTest extends TestCase
     }
 
     /**
-     * deve ter status 200 e view entry.create
+     * deve ter status 200 e view entries.create
      *
      * @return void
      */
@@ -61,7 +61,7 @@ class EntryControllerTest extends TestCase
 
         $this->actingAs($user)->get(route("entries.create"))
             ->assertOk()
-            ->assertViewIs("entry.create");
+            ->assertViewIs("entries.create");
     }
 
     /**
@@ -186,7 +186,7 @@ class EntryControllerTest extends TestCase
     }
 
     /**
-     * deve ter status 200 e view entry.edit
+     * deve ter status 200 e view entries.edit
      */
     public function test_edit_action(): void
     {
@@ -199,7 +199,7 @@ class EntryControllerTest extends TestCase
             "entry" => $entry->id
         ]))
             ->assertOk()
-            ->assertViewIs("entry.edit")
+            ->assertViewIs("entries.edit")
             ->assertViewHas("entry");
     }
 

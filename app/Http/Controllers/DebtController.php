@@ -25,7 +25,7 @@ class DebtController extends Controller
     {
         $debts = $this->_debtRepository->allByUser(auth()->user()->id);
 
-        return view("debt.index", compact(
+        return view("debts.index", compact(
             "debts"
         ));
     }
@@ -35,7 +35,7 @@ class DebtController extends Controller
      */
     public function create()
     {
-        return view("debt.create");
+        return view("debts.create");
     }
 
     /**
@@ -70,7 +70,7 @@ class DebtController extends Controller
             abort(404);
         }
 
-        return view("debt.edit", compact(
+        return view("debts.edit", compact(
             "debt"
         ));
     }

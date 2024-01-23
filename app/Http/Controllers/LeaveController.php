@@ -27,7 +27,7 @@ class LeaveController extends Controller
     {
         $leaves = $this->_leaveRepository->allByUser(auth()->user()->id, true);
 
-        return view("leave.index", compact(
+        return view("leaves.index", compact(
             "leaves"
         ));
     }
@@ -37,7 +37,7 @@ class LeaveController extends Controller
      */
     public function create()
     {
-        return view("leave.create");
+        return view("leaves.create");
     }
 
     /**
@@ -72,7 +72,7 @@ class LeaveController extends Controller
             abort(404);
         }
 
-        return view("leave.edit", compact(
+        return view("leaves.edit", compact(
             "leave"
         ));
     }

@@ -20,7 +20,7 @@ class DebtControllerTest extends TestCase
     }
 
     /**
-     * deve ter status 200 e view debt.index
+     * deve ter status 200 e view debts.index
      */
     public function test_index_action(): void
     {
@@ -32,7 +32,7 @@ class DebtControllerTest extends TestCase
 
         $this->actingAs($user)->get(route("debts.index"))
             ->assertOk()
-            ->assertViewIs("debt.index")
+            ->assertViewIs("debts.index")
             ->assertViewHas("debts", function (Collection $debts): bool {
                 return $debts->count() === 5;
             });
@@ -47,13 +47,13 @@ class DebtControllerTest extends TestCase
     }
 
     /**
-     * deve ter status 200 e view debt.create
+     * deve ter status 200 e view debts.create
      */
     public function test_create_action(): void
     {
         $this->actingAs($this->_user())->get(route("debts.create"))
             ->assertOk()
-            ->assertViewIs("debt.create");
+            ->assertViewIs("debts.create");
     }
 
     /**
@@ -180,7 +180,7 @@ class DebtControllerTest extends TestCase
     }
 
     /**
-     * deve ter status 200 e view debt.edit
+     * deve ter status 200 e view debts.edit
      */
     public function test_edit_action(): void
     {
@@ -191,7 +191,7 @@ class DebtControllerTest extends TestCase
 
         $this->actingAs($user)->get(route("debts.edit", $debt))
             ->assertOk()
-            ->assertViewIs("debt.edit")
+            ->assertViewIs("debts.edit")
             ->assertViewHas("debt");
     }
 
