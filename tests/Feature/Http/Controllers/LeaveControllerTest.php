@@ -10,6 +10,8 @@ use Tests\TestCase;
 
 class LeaveControllerTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * deve redirecionar para página de login
      */

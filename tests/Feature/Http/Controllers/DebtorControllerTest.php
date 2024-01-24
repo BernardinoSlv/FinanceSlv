@@ -10,6 +10,8 @@ use Tests\TestCase;
 
 class DebtorControllerTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * deve redirecionar para página de login
      */

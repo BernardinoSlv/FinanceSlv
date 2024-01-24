@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DebtController;
 use App\Http\Controllers\DebtorController;
+use App\Http\Controllers\EntityController;
 use App\Http\Controllers\EntryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InvestimentController;
@@ -130,5 +131,17 @@ Route::middleware("checkAuth")->group(function () {
             "edit" => "needs.edit",
             "update" => "needs.update",
             "destroy" => "needs.destroy",
+        ]);
+
+    Route::resource("entidades", EntityController::class)
+        ->parameter("entidades", "entity")
+        ->names([
+            "index" => "entities.index",
+            "create" => "entities.create",
+            "store" => "entities.store",
+            "show" => "entities.show",
+            "edit" => "entities.edit",
+            "update" => "entities.update",
+            "destroy" => "entities.destroy",
         ]);
 });

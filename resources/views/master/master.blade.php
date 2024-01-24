@@ -425,6 +425,12 @@
                                     </li>
                                 </ul>
                         </li>
+                        <li>
+                            <a href="{{ route('entities.index') }}">
+                                <i class="mdi mdi-account-group"></i>
+                                <span> Entidades </span>
+                            </a>
+                        </li>
                     </ul>
 
                 </div>
