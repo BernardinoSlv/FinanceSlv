@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Entity extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        "avatar",
+        "name",
+        "phone",
+        "description"
+    ];
 }

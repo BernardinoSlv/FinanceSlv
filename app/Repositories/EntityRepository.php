@@ -13,4 +13,12 @@ class EntityRepository extends BaseRepository implements EntityRepositoryContrac
     {
         parent::__construct($entity);
     }
+
+    public function create(int $userId, array $attribures): Entity
+    {
+        $entity = $this->_model->newInstance($attribures);
+        $entity->user_id = $userId;
+        $entity->save();
+        return $entity;
+    }
 }
