@@ -32,7 +32,7 @@ class EntityController extends Controller
      */
     public function create()
     {
-        //
+        return view("entities.create");
     }
 
     /**

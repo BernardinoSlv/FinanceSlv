@@ -29,4 +29,22 @@ class EntityControllerTest extends TestCase
             ->assertViewIs("entities.index")
             ->assertViewHas("entities");
     }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_create_action_unauthenticated(): void
+    {
+        $this->get(route("entities.create"))->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 200
+     */
+    public function test_create_action(): void
+    {
+        $this->actingAs($this->_user())->get(route("entities.create"))
+            ->assertOk()
+            ->assertViewIs("entities.create");
+    }
 }
