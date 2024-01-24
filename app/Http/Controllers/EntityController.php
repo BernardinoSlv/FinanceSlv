@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Alert;
 use App\Http\Requests\StoreEntityRequest;
 use App\Http\Requests\UpdateEntityRequest;
 use App\Models\Entity;
@@ -40,7 +41,17 @@ class EntityController extends Controller
      */
     public function store(StoreEntityRequest $request)
     {
-        //
+        $data = $request->validated();
+
+        if ($request->file("avatar")) {
+            $data["avatar"] = $request->file("avatar")->store("avatar");
+        }
+
+        $this->_entityRepository->create(auth()->id(), $data);
+
+        return redirect()->route("entities.index")->with(
+            Alert::success("Entidade criada com sucesso.")
+        );
     }
 
     /**
