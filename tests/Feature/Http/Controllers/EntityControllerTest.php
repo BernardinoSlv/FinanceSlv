@@ -180,6 +180,53 @@ class EntityControllerTest extends TestCase
         ]);
     }
 
+    /**
+     * deve redirecionar para login
+     */
+    public function test_edit_action_unauthenticated(): void
+    {
+        $entity = Entity::factory()->create();
+
+        $this->get(route("entities.edit", $entity))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_nonexistent(): void
+    {
+        $this->actingAs($this->_user())->get(route("entities.edit", 0))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_is_not_owner(): void
+    {
+        $entity = Entity::factory()->create();
+
+        $this->actingAs($this->_user())->get(route("entities.edit", $entity))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action(): void
+    {
+        $user = $this->_user();
+        $entity = Entity::factory()->create([
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->get(route("entities.edit", $entity))
+            ->assertOk()
+            ->assertViewIs("entities.edit")
+            ->assertViewHas("entity");
+    }
+
     public static function invalidPhonesProvider(): array
     {
         return [

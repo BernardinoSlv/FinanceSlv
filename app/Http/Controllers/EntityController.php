@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateEntityRequest;
 use App\Models\Entity;
 use App\Repositories\Contracts\EntityRepositoryContract;
 use App\Repositories\EntityRepository;
+use Illuminate\Support\Facades\Gate;
 
 class EntityController extends Controller
 {
@@ -67,7 +68,13 @@ class EntityController extends Controller
      */
     public function edit(Entity $entity)
     {
-        //
+        if (Gate::denies("entity-edit", $entity)) {
+            abort(404);
+        }
+
+        return  view("entities.edit", compact(
+            "entity"
+        ));
     }
 
     /**

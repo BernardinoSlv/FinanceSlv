@@ -13,8 +13,8 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Título</th>
-                    <th>Valor</th>
+                    <th>Nome</th>
+                    <th>telefone</th>
                     <th>Status</th>
                     <th>Data</th>
                     <th>Ações</th>
@@ -24,11 +24,11 @@
                 @foreach ($entities as $entity)
                     <tr>
                         <td>{{ $entity->id }}</td>
-                        <td>{{ $entity->title }}</td>
-                        <td>R$ {{ $entity->amount }}</td>
+                        <td>{{ $entity->name }}</td>
+                        <td>{{ $entity->phone }}</td>
                         <td><span class="badge bg-success">Ativo</span></td>
                         <td>{{ $entity->created_at_formated }}</td>
-                        <td >
+                        <td>
                             <a class="btn btn-outline-primary btn-sm"
                                 href="{{ route('entities.edit', [
                                     'entity' => $entity->id,
