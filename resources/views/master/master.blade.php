@@ -305,7 +305,7 @@
 
                         <li>
                             <a href="#operations" data-bs-toggle="collapse">
-                                <i class="mdi mdi-email"></i>
+                                <i class="mdi mdi-database-arrow-left-outline"></i>
                                 <span> Operações </span>
                                 <span class="menu-arrow"></span>
                             </a>

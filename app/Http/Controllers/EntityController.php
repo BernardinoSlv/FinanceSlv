@@ -82,7 +82,20 @@ class EntityController extends Controller
      */
     public function update(UpdateEntityRequest $request, Entity $entity)
     {
-        //
+        if (Gate::denies("entity-edit", $entity)) {
+            abort(404);
+        }
+
+        $data = $request->validated();
+        if ($request->file("avatar")) {
+            $data["avatar"] = $request->file("avatar")->store("avatar");
+        }
+
+        $this->_entityRepository->update($entity->id, $data);
+
+        return redirect()->route("entities.edit", $entity)->with(
+            Alert::success("Entidade atualizada com sucesso.")
+        );
     }
 
     /**
