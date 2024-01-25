@@ -62,7 +62,8 @@ class EntryControllerTest extends TestCase
 
         $this->actingAs($user)->get(route("entries.create"))
             ->assertOk()
-            ->assertViewIs("entries.create");
+            ->assertViewIs("entries.create")
+            ->assertViewHas("identifiers");
     }
 
     /**
@@ -226,7 +227,10 @@ class EntryControllerTest extends TestCase
         ]))
             ->assertOk()
             ->assertViewIs("entries.edit")
-            ->assertViewHas("entry");
+            ->assertViewHas([
+                "entry",
+                "identifiers"
+            ]);
     }
 
     /**

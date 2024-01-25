@@ -7,6 +7,7 @@ use App\Http\Requests\StoreEntryRequest;
 use App\Http\Requests\UpdateEntryRequest;
 use App\Models\Entry;
 use App\Repositories\Contracts\EntryRepositoryContract;
+use App\Repositories\Contracts\IdentifierRepositoryContract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
@@ -30,9 +31,13 @@ class EntryController extends Controller
         ));
     }
 
-    public function create()
+    public function create(IdentifierRepositoryContract $identifierRepository)
     {
-        return view("entries.create");
+        $identifiers = $identifierRepository->allByUser(auth()->id());
+
+        return view("entries.create", compact(
+            "identifiers"
+        ));
     }
 
     public function store(StoreEntryRequest $request)
@@ -46,14 +51,15 @@ class EntryController extends Controller
         );
     }
 
-    public function edit(Entry $entry)
+    public function edit(IdentifierRepositoryContract $identifierRepository, Entry $entry)
     {
         if (!Gate::allows("entry-edit", $entry)) {
             abort(404);
         }
-
+        $identifiers = $identifierRepository->allByUser(auth()->id());
         return view("entries.edit", compact(
-            "entry"
+            "entry",
+            "identifiers"
         ));
     }
 
