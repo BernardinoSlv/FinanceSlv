@@ -152,8 +152,9 @@ class EntryControllerTest extends TestCase
      */
     public function test_store_action_with_amount_real_formatting(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->hasIdentifiers(1)->create();
         $data = Entry::factory()->make([
+            "identifier_id" => $user->identifiers->first(),
             "amount" => "192.125,25"
         ])->toArray();
 
@@ -278,9 +279,10 @@ class EntryControllerTest extends TestCase
      */
     public function test_update_action_is_not_owner(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->hasIdentifiers(1)->create();
         $entry = Entry::factory()->create();
         $data = Entry::factory()->make([
+            "identifier_id" => $user->identifiers->first(),
             "amount" => "5.000,00"
         ])->toArray();
 
@@ -291,15 +293,41 @@ class EntryControllerTest extends TestCase
     }
 
     /**
+     * deve redirecionar com erro de validação apenas no campo identifier_id
+     */
+    public function test_update_action_with_identifier_of_other_user(): void
+    {
+        $user = User::factory()->hasIdentifiers(1)->create();
+        $entry = Entry::factory()->create();
+        $data = Entry::factory()->make([
+            "identifier_id" => Identifier::factory()->create(),
+            "amount" => "5.000,00"
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("entries.update", [
+            "entry" => $entry->id
+        ]), $data)
+            ->assertFound()
+            ->assertSessionHasErrors("identifier_id")
+            ->assertSessionDoesntHaveErrors([
+                "title",
+                "amount",
+                "description"
+            ]);
+    }
+
+    /**
      * deve redirecionar com mensagem de sucesso
      */
     public function test_update_action(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->hasIdentifiers(1)->create();
         $entry = Entry::factory()->create([
+            "identifier_id" => $user->identifiers->first(),
             "user_id" => $user->id
         ]);
         $data = Entry::factory()->make([
+            "identifier_id" => $user->identifiers->first(),
             "amount" => "5.000,00"
         ])->toArray();
 
