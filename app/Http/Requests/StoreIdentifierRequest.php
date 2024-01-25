@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
-class StoreEntityRequest extends FormRequest
+class StoreIdentifierRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,7 +26,7 @@ class StoreEntityRequest extends FormRequest
         return [
             "name" => [
                 "required", "min:1", "max:256",
-                Rule::unique("entities", "name")->where("user_id", auth()->id())
+                Rule::unique("identifiers", "name")->where("user_id", auth()->id())
             ],
             "avatar" => ["nullable", "image", "mimetypes:image/jpeg,image/jpg,image/png"],
             "phone" => ["nullable", "regex:/\(\d{2}\)\s\d{4,5}-\d{4}/"],

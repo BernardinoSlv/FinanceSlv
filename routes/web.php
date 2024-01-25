@@ -4,7 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DebtController;
 use App\Http\Controllers\DebtorController;
-use App\Http\Controllers\EntityController;
+use App\Http\Controllers\IdentifierController;
 use App\Http\Controllers\EntryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InvestimentController;
@@ -133,15 +133,15 @@ Route::middleware("checkAuth")->group(function () {
             "destroy" => "needs.destroy",
         ]);
 
-    Route::resource("entidades", EntityController::class)
-        ->parameter("entidades", "entity")
+    Route::resource("identificadores", IdentifierController::class)
+        ->parameter("identificadores", "identifier")
         ->names([
-            "index" => "entities.index",
-            "create" => "entities.create",
-            "store" => "entities.store",
-            "show" => "entities.show",
-            "edit" => "entities.edit",
-            "update" => "entities.update",
-            "destroy" => "entities.destroy",
+            "index" => "identifiers.index",
+            "create" => "identifiers.create",
+            "store" => "identifiers.store",
+            "show" => "identifiers.show",
+            "edit" => "identifiers.edit",
+            "update" => "identifiers.update",
+            "destroy" => "identifiers.destroy",
         ]);
 });

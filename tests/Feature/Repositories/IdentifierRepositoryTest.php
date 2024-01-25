@@ -2,29 +2,29 @@
 
 namespace Tests\Feature\Repositories;
 
-use App\Models\Entity;
-use App\Repositories\Contracts\EntityRepositoryContract;
+use App\Models\Identifier;
+use App\Repositories\Contracts\IdentifierRepositoryContract;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class EntityRepositoryTest extends TestCase
+class IdentifierRepositoryTest extends TestCase
 {
     public function test_create_method(): void
     {
-        $data = Entity::factory()->make()->toArray();
+        $data = Identifier::factory()->make()->toArray();
         $user = $this->_user();
 
         $this->_repository()->create($user->id, $data);
 
-        $this->assertDatabaseHas("entities", [
+        $this->assertDatabaseHas("identifiers", [
             ...$data,
             "user_id" => $user->id
         ]);
     }
 
-    protected function _repository(): EntityRepositoryContract
+    protected function _repository(): IdentifierRepositoryContract
     {
-        return app(EntityRepositoryContract::class);
+        return app(IdentifierRepositoryContract::class);
     }
 }

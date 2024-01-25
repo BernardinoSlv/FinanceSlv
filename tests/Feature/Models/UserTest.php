@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Models;
 
-use App\Models\Entity;
+use App\Models\Identifier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -15,25 +15,25 @@ class UserTest extends TestCase
     /**
      * deve retornar uma coleção vazia
      */
-    public function test_entities_method_without_entity(): void
+    public function test_identifiers_method_without_identifier(): void
     {
-        Entity::factory(10)->create();
+        Identifier::factory(10)->create();
         $user = User::factory()->create();
 
-        $this->assertCount(0, $user->entities);
+        $this->assertCount(0, $user->identifiers);
     }
 
     /**
      * deve retornar uma coleção com 4 items
      */
-    public function test_entities_method(): void
+    public function test_identifiers_method(): void
     {
-        Entity::factory(10)->create();
+        Identifier::factory(10)->create();
         $user = User::factory()->create();
-        Entity::factory(4)->create([
+        Identifier::factory(4)->create([
             "user_id" => $user
         ]);
 
-        $this->assertCount(4, $user->entities);
+        $this->assertCount(4, $user->identifiers);
     }
 }

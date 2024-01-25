@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers;
 
+use App\Models\Identifier;
 use App\Models\Entry;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -89,6 +90,29 @@ class EntryControllerTest extends TestCase
         $this->actingAs($user)->post(route("entries.store"))
             ->assertStatus(302)
             ->assertSessionHasErrors([
+                "identifier_id",
+                "title",
+                "amount"
+            ]);
+    }
+
+    /**
+     * deve redirecionar com erro de validação apenas no campo identifier
+     */
+    public function test_store_action_identifier_of_other_user(): void
+    {
+        $user = User::factory()->hasIdentifiers(1)->create();
+        $data = Entry::factory()->make([
+            "identifier_id" => Identifier::factory()->create(),
+            "amount" => "100,00"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("entries.store"), $data)
+            ->assertFound()
+            ->assertSessionHasErrors([
+                "identifier_id",
+            ])
+            ->assertSessionDoesntHaveErrors([
                 "title",
                 "amount"
             ]);
@@ -101,8 +125,9 @@ class EntryControllerTest extends TestCase
      */
     public function test_store_action(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->hasIdentifiers(1)->create();
         $data = Entry::factory()->make([
+            "identifier_id" => $user->identifiers->first(),
             "amount" => '125,55',
             "description" => "Apenas um teste"
         ])->toArray();

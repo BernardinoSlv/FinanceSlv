@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="text-end mb-3">
-        <a href="{{ route('entities.create') }}" class="btn btn-primary">Criar nova</a>
+        <a href="{{ route('identifiers.create') }}" class="btn btn-primary">Criar nova</a>
     </div>
 
     {{-- <h3>{{ date('m/Y') }}</h3> --}}
@@ -21,29 +21,29 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($entities as $entity)
+                @foreach ($identifiers as $identifier)
                     <tr>
-                        <td>{{ $entity->id }}</td>
-                        <td>{{ $entity->name }}</td>
-                        <td>{{ $entity->phone }}</td>
+                        <td>{{ $identifier->id }}</td>
+                        <td>{{ $identifier->name }}</td>
+                        <td>{{ $identifier->phone }}</td>
                         <td><span class="badge bg-success">Ativo</span></td>
-                        <td>{{ $entity->created_at_formated }}</td>
+                        <td>{{ $identifier->created_at_formated }}</td>
                         <td>
                             <a class="btn btn-outline-primary btn-sm"
-                                href="{{ route('entities.edit', [
-                                    'entity' => $entity->id,
+                                href="{{ route('identifiers.edit', [
+                                    'identifier' => $identifier->id,
                                 ]) }}"><i
                                     class="fas fa-edit"></i></a>
                             <form
-                                action="{{ route('entities.destroy', [
-                                    'entity' => $entity->id,
+                                action="{{ route('identifiers.destroy', [
+                                    'identifier' => $identifier->id,
                                 ]) }}"
                                 method="POST" class="d-inline-block">
                                 @csrf
                                 @method('DELETE')
 
                                 <button class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Deseja remover a entrada #{{ $entity->id }}')">
+                                    onclick="return confirm('Deseja remover a entrada #{{ $identifier->id }}')">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </form>

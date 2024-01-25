@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers;
 
-use App\Models\Entity;
+use App\Models\Identifier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -11,7 +11,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
-class EntityControllerTest extends TestCase
+class IdentifierControllerTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -20,7 +20,7 @@ class EntityControllerTest extends TestCase
      */
     public function test_index_action_unauthenticated(): void
     {
-        $this->get(route("entities.index"))
+        $this->get(route("identifiers.index"))
             ->assertRedirectToRoute("auth.index");
     }
 
@@ -29,10 +29,10 @@ class EntityControllerTest extends TestCase
      */
     public function test_index_action(): void
     {
-        $this->actingAs($this->_user())->get(route("entities.index"))
+        $this->actingAs($this->_user())->get(route("identifiers.index"))
             ->assertOk()
-            ->assertViewIs("entities.index")
-            ->assertViewHas("entities");
+            ->assertViewIs("identifiers.index")
+            ->assertViewHas("identifiers");
     }
 
     /**
@@ -40,7 +40,7 @@ class EntityControllerTest extends TestCase
      */
     public function test_create_action_unauthenticated(): void
     {
-        $this->get(route("entities.create"))->assertRedirectToRoute("auth.index");
+        $this->get(route("identifiers.create"))->assertRedirectToRoute("auth.index");
     }
 
     /**
@@ -48,9 +48,9 @@ class EntityControllerTest extends TestCase
      */
     public function test_create_action(): void
     {
-        $this->actingAs($this->_user())->get(route("entities.create"))
+        $this->actingAs($this->_user())->get(route("identifiers.create"))
             ->assertOk()
-            ->assertViewIs("entities.create");
+            ->assertViewIs("identifiers.create");
     }
 
     /**
@@ -58,7 +58,7 @@ class EntityControllerTest extends TestCase
      */
     public function test_store_action_unauthenticated(): void
     {
-        $this->post(route("entities.store"))->assertRedirectToRoute("auth.index");
+        $this->post(route("identifiers.store"))->assertRedirectToRoute("auth.index");
     }
 
     /**
@@ -66,7 +66,7 @@ class EntityControllerTest extends TestCase
      */
     public function test_store_action_without_data(): void
     {
-        $this->actingAs($this->_user())->post(route("entities.store"))
+        $this->actingAs($this->_user())->post(route("identifiers.store"))
             ->assertFound()
             ->assertSessionHasErrors([
                 "name",
@@ -85,11 +85,11 @@ class EntityControllerTest extends TestCase
      */
     public function test_store_action_invalid_phone_format(string $phone): void
     {
-        $data = Entity::factory()->make([
+        $data = Identifier::factory()->make([
             "phone" => $phone
         ])->toArray();
 
-        $this->actingAs($this->_user())->post(route("entities.store"), $data)
+        $this->actingAs($this->_user())->post(route("identifiers.store"), $data)
             ->assertFound()
             ->assertSessionHasErrors("phone")
             ->assertSessionDoesntHaveErrors([
@@ -105,14 +105,14 @@ class EntityControllerTest extends TestCase
     public function test_store_action_duplicated_name(): void
     {
         $user = $this->_user();
-        $entity = Entity::factory()->create([
+        $identifier = Identifier::factory()->create([
             "user_id" => $user
         ]);
-        $data = Entity::factory()->make([
-            "name" => $entity->name
+        $data = Identifier::factory()->make([
+            "name" => $identifier->name
         ])->toArray();
 
-        $this->actingAs($user)->post(route("entities.store"), $data)
+        $this->actingAs($user)->post(route("identifiers.store"), $data)
             ->assertFound()
             ->assertSessionHasErrors("name")
             ->assertSessionDoesntHaveErrors([
@@ -128,12 +128,12 @@ class EntityControllerTest extends TestCase
     public function test_store_action(): void
     {
         $user = $this->_user();
-        $data = Entity::factory()->make()->toArray();
+        $data = Identifier::factory()->make()->toArray();
 
-        $this->actingAs($user)->post(route("entities.store"), $data)
-            ->assertRedirectToRoute("entities.index")
+        $this->actingAs($user)->post(route("identifiers.store"), $data)
+            ->assertRedirectToRoute("identifiers.index")
             ->assertSessionHas("alert_type", "success");
-        $this->assertDatabaseHas("entities", [
+        $this->assertDatabaseHas("identifiers", [
             ...$data,
             "user_id" => $user->id
         ]);
@@ -147,20 +147,20 @@ class EntityControllerTest extends TestCase
         Storage::fake();
 
         $user = $this->_user();
-        $data = Entity::factory()->make([
+        $data = Identifier::factory()->make([
             "avatar" => UploadedFile::fake()->image("test.jpg")
         ])->toArray();
 
-        $this->actingAs($user)->post(route("entities.store"), $data)
-            ->assertRedirectToRoute("entities.index")
+        $this->actingAs($user)->post(route("identifiers.store"), $data)
+            ->assertRedirectToRoute("identifiers.index")
             ->assertSessionHas("alert_type", "success");
 
-        $entity = Entity::query()->where([
+        $identifier = Identifier::query()->where([
             ...Arr::except($data, "avatar"),
             "user_id" => $user->id
         ])->first();
-        $this->assertNotNull($entity->avatar);
-        $this->assertStringEndsWith(".jpg", $entity->avatar);
+        $this->assertNotNull($identifier->avatar);
+        $this->assertStringEndsWith(".jpg", $identifier->avatar);
     }
 
     /**
@@ -169,14 +169,14 @@ class EntityControllerTest extends TestCase
     public function test_store_action_same_name_other_user(): void
     {
         $user = $this->_user();
-        $data = Entity::factory()->make([
-            "name" => Entity::factory()->create()->name
+        $data = Identifier::factory()->make([
+            "name" => Identifier::factory()->create()->name
         ])->toArray();
 
-        $this->actingAs($user)->post(route("entities.store"), $data)
-            ->assertRedirectToRoute("entities.index")
+        $this->actingAs($user)->post(route("identifiers.store"), $data)
+            ->assertRedirectToRoute("identifiers.index")
             ->assertSessionHas("alert_type", "success");
-        $this->assertDatabaseHas("entities", [
+        $this->assertDatabaseHas("identifiers", [
             ...$data,
             "user_id" => $user->id
         ]);
@@ -187,9 +187,9 @@ class EntityControllerTest extends TestCase
      */
     public function test_edit_action_unauthenticated(): void
     {
-        $entity = Entity::factory()->create();
+        $identifier = Identifier::factory()->create();
 
-        $this->get(route("entities.edit", $entity))
+        $this->get(route("identifiers.edit", $identifier))
             ->assertRedirectToRoute("auth.index");
     }
 
@@ -198,7 +198,7 @@ class EntityControllerTest extends TestCase
      */
     public function test_edit_action_nonexistent(): void
     {
-        $this->actingAs($this->_user())->get(route("entities.edit", 0))
+        $this->actingAs($this->_user())->get(route("identifiers.edit", 0))
             ->assertNotFound();
     }
 
@@ -207,9 +207,9 @@ class EntityControllerTest extends TestCase
      */
     public function test_edit_action_is_not_owner(): void
     {
-        $entity = Entity::factory()->create();
+        $identifier = Identifier::factory()->create();
 
-        $this->actingAs($this->_user())->get(route("entities.edit", $entity))
+        $this->actingAs($this->_user())->get(route("identifiers.edit", $identifier))
             ->assertNotFound();
     }
 
@@ -219,14 +219,14 @@ class EntityControllerTest extends TestCase
     public function test_edit_action(): void
     {
         $user = $this->_user();
-        $entity = Entity::factory()->create([
+        $identifier = Identifier::factory()->create([
             "user_id" => $user
         ]);
 
-        $this->actingAs($user)->get(route("entities.edit", $entity))
+        $this->actingAs($user)->get(route("identifiers.edit", $identifier))
             ->assertOk()
-            ->assertViewIs("entities.edit")
-            ->assertViewHas("entity");
+            ->assertViewIs("identifiers.edit")
+            ->assertViewHas("identifier");
     }
 
     /**
@@ -234,9 +234,9 @@ class EntityControllerTest extends TestCase
      */
     public function test_update_action_unauthenticated(): void
     {
-        $entity = Entity::factory()->create();
+        $identifier = Identifier::factory()->create();
 
-        $this->put(route("entities.update", $entity))
+        $this->put(route("identifiers.update", $identifier))
             ->assertRedirect(route("auth.index"));
     }
 
@@ -245,7 +245,7 @@ class EntityControllerTest extends TestCase
      */
     public function test_update_action_nonexistent(): void
     {
-        $this->actingAs($this->_user())->put(route("entities.update", 0))
+        $this->actingAs($this->_user())->put(route("identifiers.update", 0))
             ->assertNotFound();
     }
 
@@ -255,11 +255,11 @@ class EntityControllerTest extends TestCase
     public function test_update_action_without_data(): void
     {
         $user = User::factory()->create();
-        $entity = Entity::factory()->create([
+        $identifier = Identifier::factory()->create([
             "user_id" => $user
         ]);
 
-        $this->actingAs($user)->put(route("entities.update", $entity))
+        $this->actingAs($user)->put(route("identifiers.update", $identifier))
             ->assertFound()
             ->assertSessionHasErrors("name")
             ->assertSessionDoesntHaveErrors([
@@ -274,10 +274,10 @@ class EntityControllerTest extends TestCase
      */
     public function test_update_action_is_not_owner(): void
     {
-        $entity = Entity::factory()->create();
-        $data = Entity::factory()->make()->toArray();
+        $identifier = Identifier::factory()->create();
+        $data = Identifier::factory()->make()->toArray();
 
-        $this->actingAs($this->_user())->put(route("entities.update", $entity), $data)
+        $this->actingAs($this->_user())->put(route("identifiers.update", $identifier), $data)
             ->assertNotFound();
     }
 
@@ -287,14 +287,14 @@ class EntityControllerTest extends TestCase
     public function test_update_action_duplicated_name(): void
     {
         $user = $this->_user();
-        $entity = Entity::factory()->create([
+        $identifier = Identifier::factory()->create([
             "user_id" => $user
         ]);
-        $data = Entity::factory()->make([
-            "name" => Entity::factory()->create(["user_id" => $user])->name
+        $data = Identifier::factory()->make([
+            "name" => Identifier::factory()->create(["user_id" => $user])->name
         ])->toArray();
 
-        $this->actingAs($user)->put(route("entities.update", $entity), $data)
+        $this->actingAs($user)->put(route("identifiers.update", $identifier), $data)
             ->assertFound()
             ->assertSessionHasErrors("name")
             ->assertSessionDoesntHaveErrors([
@@ -312,14 +312,14 @@ class EntityControllerTest extends TestCase
     public function test_update_action_invalid_phone(string $phone): void
     {
         $user = $this->_user();
-        $entity = Entity::factory()->create([
+        $identifier = Identifier::factory()->create([
             "user_id" => $user
         ]);
-        $data = Entity::factory()->make([
+        $data = Identifier::factory()->make([
             "phone" => $phone
         ])->toArray();
 
-        $this->actingAs($user)->put(route("entities.update", $entity), $data)
+        $this->actingAs($user)->put(route("identifiers.update", $identifier), $data)
             ->assertFound()
             ->assertSessionHasErrors("phone")
             ->assertSessionDoesntHaveErrors([
@@ -335,17 +335,17 @@ class EntityControllerTest extends TestCase
     public function test_update_action(): void
     {
         $user = $this->_user();
-        $entity = Entity::factory()->create([
+        $identifier = Identifier::factory()->create([
             "user_id" => $user
         ]);
-        $data = Entity::factory()->make()->toArray();
+        $data = Identifier::factory()->make()->toArray();
 
-        $this->actingAs($user)->put(route("entities.update", $entity), $data)
-            ->assertRedirectToRoute("entities.edit", $entity)
+        $this->actingAs($user)->put(route("identifiers.update", $identifier), $data)
+            ->assertRedirectToRoute("identifiers.edit", $identifier)
             ->assertSessionHas("alert_type", "success");
-        $this->assertDatabaseHas("entities", [
+        $this->assertDatabaseHas("identifiers", [
             ...$data,
-            "id" => $entity->id,
+            "id" => $identifier->id,
             "user_id" => $user->id
         ]);
     }
@@ -356,19 +356,19 @@ class EntityControllerTest extends TestCase
     public function test_update_action_same_name_other_user(): void
     {
         $user = $this->_user();
-        $entity = Entity::factory()->create([
+        $identifier = Identifier::factory()->create([
             "user_id" => $user
         ]);
-        $data = Entity::factory()->make([
-            "name" => Entity::factory()->create()->name
+        $data = Identifier::factory()->make([
+            "name" => Identifier::factory()->create()->name
         ])->toArray();
 
-        $this->actingAs($user)->put(route("entities.update", $entity), $data)
-            ->assertRedirectToRoute("entities.edit", $entity)
+        $this->actingAs($user)->put(route("identifiers.update", $identifier), $data)
+            ->assertRedirectToRoute("identifiers.edit", $identifier)
             ->assertSessionHas("alert_type", "success");
-        $this->assertDatabaseHas("entities", [
+        $this->assertDatabaseHas("identifiers", [
             ...$data,
-            "id" => $entity->id,
+            "id" => $identifier->id,
             "user_id" => $user->id
         ]);
     }
@@ -379,19 +379,19 @@ class EntityControllerTest extends TestCase
     public function test_update_action_same_name(): void
     {
         $user = $this->_user();
-        $entity = Entity::factory()->create([
+        $identifier = Identifier::factory()->create([
             "user_id" => $user
         ]);
-        $data = Entity::factory()->make([
-            "name" => $entity->name
+        $data = Identifier::factory()->make([
+            "name" => $identifier->name
         ])->toArray();
 
-        $this->actingAs($user)->put(route("entities.update", $entity), $data)
-            ->assertRedirectToRoute("entities.edit", $entity)
+        $this->actingAs($user)->put(route("identifiers.update", $identifier), $data)
+            ->assertRedirectToRoute("identifiers.edit", $identifier)
             ->assertSessionHas("alert_type", "success");
-        $this->assertDatabaseHas("entities", [
+        $this->assertDatabaseHas("identifiers", [
             ...$data,
-            "id" => $entity->id,
+            "id" => $identifier->id,
             "user_id" => $user->id
         ]);
     }
@@ -404,21 +404,21 @@ class EntityControllerTest extends TestCase
         Storage::fake();
 
         $user = $this->_user();
-        $entity = Entity::factory()->create([
+        $identifier = Identifier::factory()->create([
             "user_id" => $user
         ]);
-        $data = Entity::factory()->make([
-            "name" => $entity->name,
+        $data = Identifier::factory()->make([
+            "name" => $identifier->name,
             "avatar" => UploadedFile::fake()->image("avatar.png")
         ])->toArray();
 
-        $this->actingAs($user)->put(route("entities.update", $entity), $data)
-            ->assertRedirectToRoute("entities.edit", $entity)
+        $this->actingAs($user)->put(route("identifiers.update", $identifier), $data)
+            ->assertRedirectToRoute("identifiers.edit", $identifier)
             ->assertSessionHas("alert_type", "success");
-        $actualEntity = Entity::query()->find($entity->id);
+        $actualIdentifier = Identifier::query()->find($identifier->id);
 
-        $this->assertNotNull($actualEntity->avatar);
-        $this->assertStringEndsWith(".png", $actualEntity->avatar);
+        $this->assertNotNull($actualIdentifier->avatar);
+        $this->assertStringEndsWith(".png", $actualIdentifier->avatar);
     }
 
     /**
@@ -426,9 +426,9 @@ class EntityControllerTest extends TestCase
      */
     public function test_destroy_action_unauthenticated(): void
     {
-        $entity = Entity::factory()->create();
+        $identifier = Identifier::factory()->create();
 
-        $this->delete(route("entities.destroy", $entity))
+        $this->delete(route("identifiers.destroy", $identifier))
             ->assertRedirectToRoute("auth.index");
     }
 
@@ -437,7 +437,7 @@ class EntityControllerTest extends TestCase
      */
     public function test_destroy_action_nonexistent(): void
     {
-        $this->actingAs($this->_user())->delete(route("entities.destroy", 0))
+        $this->actingAs($this->_user())->delete(route("identifiers.destroy", 0))
             ->assertNotFound();
     }
 
@@ -446,9 +446,9 @@ class EntityControllerTest extends TestCase
      */
     public function test_destroy_action_is_not_owner(): void
     {
-        $entity = Entity::factory()->create();
+        $identifier = Identifier::factory()->create();
 
-        $this->actingAs($this->_user())->delete(route("entities.destroy", $entity))
+        $this->actingAs($this->_user())->delete(route("identifiers.destroy", $identifier))
             ->assertNotFound();
     }
 
@@ -458,14 +458,14 @@ class EntityControllerTest extends TestCase
     public function test_destroy_action(): void
     {
         $user = $this->_user();
-        $entity = Entity::factory()->create([
+        $identifier = Identifier::factory()->create([
             "user_id" => $user->id
         ]);
 
-        $this->actingAs($user)->delete(route("entities.destroy", $entity))
-            ->assertRedirect(route("entities.index"))
+        $this->actingAs($user)->delete(route("identifiers.destroy", $identifier))
+            ->assertRedirect(route("identifiers.index"))
             ->assertSessionHas("alert_type", "success");
-        $this->assertSoftDeleted($entity);
+        $this->assertSoftDeleted($identifier);
     }
 
     public static function invalidPhonesProvider(): array

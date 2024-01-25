@@ -44,8 +44,8 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function entities(): HasMany
+    public function identifiers(): HasMany
     {
-        return $this->hasMany(Entity::class, "user_id", "id");
+        return $this->hasMany(Identifier::class, "user_id", "id");
     }
 }

@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
-class UpdateEntityRequest extends FormRequest
+class UpdateIdentifierRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,8 +26,8 @@ class UpdateEntityRequest extends FormRequest
         return [
             "name" => [
                 "required", "min:1", "max:256",
-                Rule::unique("entities", "name")->where("user_id", auth()->id())
-                    ->ignore($this->route("entity")->id)
+                Rule::unique("identifiers", "name")->where("user_id", auth()->id())
+                    ->ignore($this->route("identifier")->id)
             ],
             "avatar" => ["nullable", "image", "mimetypes:image/jpeg,image/jpg,image/png"],
             "phone" => ["nullable", "regex:/\(\d{2}\)\s\d{4,5}-\d{4}/"],

@@ -426,9 +426,9 @@
                                 </ul>
                         </li>
                         <li>
-                            <a href="{{ route('entities.index') }}">
+                            <a href="{{ route('identifiers.index') }}">
                                 <i class="mdi mdi-account-group"></i>
-                                <span> Entidades </span>
+                                <span> Identificadores </span>
                             </a>
                         </li>
                     </ul>
