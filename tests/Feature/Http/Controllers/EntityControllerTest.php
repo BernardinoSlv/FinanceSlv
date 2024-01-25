@@ -421,6 +421,53 @@ class EntityControllerTest extends TestCase
         $this->assertStringEndsWith(".png", $actualEntity->avatar);
     }
 
+    /**
+     * deve redirecionar para login
+     */
+    public function test_destroy_action_unauthenticated(): void
+    {
+        $entity = Entity::factory()->create();
+
+        $this->delete(route("entities.destroy", $entity))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_nonexistent(): void
+    {
+        $this->actingAs($this->_user())->delete(route("entities.destroy", 0))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_is_not_owner(): void
+    {
+        $entity = Entity::factory()->create();
+
+        $this->actingAs($this->_user())->delete(route("entities.destroy", $entity))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_destroy_action(): void
+    {
+        $user = $this->_user();
+        $entity = Entity::factory()->create([
+            "user_id" => $user->id
+        ]);
+
+        $this->actingAs($user)->delete(route("entities.destroy", $entity))
+            ->assertRedirect(route("entities.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertSoftDeleted($entity);
+    }
+
     public static function invalidPhonesProvider(): array
     {
         return [

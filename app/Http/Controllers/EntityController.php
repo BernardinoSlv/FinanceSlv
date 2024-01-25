@@ -103,6 +103,13 @@ class EntityController extends Controller
      */
     public function destroy(Entity $entity)
     {
-        //
+        if (Gate::denies("entity-edit", $entity)) {
+            abort(404);
+        }
+
+        $this->_entityRepository->delete($entity->id);
+        return redirect()->route("entities.index")->with(
+            Alert::success("Entidade removida com sucesso.")
+        );
     }
 }

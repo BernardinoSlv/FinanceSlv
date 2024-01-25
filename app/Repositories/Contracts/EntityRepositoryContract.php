@@ -14,4 +14,6 @@ interface EntityRepositoryContract
     public function create(int $userId, array $attribures): Entity;
 
     public function update(int $id, array $attributes): bool;
+
+    public function delete(int $id): bool;
 }
