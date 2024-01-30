@@ -14,6 +14,7 @@ class Debtor extends Model
     use DatetimeFormated;
 
     protected $fillable = [
+        "identifier_id",
         "title",
         "amount",
         "description",
