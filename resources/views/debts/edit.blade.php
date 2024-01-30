@@ -9,7 +9,7 @@
         <div class="row gy-3 mb-4">
             <div class="col-sm-6">
                 <label for="" class="form-label">Identificador</label>
-                <x-inputs.selects.identifier :identifiers="$identifiers" :selected-id="$expense->identifier_id" />
+                <x-inputs.selects.identifier :identifiers="$identifiers" :selected-id="$debt->identifier_id" />
             </div>
             <div class="col-sm-6">
                 <label for="" class="form-label">Título</label>
