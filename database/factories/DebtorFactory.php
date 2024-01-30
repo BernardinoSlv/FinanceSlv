@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Identifier;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -17,8 +18,10 @@ class DebtorFactory extends Factory
      */
     public function definition(): array
     {
+        $user = User::factory()->create();
         return [
-            "user_id" => User::factory()->create(),
+            "user_id" => $user,
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "title" => fake()->word() . time() . rand(0, 1000) . rand(0, 1000),
             "amount" => 10,
             "description" => fake()->text(),
