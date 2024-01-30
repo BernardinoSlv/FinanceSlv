@@ -26,15 +26,12 @@ class StoreDebtorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "title" => [
+            "identifier_id" => [
                 "required",
-                "min:1",
-                "max:256",
-                Rule::unique("debtors", "title")
-                    ->where(function (Builder $query): void {
-                        $query->where("user_id", auth()->user()->id);
-                    })
+                Rule::exists("identifiers", "id")
+                    ->where("user_id", auth()->id())
             ],
+            "title" => ["required", "min:1", "max:256",],
             "amount" => ["required", "regex:" . RegexEnum::AMOUNT->value],
             "description" => ["nullable"],
         ];

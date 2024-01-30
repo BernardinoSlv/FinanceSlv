@@ -26,12 +26,12 @@ class UpdateDebtorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "title" => [
-                "required", "min:1", "max:256",
-                Rule::unique("debtors", "title")->where(function (Builder $query): void {
-                    $query->where("user_id", auth()->user()->id);
-                })->ignore($this->debtor->id)
+            "identifier_id" => [
+                "required",
+                Rule::exists("identifiers", "id")
+                    ->where("user_id", auth()->id())
             ],
+            "title" => ["required", "min:1", "max:256",],
             "amount" => ["required", "regex:" . RegexEnum::AMOUNT->value],
             "description" => ["nullable"]
         ];
