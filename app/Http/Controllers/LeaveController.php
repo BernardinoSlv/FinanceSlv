@@ -6,6 +6,7 @@ use App\Helpers\Alert;
 use App\Http\Requests\StoreLeaveRequest;
 use App\Http\Requests\UpdateLeaveRequest;
 use App\Models\Leave;
+use App\Repositories\Contracts\IdentifierRepositoryContract;
 use App\Repositories\Contracts\LeaveRepositoryContract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -35,9 +36,13 @@ class LeaveController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(IdentifierRepositoryContract $identifierRepository)
     {
-        return view("leaves.create");
+        $identifiers = $identifierRepository->allByUser(auth()->id());
+
+        return view("leaves.create", compact(
+            "identifiers"
+        ));
     }
 
     /**
@@ -66,14 +71,16 @@ class LeaveController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Leave $leave)
+    public function edit(IdentifierRepositoryContract $identifierRepository, Leave $leave)
     {
         if (!Gate::allows("leave-edit", $leave)) {
             abort(404);
         }
+        $identifiers = $identifierRepository->allByUser(auth()->id());
 
         return view("leaves.edit", compact(
-            "leave"
+            "leave",
+            "identifiers"
         ));
     }
 
