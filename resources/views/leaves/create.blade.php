@@ -7,12 +7,16 @@
         @csrf
 
         <div class="row gy-3 mb-4">
-            <div class="col-sm-8">
+            <div class="col-sm-6">
+                <label for="" class="form-label">Identificador</label>
+                <x-inputs.selects.identifier :identifiers="$identifiers" />
+            </div>
+            <div class="col-sm-6">
                 <label for="" class="form-label">Título</label>
                 <input type="text" name="title" class="form-control" value="{{ old('title') }}">
                 <div class="form-text"></div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-6">
                 <label for="" class="form-label">Valor</label>
                 <input type="text" name="amount" class="form-control" value="{{ old('amount') }}">
                 <div class="form-text">Ex: 125,50</div>

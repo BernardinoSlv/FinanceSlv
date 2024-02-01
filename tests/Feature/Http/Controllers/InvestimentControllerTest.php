@@ -2,11 +2,13 @@
 
 namespace Tests\Feature\Http\Controllers;
 
+use App\Models\Identifier;
 use App\Models\Investiment;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Arr;
 use Tests\TestCase;
 
 class InvestimentControllerTest extends TestCase
@@ -55,7 +57,8 @@ class InvestimentControllerTest extends TestCase
     {
         $this->actingAs($this->_user())->get(route("investiments.create"))
             ->assertOk()
-            ->assertViewIs("investiments.create");
+            ->assertViewIs("investiments.create")
+            ->assertViewHas("identifiers");
     }
 
     /**
@@ -81,29 +84,20 @@ class InvestimentControllerTest extends TestCase
     }
 
     /**
-     * deve redirecionar com erro no campo title
+     * deve ter erro de validação apenas no campo identifier_id
      */
-    public function test_store_action_duplicated_title(): void
+    public function test_store_action_using_identifier_is_not_owner(): void
     {
         $user = $this->_user();
-        $investiment = Investiment::factory()->create([
-            "user_id" => $user
-        ]);
         $data = Investiment::factory()->make([
-            "title" => $investiment->title,
+            "identifier_id" => Identifier::factory()->create(),
             "amount" => "1.000,00"
         ])->toArray();
 
-
         $this->actingAs($user)->post(route("investiments.store"), $data)
             ->assertFound()
-            ->assertSessionHasErrors([
-                "title",
-            ])
-            ->assertSessionDoesntHaveErrors([
-                "description",
-                "amount"
-            ]);
+            ->assertSessionHasErrors("identifier_id")
+            ->assertSessionDoesntHaveErrors(array_keys(Arr::except($data, "identifier_id")));
     }
 
     /**
@@ -113,8 +107,35 @@ class InvestimentControllerTest extends TestCase
     {
         $user = $this->_user();
         $data = Investiment::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "amount" => "1.000,00"
         ])->toArray();
+
+        $this->actingAs($user)->post(route("investiments.store"), $data)
+            ->assertRedirectToRoute("investiments.index")
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("investiments", [
+            ...$data,
+            "user_id" => $user->id,
+            "amount" => 1000.00
+        ]);
+    }
+
+    /**
+     * deve persistir com sucesso
+     */
+    public function test_store_action_duplicated_title(): void
+    {
+        $user = $this->_user();
+        $investiment = Investiment::factory()->create([
+            "user_id" => $user
+        ]);
+        $data = Investiment::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
+            "title" => $investiment->title,
+            "amount" => "1.000,00"
+        ])->toArray();
+
 
         $this->actingAs($user)->post(route("investiments.store"), $data)
             ->assertRedirectToRoute("investiments.index")
@@ -133,6 +154,7 @@ class InvestimentControllerTest extends TestCase
     {
         $user = $this->_user();
         $data = Investiment::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "amount" => "1.000,00",
             "title" => Investiment::factory()->create()->title
         ])->toArray();
@@ -190,7 +212,7 @@ class InvestimentControllerTest extends TestCase
         $this->actingAs($user)->get(route("investiments.edit", $investiment))
             ->assertOk()
             ->assertViewIs("investiments.edit")
-            ->assertViewHas("investiment");
+            ->assertViewHas(["investiment", "identifiers"]);
     }
 
     /**
@@ -209,12 +231,14 @@ class InvestimentControllerTest extends TestCase
      */
     public function test_update_action_is_not_owner(): void
     {
+        $user = $this->_user();
         $investiment = Investiment::factory()->create();
         $data = Investiment::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "amount" => "5.000,00"
         ])->toArray();
 
-        $this->actingAs($this->_user())->put(route("investiments.update", $investiment), $data)
+        $this->actingAs($user)->put(route("investiments.update", $investiment), $data)
             ->assertNotFound();
     }
 
@@ -238,29 +262,23 @@ class InvestimentControllerTest extends TestCase
     }
 
     /**
-     * deve redirecionar com erro no campo title
+     * deve redirecionar com erro de validação apenas no campo identifier_id
      */
-    public function test_update_action_duplicated_title(): void
+    public function test_update_action_using_identifier_is_not_owner(): void
     {
         $user = $this->_user();
         $investiment = Investiment::factory()->create([
             "user_id" => $user
         ]);
-        $otherInvestiment = Investiment::factory()->create([
-            "user_id" => $user,
-        ]);
         $data = Investiment::factory()->make([
-            "title" => $otherInvestiment->title,
+            "identifier_id" => Identifier::factory()->create(),
             "amount" => "5.000,00"
         ])->toArray();
 
         $this->actingAs($user)->put(route("investiments.update", $investiment), $data)
             ->assertFound()
-            ->assertSessionHasErrors("title")
-            ->assertSessionDoesntHaveErrors([
-                "amount",
-                "description"
-            ]);
+            ->assertSessionHasErrors("identifier_id")
+            ->assertSessionDoesntHaveErrors(array_keys(Arr::except($data, "identifier_id")));
     }
 
     /**
@@ -273,6 +291,36 @@ class InvestimentControllerTest extends TestCase
             "user_id" => $user
         ]);
         $data = Investiment::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
+            "amount" => "5.000,00"
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("investiments.update", $investiment), $data)
+            ->assertRedirectToRoute("investiments.index")
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("investiments", [
+            ...$data,
+            "id" => $investiment->id,
+            "user_id" => $user->id,
+            "amount" => 5000.00
+        ]);
+    }
+
+    /**
+     * deve atualizar registro
+     */
+    public function test_update_action_duplicated_title(): void
+    {
+        $user = $this->_user();
+        $investiment = Investiment::factory()->create([
+            "user_id" => $user
+        ]);
+        $otherInvestiment = Investiment::factory()->create([
+            "user_id" => $user,
+        ]);
+        $data = Investiment::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
+            "title" => $otherInvestiment->title,
             "amount" => "5.000,00"
         ])->toArray();
 
@@ -297,6 +345,7 @@ class InvestimentControllerTest extends TestCase
             "user_id" => $user
         ]);
         $data = Investiment::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "title" => $investiment->title,
             "amount" => "5.000,00"
         ])->toArray();
@@ -322,6 +371,7 @@ class InvestimentControllerTest extends TestCase
             "user_id" => $user
         ]);
         $data = Investiment::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "title" => Investiment::factory()->create()->title,
             "amount" => "5.000,00"
         ])->toArray();

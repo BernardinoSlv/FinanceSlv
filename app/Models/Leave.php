@@ -12,6 +12,7 @@ class Leave extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        "identifier_id",
         "title",
         "description",
         "amount",

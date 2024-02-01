@@ -6,7 +6,9 @@ use App\Helpers\Alert;
 use App\Http\Requests\StoreInvestimentRequest;
 use App\Http\Requests\UpdateInvestimentRequest;
 use App\Models\Investiment;
+use App\Repositories\Contracts\IdentifierRepositoryContract;
 use App\Repositories\Contracts\InvestimentRepositoryContract;
+use App\Repositories\IdentifierRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
@@ -33,9 +35,13 @@ class InvestimentController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(IdentifierRepositoryContract $identifierRepository)
     {
-        return view("investiments.create");
+        $identifiers = $identifierRepository->allByUser(auth()->id());
+
+        return view("investiments.create", compact(
+            "identifiers"
+        ));
     }
 
     /**
@@ -64,14 +70,18 @@ class InvestimentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Investiment $investiment)
-    {
+    public function edit(
+        IdentifierRepositoryContract $identifierRepository,
+        Investiment $investiment
+    ) {
         if (Gate::denies("investiment-edit", $investiment)) {
             abort(404);
         }
+        $identifiers = $identifierRepository->allByUser(auth()->id());
 
         return view("investiments.edit", compact(
-            "investiment"
+            "investiment",
+            "identifiers"
         ));
     }
 

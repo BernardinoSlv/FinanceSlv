@@ -305,7 +305,7 @@
 
                         <li>
                             <a href="#operations" data-bs-toggle="collapse">
-                                <i class="mdi mdi-email"></i>
+                                <i class="mdi mdi-database-arrow-left-outline"></i>
                                 <span> Operações </span>
                                 <span class="menu-arrow"></span>
                             </a>
@@ -424,6 +424,12 @@
                                         </div>
                                     </li>
                                 </ul>
+                        </li>
+                        <li>
+                            <a href="{{ route('identifiers.index') }}">
+                                <i class="mdi mdi-account-group"></i>
+                                <span> Identificadores </span>
+                            </a>
                         </li>
                     </ul>
 

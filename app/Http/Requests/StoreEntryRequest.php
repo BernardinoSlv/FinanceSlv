@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Enums\RegexEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Src\Parsers\ToFloatParser;
 
 class StoreEntryRequest extends FormRequest
@@ -25,6 +26,10 @@ class StoreEntryRequest extends FormRequest
     public function rules(): array
     {
         return [
+            "identifier_id" => [
+                "required",
+                Rule::exists("identifiers", "id")->where("user_id", auth()->id())
+            ],
             "title" => ["required", "min:3", "max:256"],
             "amount" => ["required", "regex:" . RegexEnum::AMOUNT->value],
             "description" => ["nullable"]

@@ -30,20 +30,20 @@ abstract class BaseRepository
 
     public function update(int $id, array $attributes): bool
     {
-        if (!($entity = $this->_model->find($id))) {
+        if (!($identifier = $this->_model->find($id))) {
             return false;
         }
-        $entity->fill($attributes);
-        $entity->save();
+        $identifier->fill($attributes);
+        $identifier->save();
         return true;
     }
 
     public function delete(int $id): bool
     {
-        if (!($entity = $this->_model->query()->find($id))) {
+        if (!($identifier = $this->_model->query()->find($id))) {
             return false;
         }
-        $entity->delete();
+        $identifier->delete();
         return true;
     }
 }

@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Models\Debt;
 use App\Models\Debtor;
+use App\Models\Identifier;
 use App\Models\Entry;
 use App\Models\Expense;
 use App\Models\Investiment;
@@ -51,12 +52,16 @@ class AuthServiceProvider extends ServiceProvider
             return $user->id === $debt->user_id;
         });
 
-        Gate::define("investiment-edit", function(User $user, Investiment $investiment): bool {
+        Gate::define("investiment-edit", function (User $user, Investiment $investiment): bool {
             return $user->id === $investiment->user_id;
         });
 
-        Gate::define("need-edit", function(User $user, Need $need): bool {
+        Gate::define("need-edit", function (User $user, Need $need): bool {
             return $user->id === $need->user_id;
+        });
+
+        Gate::define("identifier-edit", function (User $user, Identifier $identifier): bool {
+            return $user->id === $identifier->user_id;
         });
     }
 }

@@ -12,6 +12,7 @@ class Investiment extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        "identifier_id",
         "title",
         "amount",
         "description"

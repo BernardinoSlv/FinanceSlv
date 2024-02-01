@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Debtor;
+use App\Models\Identifier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -10,6 +11,8 @@ use Tests\TestCase;
 
 class DebtorControllerTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * deve redirecionar para página de login
      */
@@ -44,7 +47,8 @@ class DebtorControllerTest extends TestCase
     {
         $this->actingAs($this->_user())->get(route("debtors.create"))
             ->assertOk()
-            ->assertViewIs("debtors.create");
+            ->assertViewIs("debtors.create")
+            ->assertViewHas("identifiers");
     }
 
     /**
@@ -69,25 +73,22 @@ class DebtorControllerTest extends TestCase
     }
 
     /**
-     * deve redirecionar com erros de validação
+     * deve ter erro de validação apenas no campo identifier_id
      */
-    public function test_store_action_duplicated_title(): void
+    public function test_store_action_using_identifier_is_not_owner(): void
     {
         $user = $this->_user();
-        $debtor = Debtor::factory()->create([
-            "user_id" => $user->id
-        ]);
         $data = Debtor::factory()->make([
-            "title" => $debtor->title,
-            "amount" => "99,30"
+            "identifier_id" => Identifier::factory()->create(),
+            "amount" => "10.000,00"
         ])->toArray();
 
         $this->actingAs($user)->post(route("debtors.store"), $data)
-            ->assertStatus(302)
-            ->assertSessionHasErrors("title")
+            ->assertFound()
+            ->assertSessionHasErrors("identifier_id")
             ->assertSessionDoesntHaveErrors([
-                "amonut",
-                "description",
+                "amount",
+                "description"
             ]);
     }
 
@@ -98,6 +99,7 @@ class DebtorControllerTest extends TestCase
     {
         $user = $this->_user();
         $data = Debtor::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "amount" => "10.000,00"
         ])->toArray();
 
@@ -112,6 +114,31 @@ class DebtorControllerTest extends TestCase
     }
 
     /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_store_action_duplicated_title(): void
+    {
+        $user = $this->_user();
+        $debtor = Debtor::factory()->create([
+            "user_id" => $user->id
+        ]);
+        $data = Debtor::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
+            "title" => $debtor->title,
+            "amount" => "99,30"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("debtors.store"), $data)
+            ->assertRedirect(route("debtors.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("debtors", [
+            ...$data,
+            "amount" => 99.30,
+            "user_id" => $user->id
+        ]);
+    }
+
+    /**
      * deve criar registro com título repetido, desde que não seja do usuário
      */
     public function test_store_action_same_title_of_the_other_user(): void
@@ -119,6 +146,7 @@ class DebtorControllerTest extends TestCase
         $user = $this->_user();
         $debtor = Debtor::factory()->create();
         $data = Debtor::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "title" => $debtor->title,
             "amount" => "99,00"
         ])->toArray();
@@ -177,7 +205,10 @@ class DebtorControllerTest extends TestCase
         $this->actingAs($user)->get(route("debtors.edit", $debtor))
             ->assertOk()
             ->assertViewIs("debtors.edit")
-            ->assertViewHas("debtor");
+            ->assertViewHas([
+                "debtor",
+                "identifiers"
+            ]);
     }
 
     /**
@@ -196,13 +227,15 @@ class DebtorControllerTest extends TestCase
      */
     public function test_update_action_is_not_owner(): void
     {
+        $user = $this->_user();
         $debtor = Debtor::factory()->create();
         $data = Debtor::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "amount" => "200,00"
         ])->toArray();
 
 
-        $this->actingAs($this->_user())->put(route("debtors.update", $debtor), $data)
+        $this->actingAs($user)->put(route("debtors.update", $debtor), $data)
             ->assertNotFound();
     }
 
@@ -240,30 +273,28 @@ class DebtorControllerTest extends TestCase
     }
 
     /**
-     * deve redirecionar com erro de validação no campo title
+     * deve ter erro de validação apenas no campo identifier_id
      */
-    public function test_update_action_duplicated_title(): void
+    public function test_update_action_using_identifier_is_not_owner(): void
     {
         $user = $this->_user();
-        $outherdebtor = Debtor::factory()->create([
-            "user_id" => $user
-        ]);
         $debtor = Debtor::factory()->create([
             "user_id" => $user
         ]);
         $data = Debtor::factory()->make([
-            "title" => $outherdebtor->title,
-            "amount" => "29,90"
+            "identifier_id" => Identifier::factory()->create(),
+            "amount" => "500,00"
         ])->toArray();
 
         $this->actingAs($user)->put(route("debtors.update", $debtor), $data)
             ->assertFound()
-            ->assertSessionHasErrors("title")
+            ->assertSessionHasErrors("identifier_id")
             ->assertSessionDoesntHaveErrors([
                 "amount",
                 "description"
             ]);
     }
+
     /**
      * deve redirecionar com mensagem de sucesso
      */
@@ -274,6 +305,7 @@ class DebtorControllerTest extends TestCase
             "user_id" => $user
         ]);
         $data = Debtor::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "amount" => "500,00"
         ])->toArray();
 
@@ -288,6 +320,34 @@ class DebtorControllerTest extends TestCase
     }
 
     /**
+     * deve ter mensagem de sucesso
+     */
+    public function test_update_action_duplicated_title(): void
+    {
+        $user = $this->_user();
+        $outherdebtor = Debtor::factory()->create([
+            "user_id" => $user
+        ]);
+        $debtor = Debtor::factory()->create([
+            "user_id" => $user
+        ]);
+        $data = Debtor::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
+            "title" => $outherdebtor->title,
+            "amount" => "29,90"
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("debtors.update", $debtor), $data)
+            ->assertRedirect(route("debtors.edit", $debtor))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("debtors", [
+            ...$data,
+            "user_id" => $user->id,
+            "amount" => 29.90
+        ]);
+    }
+
+    /**
      * deve redirecionar com mensagem de sucesso
      */
     public function test_update_action_same_title(): void
@@ -297,6 +357,7 @@ class DebtorControllerTest extends TestCase
             "user_id" => $user
         ]);
         $data = Debtor::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "amount" => "500,00",
             "title" => $debtor->title
         ])->toArray();

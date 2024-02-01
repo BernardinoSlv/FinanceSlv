@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Identifier;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -17,8 +18,13 @@ class EntryFactory extends Factory
      */
     public function definition(): array
     {
+        $user = User::factory()->create();
+        
         return [
-            "user_id" => User::factory()->create()->id,
+            "user_id" => $user,
+            "identifier_id" => Identifier::factory()->create([
+                "user_id" => $user
+            ]),
             "title" => fake("pt_BR")->title(),
             "description" => null,
             "amount" => 10000

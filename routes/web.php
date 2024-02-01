@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DebtController;
 use App\Http\Controllers\DebtorController;
+use App\Http\Controllers\IdentifierController;
 use App\Http\Controllers\EntryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InvestimentController;
@@ -130,5 +131,17 @@ Route::middleware("checkAuth")->group(function () {
             "edit" => "needs.edit",
             "update" => "needs.update",
             "destroy" => "needs.destroy",
+        ]);
+
+    Route::resource("identificadores", IdentifierController::class)
+        ->parameter("identificadores", "identifier")
+        ->names([
+            "index" => "identifiers.index",
+            "create" => "identifiers.create",
+            "store" => "identifiers.store",
+            "show" => "identifiers.show",
+            "edit" => "identifiers.edit",
+            "update" => "identifiers.update",
+            "destroy" => "identifiers.destroy",
         ]);
 });

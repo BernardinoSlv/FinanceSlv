@@ -7,6 +7,7 @@ use App\Http\Requests\StoreDebtorRequest;
 use App\Http\Requests\UpdateDebtorRequest;
 use App\Models\Debtor;
 use App\Repositories\Contracts\DebtorRepositoryContract;
+use App\Repositories\Contracts\IdentifierRepositoryContract;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
@@ -33,9 +34,11 @@ class DebtorController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(IdentifierRepositoryContract $identifierRepository,)
     {
-        return view("debtors.create");
+        $identifiers = $identifierRepository->allByUser(auth()->id());
+
+        return view("debtors.create", compact("identifiers"));
     }
 
     /**
@@ -64,13 +67,14 @@ class DebtorController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Debtor $debtor)
+    public function edit(IdentifierRepositoryContract $identifierRepository, Debtor $debtor)
     {
         if (Gate::denies("debtor-edit", $debtor)) {
             abort(404);
         }
+        $identifiers = $identifierRepository->allByUser(auth()->id());
 
-        return view("debtors.edit", compact("debtor"));
+        return view("debtors.edit", compact("debtor", "identifiers"));
     }
 
     /**

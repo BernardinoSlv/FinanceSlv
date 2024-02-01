@@ -2,10 +2,12 @@
 
 namespace Tests\Feature\Http\Controllers;
 
+use App\Models\Identifier;
 use App\Models\Need;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Arr;
 use Tests\TestCase;
 
 class NeedControllerTest extends TestCase
@@ -48,7 +50,10 @@ class NeedControllerTest extends TestCase
     {
         $this->actingAs($this->_user())->get(route("needs.create"))
             ->assertOk()
-            ->assertViewIs("needs.create");
+            ->assertViewIs("needs.create")
+            ->assertViewHas([
+                "identifiers"
+            ]);
     }
 
     /**
@@ -98,12 +103,50 @@ class NeedControllerTest extends TestCase
     }
 
     /**
+     * deve ter erro de validação apenas no campo identifier_id
+     */
+    public function test_store_action_using_identifier_is_not_owner(): void
+    {
+        $user = $this->_user();
+        $data = Need::factory()->make([
+            "identifier_id" => Identifier::factory()->create(),
+            "amount" => "100,00"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("needs.store"), $data)
+            ->assertFound()
+            ->assertSessionHasErrors("identifier_id")
+            ->assertSessionDoesntHaveErrors(array_keys(Arr::except($data, "identifier_id")));
+    }
+
+    /**
      * deve redirecionar com mensagem de sucesso
      */
     public function test_store_action(): void
     {
         $user = $this->_user();
         $data = Need::factory()->make([
+            "amount" => "100,00"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("needs.store"), $data)
+            ->assertRedirectToRoute("needs.index")
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("needs", [
+            ...$data,
+            "amount" => 100.00,
+            "user_id" => $user->id
+        ]);
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_store_action_sended_identifier(): void
+    {
+        $user = $this->_user();
+        $data = Need::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "amount" => "100,00"
         ])->toArray();
 
@@ -183,7 +226,10 @@ class NeedControllerTest extends TestCase
         $this->actingAs($user)->get(route("needs.edit", $need))
             ->assertOk()
             ->assertViewIs("needs.edit")
-            ->assertViewHas("need");
+            ->assertViewHas([
+                "need",
+                "identifiers"
+            ]);
     }
 
     /**
@@ -232,12 +278,14 @@ class NeedControllerTest extends TestCase
      */
     public function test_update_action_without_permission(): void
     {
+        $user = $this->_user();
         $need = Need::factory()->create([]);
         $data = Need::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "amount" => "200,00"
         ])->toArray();
 
-        $this->actingAs($this->_user())->put(route("needs.update", $need), $data)
+        $this->actingAs($user)->put(route("needs.update", $need), $data)
             ->assertNotFound();
     }
 
@@ -268,6 +316,46 @@ class NeedControllerTest extends TestCase
     }
 
     /**
+     * deve ter erro de validação apenas no campo identifier_id
+     */
+    public function test_update_action_using_identifier_is_not_owner(): void
+    {
+        $user = $this->_user();
+        $need = Need::factory()->create([
+            "user_id" => $user
+        ]);
+        $data = Need::factory()->make([
+            "identifier_id" => Identifier::factory()->create(),
+            "amount" => "120,00"
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("needs.update", $need), $data)
+            ->assertFound()
+            ->assertSessionHasErrors("identifier_id")
+            ->assertSessionDoesntHaveErrors(array_keys(Arr::except($data, "identifier_id")));
+    }
+
+    /**
+     * deve ter erro de validação apenas no campo identifier_id
+     */
+    public function test_update_action_without_identifier_when_status_is_completed(): void
+    {
+        $user = $this->_user();
+        $need = Need::factory()->create([
+            "user_id" => $user
+        ]);
+        $data = Need::factory()->make([
+            "amount" => "120,00",
+            "completed" => 1,
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("needs.update", $need), $data)
+            ->assertFound()
+            ->assertSessionHasErrors("identifier_id")
+            ->assertSessionDoesntHaveErrors(array_keys(Arr::except($data, "identifier_id")));
+    }
+
+    /**
      * deve redirecionar com mensagem de sucesso
      */
     public function test_update_action(): void
@@ -277,7 +365,34 @@ class NeedControllerTest extends TestCase
             "user_id" => $user
         ]);
         $data = Need::factory()->make([
-            "amount" => "120,00"
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
+            "amount" => "120,00",
+            "completed" => 1,
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("needs.update", $need), $data)
+            ->assertRedirectToRoute("needs.edit", $need)
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("needs", [
+            ...$data,
+            "amount" => 120.00,
+            "user_id" => $user->id
+        ]);
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_update_action_without_identifier_with_status_completed_zero_field(): void
+    {
+        $user = $this->_user();
+        $need = Need::factory()->create([
+            "user_id" => $user,
+            "completed" => 1
+        ]);
+        $data = Need::factory()->make([
+            "amount" => "120,00",
+            "completed" => 0,
         ])->toArray();
 
         $this->actingAs($user)->put(route("needs.update", $need), $data)
@@ -300,6 +415,7 @@ class NeedControllerTest extends TestCase
             "user_id" => $user
         ]);
         $data = Need::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "title" => $need->title,
             "amount" => "120,00"
         ])->toArray();

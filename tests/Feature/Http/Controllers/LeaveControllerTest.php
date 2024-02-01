@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers;
 
+use App\Models\Identifier;
 use App\Models\Leave;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -10,6 +11,8 @@ use Tests\TestCase;
 
 class LeaveControllerTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * deve redirecionar para página de login
      */
@@ -50,7 +53,8 @@ class LeaveControllerTest extends TestCase
 
         $this->actingAs($user)->get(route("leaves.create"))
             ->assertOk()
-            ->assertViewIs("leaves.create");
+            ->assertViewIs("leaves.create")
+            ->assertViewHas("identifiers");
     }
 
     /**
@@ -72,10 +76,29 @@ class LeaveControllerTest extends TestCase
         $this->actingAs($user)->post(route("leaves.store"))
             ->assertStatus(302)
             ->assertSessionHasErrors([
+                "identifier_id",
                 "title",
                 "amount"
             ])
             ->assertSessionDoesntHaveErrors("description");
+    }
+
+    /**
+     * deve redirecionar com erro no campo identifier_id
+     */
+    public function test_store_action_using_identifier_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $data = Leave::factory()->make([
+            "amount" => "100,00"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("leaves.store"), $data)
+            ->assertFound()
+            ->assertSessionHasErrors([
+                "identifier_id",
+            ])
+            ->assertSessionDoesntHaveErrors(["amount", "title", "description"]);
     }
 
     /**
@@ -85,6 +108,9 @@ class LeaveControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $data = Leave::factory()->make([
+            "identifier_id" => Identifier::factory()->create([
+                "user_id" => $user
+            ]),
             "amount" => "15,99"
         ])->toArray();
 
@@ -142,7 +168,7 @@ class LeaveControllerTest extends TestCase
         $this->actingAs($user)->get(route("leaves.edit", $leave->id))
             ->assertOk()
             ->assertViewIs("leaves.edit")
-            ->assertViewHas("leave");
+            ->assertViewHas(["leave", "identifiers"]);
     }
 
     /**
@@ -170,12 +196,16 @@ class LeaveControllerTest extends TestCase
      */
     public function test_update_is_not_owner(): void
     {
+        $user = $this->_user();
         $leave = Leave::factory()->create();
         $data = Leave::factory()->make([
+            "identifier_id" => Identifier::factory()->create([
+                "user_id" => $user
+            ]),
             "amount" => "100,00"
         ])->toArray();
 
-        $this->actingAs($this->_user())->put(route("leaves.update", $leave->id), $data)
+        $this->actingAs($user)->put(route("leaves.update", $leave->id), $data)
             ->assertStatus(404);
     }
 
@@ -199,6 +229,31 @@ class LeaveControllerTest extends TestCase
     }
 
     /**
+     * deve redirecionar com erro de validação no campo identifier_id
+     */
+    public function test_update_action_using_identifier_is_not_owner(): void
+    {
+        $user = $this->_user();
+        $leave = Leave::factory()->create([
+            "user_id" => $user->id
+        ]);
+        $data = Leave::factory()->make([
+            "amount" => "100,00"
+        ])->toArray();
+
+        $this->actingAs($this->_user())->put(route("leaves.update", $leave->id), $data)
+            ->assertFound(302)
+            ->assertSessionHasErrors([
+                "identifier_id",
+            ])
+            ->assertSessionDoesntHaveErrors([
+                "title",
+                "description",
+                "amount"
+            ]);
+    }
+
+    /**
      * deve redirecionar com mensagem de sucesso
      */
     public function test_update(): void
@@ -208,6 +263,9 @@ class LeaveControllerTest extends TestCase
             "user_id" => $user->id
         ]);
         $data = Leave::factory()->make([
+            "identifier_id" => Identifier::factory()->create([
+                "user_id" => $user
+            ]),
             "amount" => "100,00"
         ])->toArray();
 

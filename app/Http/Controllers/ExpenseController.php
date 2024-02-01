@@ -7,6 +7,7 @@ use App\Http\Requests\StoreExpenseRequest;
 use App\Http\Requests\UpdateExpenseRequest;
 use App\Models\Expense;
 use App\Repositories\Contracts\ExpenseRepositoryContract;
+use App\Repositories\Contracts\IdentifierRepositoryContract;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
@@ -33,9 +34,13 @@ class ExpenseController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(IdentifierRepositoryContract $identifierRepository)
     {
-        return view("expenses.create");
+        $identifiers = $identifierRepository->allByUser(auth()->id());
+
+        return view("expenses.create", compact(
+            "identifiers"
+        ));
     }
 
     /**
@@ -65,12 +70,14 @@ class ExpenseController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Expense $expense)
+    public function edit(IdentifierRepositoryContract $identifierRepository, Expense $expense)
     {
         if (Gate::denies("expense-edit", $expense)) {
             abort(404);
         }
-        return view("expenses.edit", compact("expense"));
+        $identifiers = $identifierRepository->allByUser(auth()->id());
+
+        return view("expenses.edit", compact("expense", "identifiers"));
     }
 
     /**

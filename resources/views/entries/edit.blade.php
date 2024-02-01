@@ -3,18 +3,22 @@
 @section('content')
     @include('includes.alerts')
 
-    <form action="{{ route("entries.update", [
-        "entry" => $entry->id
+    <form action="{{ route('entries.update', [
+        'entry' => $entry->id,
     ]) }}" method="POST">
         @method('PUT')
         @csrf
         <div class="row gy-3 mb-4">
-            <div class="col-sm-8">
+            <div class="col-sm-6">
+                <label for="" class="form-label">Identificador</label>
+                <x-inputs.selects.identifier :identifiers="$identifiers" :selected-id="$entry->identifier_id" />
+            </div>
+            <div class="col-sm-6">
                 <label for="" class="form-label">Título</label>
                 <input type="text" name="title" class="form-control" value="{{ old('title', $entry->title) }}">
                 <div class="form-text">Ex: Pagamento do fulano</div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-6">
                 <label for="" class="form-label">Valor</label>
                 <input type="text" name="amount" class="form-control" value="{{ old('amount', $entry->amount) }}">
                 <div class="form-text">Ex: 125,50</div>

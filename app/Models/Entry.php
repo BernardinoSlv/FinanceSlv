@@ -14,6 +14,7 @@ class Entry extends Model
     use DatetimeFormated;
 
     protected $fillable = [
+        "identifier_id",
         "title",
         "description",
         "amount",

@@ -3,17 +3,21 @@
 @section('content')
     @include('includes.alerts')
 
-    <form action="{{ route('expenses.update', $debtor) }}" method="POST">
+    <form action="{{ route('debtors.update', $debtor) }}" method="POST">
         @csrf
         @method('PUT')
 
         <div class="row gy-3 mb-4">
-            <div class="col-sm-8">
+            <div class="col-sm-6">
+                <label for="" class="form-label">Identificador</label>
+                <x-inputs.selects.identifier :identifiers="$identifiers" :selected-id="$debtor->identifier_id" />
+            </div>
+            <div class="col-sm-6">
                 <label for="" class="form-label">Título</label>
                 <input type="text" name="title" class="form-control" value="{{ old('title', $debtor->title) }}">
                 <div class="form-text"></div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-6">
                 <label for="" class="form-label">Valor</label>
                 <input type="text" name="amount" class="form-control" value="{{ old('amount', $debtor->amount) }}">
                 <div class="form-text">Ex: 125,50</div>

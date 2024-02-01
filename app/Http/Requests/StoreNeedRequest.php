@@ -25,6 +25,10 @@ class StoreNeedRequest extends FormRequest
     public function rules(): array
     {
         return [
+            "identifier_id" => [
+                "nullable",
+                Rule::exists("identifiers", "id")->where("user_id", auth()->id()),
+            ],
             "title" => [
                 "required", "min:1", "max:256",
                 Rule::unique("needs", "title")->where("user_id", auth()->id())
