@@ -25,6 +25,11 @@ class UpdateNeedRequest extends FormRequest
     public function rules(): array
     {
         return [
+            "identifier_id" => [
+                "required_if:completed,1",
+                "nullable",
+                Rule::exists("identifiers", "id")->where("user_id", auth()->id()),
+            ],
             "title" => [
                 "required", "min:1", "max:256",
                 Rule::unique("needs", "title")
@@ -32,7 +37,8 @@ class UpdateNeedRequest extends FormRequest
                     ->ignore($this->need->id)
             ],
             "amount" => ["required", "regex:" . RegexEnum::AMOUNT->value],
-            "description" => ["nullable"]
+            "description" => ["nullable"],
+            "completed" => ["nullable", "in:0,1"],
         ];
     }
 }
