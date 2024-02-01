@@ -6,6 +6,7 @@ use App\Helpers\Alert;
 use App\Http\Requests\StoreNeedRequest;
 use App\Http\Requests\UpdateNeedRequest;
 use App\Models\Need;
+use App\Repositories\Contracts\IdentifierRepositoryContract;
 use App\Repositories\Contracts\NeedRepositoryContract;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
@@ -33,9 +34,13 @@ class NeedController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(IdentifierRepositoryContract $identifierRepository)
     {
-        return view("needs.create");
+        $identifiers = $identifierRepository->allByUser(auth()->id());
+
+        return view("needs.create", compact(
+            "identifiers"
+        ));
     }
 
     /**
@@ -64,14 +69,16 @@ class NeedController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Need $need)
+    public function edit(IdentifierRepositoryContract $identifierRepository, Need $need)
     {
         if (Gate::denies("need-edit", $need)) {
             abort(404);
         }
+        $identifiers = $identifierRepository->allByUser(auth()->id());
 
         return view("needs.edit", compact(
-            "need"
+            "need",
+            "identifiers"
         ));
     }
 
