@@ -7,12 +7,16 @@
         @method('PUT')
         @csrf
         <div class="row gy-3 mb-4">
-            <div class="col-sm-8">
+            <div class="col-sm-6">
+                <label for="" class="form-label">Identificador</label>
+                <x-inputs.selects.identifier :identifiers="$identifiers" :selected-id="$investiment->identifier_id" />
+            </div>
+            <div class="col-sm-6">
                 <label for="" class="form-label">Título</label>
                 <input type="text" name="title" class="form-control" value="{{ old('title', $investiment->title) }}">
                 <div class="form-text">Ex: Pagamento do fulano</div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-6">
                 <label for="" class="form-label">Valor</label>
                 <input type="text" name="amount" class="form-control" value="{{ old('amount', $investiment->amount) }}">
                 <div class="form-text">Ex: 125,50</div>
