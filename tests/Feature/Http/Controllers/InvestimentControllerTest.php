@@ -57,7 +57,8 @@ class InvestimentControllerTest extends TestCase
     {
         $this->actingAs($this->_user())->get(route("investiments.create"))
             ->assertOk()
-            ->assertViewIs("investiments.create");
+            ->assertViewIs("investiments.create")
+            ->assertViewHas("identifiers");
     }
 
     /**
@@ -211,7 +212,7 @@ class InvestimentControllerTest extends TestCase
         $this->actingAs($user)->get(route("investiments.edit", $investiment))
             ->assertOk()
             ->assertViewIs("investiments.edit")
-            ->assertViewHas("investiment");
+            ->assertViewHas(["investiment", "identifiers"]);
     }
 
     /**
