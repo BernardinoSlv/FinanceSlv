@@ -6,12 +6,21 @@
     <form action="{{ route('needs.store') }}" method="POST">
         @csrf
         <div class="row gy-3 mb-4">
-            <div class="col-sm-8">
+            <div class="col-sm-6">
+                <label for="" class="form-label">Identificador</label>
+                <select name="identifier_id" class="form-control">
+                    <option value="" selected></option>
+                    @foreach ($identifiers as $identifier)
+                        <option value="{{ $identifier->id }}" @selected(intval(old('identifier_id')) === $identifier->id)>{{ $identifier->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-sm-6">
                 <label for="" class="form-label">Título</label>
                 <input type="text" name="title" class="form-control" value="{{ old('title') }}">
                 <div class="form-text">Ex: Pagamento do fulano</div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-6">
                 <label for="" class="form-label">Valor</label>
                 <input type="text" name="amount" class="form-control" value="{{ old('amount') }}">
                 <div class="form-text">Ex: 125,50</div>
