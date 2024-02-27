@@ -62,7 +62,8 @@ abstract class BaseRepository
             return $this->_model->query()->where([
                 "leaveable_type" => $polymorphType,
                 "leaveable_id" => $polymorphId
-            ]);
+            ])
+            ->delete();
         }
         throw new Error("Method is not allowed");
     }
