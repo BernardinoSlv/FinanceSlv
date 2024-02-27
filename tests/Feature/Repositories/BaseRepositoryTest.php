@@ -120,7 +120,7 @@ class BaseRepositoryTest extends TestCase
     public function test_delete_polymorph_method_without_entry(): void
     {
         Entry::factory(10)->create();
-        Entry::factory(10)
+        $entries = Entry::factory(10)
             ->sequence(
                 ...Debtor::factory(10)->create()->map(function (Debtor $debtor): array {
                     return ["entryable_id" => $debtor->id];
@@ -130,9 +130,10 @@ class BaseRepositoryTest extends TestCase
                 "entryable_type" => Debtor::class
             ]);
 
+        // dd(Entry::all()->map(fn (Entry $entry) => dump($entry->id)));
         $this->assertEquals(0, $this->_repository()->deletePolymorph(
             Debtor::class,
-            21
+            $entries->last()->id + 1
         ));
         $this->assertDatabaseCount("entries", 20);
     }
