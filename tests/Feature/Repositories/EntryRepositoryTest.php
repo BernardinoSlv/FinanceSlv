@@ -3,6 +3,7 @@
 namespace Tests\Feature\Repositories;
 
 use App\Models\Entry;
+use App\Models\Expense;
 use App\Models\User;
 use App\Repositories\Contracts\EntryRepositoryContract;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -49,6 +50,25 @@ class EntryRepositoryTest extends TestCase
         $this->assertDatabaseHas("entries", [
             ...$data,
             "user_id" => $user->id,
+        ]);
+    }
+
+    /**
+     * deve criar registro para uma entrada polimorfica
+     */
+    public function test_create_method_using_polymorph(): void
+    {
+        $expense = Expense::factory()->create();
+
+        $this->_repository()->create($expense->user_id, [
+            "entryable_type" => Expense::class,
+            "entryable_id" => $expense->id
+        ]);
+
+        $this->assertDatabaseHas("entries", [
+            "user_id" => $expense->user_id,
+            "entryable_type" => Expense::class,
+            "entryable_id" => $expense->id
         ]);
     }
 
