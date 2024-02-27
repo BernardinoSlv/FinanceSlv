@@ -16,4 +16,9 @@ interface EntryRepositoryContract
     public function update(int $id, array $attributes): bool;
 
     public function delete(int $id): bool;
+
+    /**
+     * remove registros polimorficos 
+     */
+    public function deletePolymorph(string $entryableType, int $entryableId): int;
 }

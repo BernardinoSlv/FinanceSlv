@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Repositories;
 
+use App\Models\Debtor;
 use App\Models\Entry;
 use App\Models\Expense;
 use App\Models\User;
@@ -58,19 +59,20 @@ class EntryRepositoryTest extends TestCase
      */
     public function test_create_method_using_polymorph(): void
     {
-        $expense = Expense::factory()->create();
+        $debtor = Debtor::factory()->create();
 
-        $this->_repository()->create($expense->user_id, [
-            "entryable_type" => Expense::class,
-            "entryable_id" => $expense->id
+        $this->_repository()->create($debtor->user_id, [
+            "entryable_type" => Debtor::class,
+            "entryable_id" => $debtor->id
         ]);
 
         $this->assertDatabaseHas("entries", [
-            "user_id" => $expense->user_id,
-            "entryable_type" => Expense::class,
-            "entryable_id" => $expense->id
+            "user_id" => $debtor->user_id,
+            "entryable_type" => Debtor::class,
+            "entryable_id" => $debtor->id
         ]);
     }
+
 
     protected function _repository(): EntryRepositoryContract
     {

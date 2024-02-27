@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Repositories\Contracts\EntryRepositoryContract;
+use App\Repositories\Contracts\LeaveRepositoryContract;
+use Error;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -45,5 +48,22 @@ abstract class BaseRepository
         }
         $identifier->delete();
         return true;
+    }
+
+    public function deletePolymorph(string $polymorphType, int $polymorphId): int
+    {
+        if ($this instanceof EntryRepositoryContract) {
+            return $this->_model->query()->where([
+                "entryable_type" => $polymorphType,
+                "entryable_id" => $polymorphId
+            ])
+                ->delete();
+        } elseif ($this instanceof LeaveRepositoryContract) {
+            return $this->_model->query()->where([
+                "leaveable_type" => $polymorphType,
+                "leaveable_id" => $polymorphId
+            ]);
+        }
+        throw new Error("Method is not allowed");
     }
 }

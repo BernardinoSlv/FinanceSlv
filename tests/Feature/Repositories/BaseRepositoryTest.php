@@ -2,9 +2,12 @@
 
 namespace Tests\Feature\Repositories;
 
+use App\Models\Debtor;
 use App\Models\Entry;
 use App\Models\User;
 use App\Repositories\Contracts\EntryRepositoryContract;
+use App\Repositories\Contracts\ExpenseRepositoryContract;
+use Error;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -99,6 +102,91 @@ class BaseRepositoryTest extends TestCase
             "id" => $entry->id
         ]);
     }
+
+    /**
+     * deve lançar uma exceção
+     */
+    public function test_delete_polymorph_method_should_throw_error(): void
+    {
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage("Method is not allowed");
+
+        app(ExpenseRepositoryContract::class)->deletePolymorph(Debtor::class, 21);
+    }
+
+    /**
+     * deve retornar 0
+     */
+    public function test_delete_polymorph_method_without_entry(): void
+    {
+        Entry::factory(10)->create();
+        Entry::factory(10)
+            ->sequence(
+                ...Debtor::factory(10)->create()->map(function (Debtor $debtor): array {
+                    return ["entryable_id" => $debtor->id];
+                })
+            )
+            ->create([
+                "entryable_type" => Debtor::class
+            ]);
+
+        $this->assertEquals(0, $this->_repository()->deletePolymorph(
+            Debtor::class,
+            21
+        ));
+        $this->assertDatabaseCount("entries", 20);
+    }
+
+    /**
+     * deve retorna 1
+     */
+    public function test_delete_polymorph_method_with_one_entry(): void
+    {
+        Entry::factory(10)->create();
+        Entry::factory(10)
+            ->sequence(
+                ...Debtor::factory(10)->create()->map(function (Debtor $debtor): array {
+                    return ["entryable_id" => $debtor->id];
+                })
+            )
+            ->create([
+                "entryable_type" => Debtor::class
+            ]);
+        $debtor = Debtor::factory()->create();
+        Entry::factory()->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => $debtor->id
+        ]);
+
+        $this->assertEquals(1, $this->_repository()->deletePolymorph(Debtor::class, $debtor->id));
+        $this->assertDatabaseCount("entries", 20);
+    }
+
+    /**
+     * deve retornar 10
+     */
+    public function test_delete_polymorph_method(): void
+    {
+        Entry::factory(10)->create();
+        Entry::factory(10)
+            ->sequence(
+                ...Debtor::factory(10)->create()->map(function (Debtor $debtor): array {
+                    return ["entryable_id" => $debtor->id];
+                })
+            )
+            ->create([
+                "entryable_type" => Debtor::class
+            ]);
+        $debtor = Debtor::factory()->create();
+        Entry::factory(5)->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => $debtor->id
+        ]);
+
+        $this->assertEquals(5, $this->_repository()->deletePolymorph(Debtor::class, $debtor->id));
+        $this->assertDatabaseCount("entries", 20);
+    }
+
 
     protected function _repository(): EntryRepositoryContract
     {
