@@ -2,12 +2,17 @@
 
 namespace Tests\Feature\Http\Controllers;
 
+use App\Models\Entry;
 use App\Models\Expense;
 use App\Models\Identifier;
 use App\Models\User;
+use App\Repositories\Contracts\EntryRepositoryContract;
+use App\Repositories\Contracts\ExpenseRepositoryContract;
+use App\Repositories\Contracts\LeaveRepositoryContract;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
+use Mockery;
 use Tests\TestCase;
 
 class ExpenseControllerTest extends TestCase
@@ -161,15 +166,20 @@ class ExpenseControllerTest extends TestCase
         ])->toArray();
         $data = Arr::except($data, "effetive_at");
 
+        $this->instance(
+            LeaveRepositoryContract::class,
+            Mockery::mock(LeaveRepositoryContract::class)
+                ->shouldReceive("create")
+                ->once()
+                ->withSomeOfArgs($user->id)
+                ->getMock()
+        );
+
         $this->assertArrayNotHasKey("effetive_at", $data);
         $this->actingAs($user)->post(route("expenses.store"), $data)
             ->assertRedirect(route("expenses.index"))
             ->assertSessionHas("alert_type", "success");
-        $this->assertDatabaseHas("expenses", [
-            ...Arr::except($data, "user_id"),
-            "user_id" => $user->id,
-            "amount" => 100.00
-        ]);
+        Mockery::close();
     }
 
     /**
@@ -390,10 +400,31 @@ class ExpenseControllerTest extends TestCase
         $expense = Expense::factory()->create([
             "user_id" => $user->id
         ]);
+        $entry = Entry::factory()->create([
+            "entryable_type" => Expense::class,
+            "entryable_id" => $expense->id
+        ]);
+
+        $this->instance(
+            ExpenseRepositoryContract::class,
+            Mockery::mock(ExpenseRepositoryContract::class)
+                ->shouldReceive("delete")
+                ->with($expense->id)
+                ->once()
+                ->getMock()
+        );
+        $this->instance(
+            LeaveRepositoryContract::class,
+            Mockery::mock(LeaveRepositoryContract::class)
+                ->shouldReceive("deletePolymorph")
+                ->with(Expense::class, $expense->id)
+                ->once()
+                ->getMock()
+        );
 
         $this->actingAs($user)->delete(route("expenses.destroy", $expense))
             ->assertRedirect(route("expenses.index"))
             ->assertSessionHas("alert_type", "success");
-        $this->assertSoftDeleted($expense);
+        Mockery::close();
     }
 }

@@ -6,8 +6,10 @@ use App\Helpers\Alert;
 use App\Http\Requests\StoreExpenseRequest;
 use App\Http\Requests\UpdateExpenseRequest;
 use App\Models\Expense;
+use App\Repositories\Contracts\EntryRepositoryContract;
 use App\Repositories\Contracts\ExpenseRepositoryContract;
 use App\Repositories\Contracts\IdentifierRepositoryContract;
+use App\Repositories\Contracts\LeaveRepositoryContract;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
@@ -46,13 +48,22 @@ class ExpenseController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreExpenseRequest $request)
-    {
-        $this->_expenseRepository->create(auth()->user()->id, [
+    public function store(
+        StoreExpenseRequest $request,
+        LeaveRepositoryContract $leaveRepository
+    ) {
+        $expense = $this->_expenseRepository->create(auth()->user()->id, [
             ...$request->validated(),
             "amount" => RealToFloatParser::parse($request->input("amount")),
             "effetive_at" => $request->input("effetive_at") ?? Carbon::now(),
         ]);
+
+        if (!$request->input("effetive_at")) {
+            $leaveRepository->create(auth()->id(), [
+                "leaveable_type" => Expense::class,
+                "leaveable_id" => $expense->id
+            ]);
+        }
 
         return redirect()->route("expenses.index")->with(
             Alert::success("Despesa criada com sucesso.")
@@ -101,12 +112,14 @@ class ExpenseController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Expense $expense)
+    public function destroy(LeaveRepositoryContract $leaveRepository, Expense $expense)
     {
         if (Gate::denies("expense-edit", $expense)) {
             abort(404);
         }
+
         $this->_expenseRepository->delete($expense->id);
+        $leaveRepository->deletePolymorph(Expense::class, $expense->id);
 
         return redirect()->route("expenses.index")->with(
             Alert::success("Despesa removida com sucesso")
