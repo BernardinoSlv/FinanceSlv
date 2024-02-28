@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Repositories\Contracts\BaseRepositoryContract;
 use App\Repositories\Contracts\EntryRepositoryContract;
 use App\Repositories\Contracts\LeaveRepositoryContract;
 use Error;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-abstract class BaseRepository
+abstract class BaseRepository implements BaseRepositoryContract
 {
     protected Model $_model;
 
