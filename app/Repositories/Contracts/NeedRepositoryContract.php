@@ -7,7 +7,7 @@ namespace App\Repositories\Contracts;
 use App\Models\Need;
 use Illuminate\Database\Eloquent\Collection;
 
-interface NeedRepositoryContract
+interface NeedRepositoryContract extends BaseRepositoryContract
 {
     public function create(int $userId, array $attributes): Need;
 }

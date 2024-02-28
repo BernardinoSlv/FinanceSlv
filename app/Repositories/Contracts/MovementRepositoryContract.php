@@ -6,7 +6,7 @@ namespace App\Repositories\Contracts;
 
 use App\Models\Movement;
 
-interface MovementRepositoryContract
+interface MovementRepositoryContract extends BaseRepositoryContract
 {
     public function create(int $userId, array $attributes): Movement;
 }

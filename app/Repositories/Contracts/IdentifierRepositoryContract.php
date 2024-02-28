@@ -7,7 +7,7 @@ namespace App\Repositories\Contracts;
 use App\Models\Identifier;
 use Illuminate\Database\Eloquent\Collection;
 
-interface IdentifierRepositoryContract
+interface IdentifierRepositoryContract extends BaseRepositoryContract
 {
     public function create(int $userId, array $attribures): Identifier;
 }

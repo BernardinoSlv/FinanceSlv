@@ -7,7 +7,7 @@ namespace App\Repositories\Contracts;
 use App\Models\Entry;
 use Illuminate\Database\Eloquent\Collection;
 
-interface EntryRepositoryContract
+interface EntryRepositoryContract extends BaseRepositoryContract
 {
     public function create(int $userId,  array $attributes): Entry;
 

@@ -7,7 +7,7 @@ namespace App\Repositories\Contracts;
 use App\Models\Debt;
 use Illuminate\Database\Eloquent\Collection;
 
-interface DebtRepositoryContract
+interface DebtRepositoryContract extends BaseRepositoryContract
 {
     public function create(int $userId, array $attributes): Debt;
 }
