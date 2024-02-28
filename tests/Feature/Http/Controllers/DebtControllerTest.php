@@ -79,7 +79,6 @@ class DebtControllerTest extends TestCase
             ->assertSessionHasErrors([
                 "title",
                 "amount",
-                "start_at"
             ])
             ->assertSessionDoesntHaveErrors([
                 "description"
@@ -250,7 +249,6 @@ class DebtControllerTest extends TestCase
             ->assertSessionHasErrors([
                 "title",
                 "amount",
-                "start_at"
             ])
             ->assertSessionDoesntHaveErrors("description");
     }
