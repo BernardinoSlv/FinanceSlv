@@ -16,5 +16,7 @@ class Leave extends Model
         "title",
         "description",
         "amount",
+        "leaveable_type",
+        "leaveable_id"
     ];
 }

@@ -18,5 +18,7 @@ class Entry extends Model
         "title",
         "description",
         "amount",
+        "entryable_type",
+        "entryable_id"
     ];
 }

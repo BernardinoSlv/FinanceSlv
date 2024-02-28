@@ -16,7 +16,7 @@ class ExpenseRepository extends BaseRepository implements ExpenseRepositoryContr
 
     public function create(int $userId, array $attributes): Expense
     {
-        $expense = $this->_model->fill($attributes);
+        $expense = new Expense($attributes);
         $expense->user_id = $userId;
         $expense->save();
         return $expense;

@@ -16,7 +16,7 @@ class IdentifierRepository extends BaseRepository implements IdentifierRepositor
 
     public function create(int $userId, array $attribures): Identifier
     {
-        $identifier = $this->_model->newInstance($attribures);
+        $identifier = new Identifier($attribures);
         $identifier->user_id = $userId;
         $identifier->save();
         return $identifier;

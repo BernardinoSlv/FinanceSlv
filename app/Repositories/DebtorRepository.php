@@ -16,10 +16,9 @@ class DebtorRepository extends BaseRepository implements DebtorRepositoryContrac
 
     public function create(int $userId, array $attributes): Debtor
     {
-        $debtor = $this->_model->fill($attributes);
+        $debtor = new Debtor($attributes);
         $debtor->user_id = $userId;
         $debtor->save();
-
         return $debtor;
     }
 }

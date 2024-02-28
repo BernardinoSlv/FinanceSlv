@@ -34,7 +34,6 @@ class UpdateDebtRequest extends FormRequest
             "title" => ["required", "min:1", "max:256",],
             "description" => ["nullable"],
             "amount" => ["required", "regex:" . RegexEnum::AMOUNT->value],
-            "start_at" => ["required", "date"]
         ];
     }
 }

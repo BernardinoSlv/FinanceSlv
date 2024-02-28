@@ -18,6 +18,5 @@ class Debt extends Model
         "title",
         "description",
         "amount",
-        "start_at"
     ];
 }

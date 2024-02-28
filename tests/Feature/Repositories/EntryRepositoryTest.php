@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Repositories;
 
+use App\Models\Debtor;
 use App\Models\Entry;
+use App\Models\Expense;
 use App\Models\User;
 use App\Repositories\Contracts\EntryRepositoryContract;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -51,6 +53,26 @@ class EntryRepositoryTest extends TestCase
             "user_id" => $user->id,
         ]);
     }
+
+    /**
+     * deve criar registro para uma entrada polimorfica
+     */
+    public function test_create_method_using_polymorph(): void
+    {
+        $debtor = Debtor::factory()->create();
+
+        $this->_repository()->create($debtor->user_id, [
+            "entryable_type" => Debtor::class,
+            "entryable_id" => $debtor->id
+        ]);
+
+        $this->assertDatabaseHas("entries", [
+            "user_id" => $debtor->user_id,
+            "entryable_type" => Debtor::class,
+            "entryable_id" => $debtor->id
+        ]);
+    }
+
 
     protected function _repository(): EntryRepositoryContract
     {
