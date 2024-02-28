@@ -16,7 +16,7 @@ class NeedRepository extends BaseRepository implements NeedRepositoryContract
 
     public function create(int $userId, array $attributes): Need
     {
-        $need = $this->_model->fill($attributes);
+        $need = new Need($attributes);
         $need->user_id = $userId;
         $need->save();
         return $need;
