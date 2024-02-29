@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateLeaveRequest;
 use App\Models\Leave;
 use App\Repositories\Contracts\IdentifierRepositoryContract;
 use App\Repositories\Contracts\LeaveRepositoryContract;
+use App\Repositories\Contracts\MovementRepositoryContract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
@@ -48,11 +49,17 @@ class LeaveController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreLeaveRequest $request)
-    {
-        $this->_leaveRepository->create(auth()->user()->id, [
+    public function store(
+        StoreLeaveRequest $request,
+        MovementRepositoryContract $movementRepository
+    ) {
+        $leave = $this->_leaveRepository->create(auth()->user()->id, [
             ...$request->validated(),
             "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+        $movementRepository->create(auth()->id(), [
+            "movementable_type" => Leave::class,
+            "movementable_id" => $leave->id
         ]);
 
         return redirect()->route("leaves.index")->with(
@@ -105,12 +112,13 @@ class LeaveController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Leave $leave)
+    public function destroy(MovementRepositoryContract $movementRepository, Leave $leave)
     {
         if (!Gate::allows("leave-edit", $leave)) {
             abort(404);
         }
         $this->_leaveRepository->delete($leave->id);
+        $movementRepository->deletePolymorph(Leave::class, $leave->id);
 
         return redirect()->route("leaves.index")->with(
             Alert::success("Saída excluída com sucesso.")

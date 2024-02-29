@@ -5,8 +5,13 @@ namespace Tests\Feature\Http\Controllers;
 use App\Models\Identifier;
 use App\Models\Leave;
 use App\Models\User;
+use App\Repositories\Contracts\LeaveRepositoryContract;
+use App\Repositories\Contracts\MovementRepositoryContract;
+use App\Repositories\LeaveRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Arr;
+use Mockery;
 use Tests\TestCase;
 
 class LeaveControllerTest extends TestCase
@@ -104,7 +109,7 @@ class LeaveControllerTest extends TestCase
     /**
      * deve redirecionar com mensagem de sucesso
      */
-    public function test_store(): void
+    public function test_store_action(): void
     {
         $user = User::factory()->create();
         $data = Leave::factory()->make([
@@ -114,14 +119,35 @@ class LeaveControllerTest extends TestCase
             "amount" => "15,99"
         ])->toArray();
 
+        $this->instance(
+            LeaveRepositoryContract::class,
+            Mockery::mock(app(LeaveRepositoryContract::class))
+                ->shouldReceive("create")
+                ->with($user->id, [
+                    ...Arr::only($data, ["identifier_id", "title", "description"]),
+                    "amount" => 15.99
+                ])
+                ->passthru()
+                ->once()
+                ->getMock()
+        );
+        $this->instance(
+            MovementRepositoryContract::class,
+            Mockery::mock(MovementRepositoryContract::class)
+                ->shouldReceive("create")
+                ->with($user->id, [
+                    "movementable_type" => Leave::class,
+                    "movementable_id" => 1
+                ])
+                ->once()
+                ->getMock()
+
+        );
+
         $this->actingAs($user)->post(route("leaves.store"), $data)
             ->assertRedirect(route("leaves.index"))
             ->assertSessionHas("alert_type", "success");
-        $this->assertDatabaseHas("leaves", [
-            ...$data,
-            "amount" => 15.99,
-            "user_id" => $user->id
-        ]);
+        Mockery::close();
     }
 
     /**
@@ -320,9 +346,26 @@ class LeaveControllerTest extends TestCase
             "user_id" => $user->id
         ]);
 
+        $this->instance(
+            LeaveRepositoryContract::class,
+            Mockery::mock(LeaveRepositoryContract::class)
+                ->shouldReceive("delete")
+                ->with($leave->id)
+                ->once()
+                ->getMock()
+        );
+        $this->instance(
+            MovementRepositoryContract::class,
+            Mockery::mock(MovementRepositoryContract::class)
+                ->shouldReceive("deletePolymorph")
+                ->with(Leave::class, $leave->id)
+                ->once()
+                ->getMock()
+        );
+
         $this->actingAs($user)->delete(route("leaves.destroy", $leave->id))
             ->assertRedirect(route("leaves.index"))
             ->assertSessionHas("alert_type", "success");
-        $this->assertSoftDeleted($leave);
+        Mockery::close();
     }
 }
