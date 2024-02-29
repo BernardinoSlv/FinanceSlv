@@ -5,9 +5,12 @@ namespace Tests\Feature\Http\Controllers;
 use App\Models\Identifier;
 use App\Models\Entry;
 use App\Models\User;
+use App\Repositories\Contracts\EntryRepositoryContract;
+use App\Repositories\Contracts\MovementRepositoryContract;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
+use Mockery;
 use Tests\TestCase;
 
 class EntryControllerTest extends TestCase
@@ -133,17 +136,38 @@ class EntryControllerTest extends TestCase
             "description" => "Apenas um teste"
         ])->toArray();
 
+        $this->instance(
+            EntryRepositoryContract::class,
+            Mockery::mock(app(EntryRepositoryContract::class))
+                ->shouldReceive("create")
+                ->with($user->id, [
+                    ...Arr::only($data, ["title", "identifier_id", "description"]),
+                    "amount" => 125.55
+                ])
+                ->passthru()
+                ->once()
+                ->getMock()
+        );
+        $this->instance(
+            MovementRepositoryContract::class,
+            Mockery::mock(MovementRepositoryContract::class)
+                ->shouldReceive("create")
+                ->with($user->id, [
+                    "movementable_type" => Entry::class,
+                    "movementable_id" => 1
+                ])
+                ->once()
+                ->getMock()
+        );
+
         $this->actingAs($user)->post(route("entries.store"), $data)
             ->assertRedirect(route("entries.index"))
             ->assertSessionHas([
                 "alert_type" => "success",
                 "alert_text" => "Entrada criada com sucesso."
             ]);
-        $this->assertDatabaseHas("entries", [
-            ...$data,
-            "user_id" => $user->id,
-            "amount" => 125.55
-        ]);
+
+        Mockery::close();
     }
 
     /**
@@ -402,14 +426,29 @@ class EntryControllerTest extends TestCase
             "user_id" => $user->id
         ]);
 
+        $this->instance(
+            EntryRepositoryContract::class,
+            Mockery::mock(app(EntryRepositoryContract::class))
+                ->shouldReceive("delete")
+                ->with($entry->id)
+                ->once()
+                ->getMock()
+        );
+        $this->instance(
+            MovementRepositoryContract::class,
+            Mockery::mock(app(MovementRepositoryContract::class))
+                ->shouldReceive("deletePolymorph")
+                ->with(Entry::class, $entry->id)
+                ->once()
+                ->getMock()
+        );
+
         $this->actingAs($user)->delete(route("entries.destroy", [
             "entry" => $entry->id
         ]))
             ->assertRedirect(route("entries.index"))
             ->assertSessionHas("alert_type", "success");
 
-        $this->assertDatabaseMissing("entries", [
-            "id" => $entry->id
-        ]);
+        Mockery::close();
     }
 }

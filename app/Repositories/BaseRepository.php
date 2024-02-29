@@ -7,6 +7,7 @@ namespace App\Repositories;
 use App\Repositories\Contracts\BaseRepositoryContract;
 use App\Repositories\Contracts\EntryRepositoryContract;
 use App\Repositories\Contracts\LeaveRepositoryContract;
+use App\Repositories\Contracts\MovementRepositoryContract;
 use Error;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -64,7 +65,13 @@ abstract class BaseRepository implements BaseRepositoryContract
                 "leaveable_type" => $polymorphType,
                 "leaveable_id" => $polymorphId
             ])
-            ->delete();
+                ->delete();
+        } elseif ($this instanceof MovementRepositoryContract) {
+            return $this->_model->query()->where([
+                "movementable_type" => $polymorphType,
+                "movementable_id" => $polymorphId
+            ])
+                ->delete();
         }
         throw new Error("Method is not allowed");
     }

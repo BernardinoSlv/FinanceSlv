@@ -24,13 +24,4 @@ class EntryRepository extends BaseRepository implements EntryRepositoryContract
         $entry->save();
         return $entry;
     }
-
-    public function deletePolymorph(string $entryableType, int $entryableId): int
-    {
-        return $this->_model->query()->where([
-            "entryable_type" => $entryableType,
-            "entryable_id" => $entryableId
-        ])
-            ->delete();
-    }
 }

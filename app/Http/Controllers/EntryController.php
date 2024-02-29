@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateEntryRequest;
 use App\Models\Entry;
 use App\Repositories\Contracts\EntryRepositoryContract;
 use App\Repositories\Contracts\IdentifierRepositoryContract;
+use App\Repositories\Contracts\MovementRepositoryContract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
@@ -40,12 +41,19 @@ class EntryController extends Controller
         ));
     }
 
-    public function store(StoreEntryRequest $request)
-    {
-        $this->_entryRepository->create(auth()->user()->id, [
+    public function store(
+        StoreEntryRequest $request,
+        MovementRepositoryContract $movementRepository
+    ) {
+        $entry = $this->_entryRepository->create(auth()->user()->id, [
             ...$request->validated(),
             "amount" => RealToFloatParser::parse($request->input("amount"))
         ]);
+        $movementRepository->create(auth()->id(), [
+            "movementable_type" => Entry::class,
+            "movementable_id" => $entry->id
+        ]);
+
         return redirect(route("entries.index"))->with(
             Alert::success("Entrada criada com sucesso.")
         );
@@ -79,12 +87,13 @@ class EntryController extends Controller
         );
     }
 
-    public function destroy(Entry $entry)
+    public function destroy(MovementRepositoryContract $movementRepository, Entry $entry)
     {
         if (!Gate::allows("entry-edit", $entry)) {
             abort(404);
         }
         $this->_entryRepository->delete($entry->id);
+        $movementRepository->deletePolymorph(Entry::class, $entry->id);
 
         return redirect()->route("entries.index")->with(
             Alert::success("Entrada excluída com sucesso")

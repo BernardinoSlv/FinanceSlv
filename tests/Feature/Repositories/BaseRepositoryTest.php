@@ -2,14 +2,20 @@
 
 namespace Tests\Feature\Repositories;
 
+use App\Models\Debt;
 use App\Models\Debtor;
 use App\Models\Entry;
+use App\Models\Leave;
+use App\Models\Movement;
 use App\Models\User;
 use App\Repositories\Contracts\EntryRepositoryContract;
 use App\Repositories\Contracts\ExpenseRepositoryContract;
+use App\Repositories\Contracts\LeaveRepositoryContract;
+use App\Repositories\Contracts\MovementRepositoryContract;
 use Error;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class BaseRepositoryTest extends TestCase
@@ -98,9 +104,7 @@ class BaseRepositoryTest extends TestCase
         $entry = Entry::factory()->create();
 
         $this->assertTrue($this->_repository()->delete($entry->id));
-        $this->assertDatabaseMissing("entries", [
-            "id" => $entry->id
-        ]);
+        $this->assertSoftDeleted($entry);
     }
 
     /**
@@ -154,13 +158,14 @@ class BaseRepositoryTest extends TestCase
                 "entryable_type" => Debtor::class
             ]);
         $debtor = Debtor::factory()->create();
-        Entry::factory()->create([
+        $entry = Entry::factory()->create([
             "entryable_type" => Debtor::class,
             "entryable_id" => $debtor->id
         ]);
 
         $this->assertEquals(1, $this->_repository()->deletePolymorph(Debtor::class, $debtor->id));
-        $this->assertDatabaseCount("entries", 20);
+        $this->assertDatabaseCount("entries", 21);
+        $this->assertSoftDeleted($entry);
     }
 
     /**
@@ -179,13 +184,69 @@ class BaseRepositoryTest extends TestCase
                 "entryable_type" => Debtor::class
             ]);
         $debtor = Debtor::factory()->create();
-        Entry::factory(5)->create([
+        $entries = Entry::factory(5)->create([
             "entryable_type" => Debtor::class,
             "entryable_id" => $debtor->id
         ]);
 
-        $this->assertEquals(5, $this->_repository()->deletePolymorph(Debtor::class, $debtor->id));
-        $this->assertDatabaseCount("entries", 20);
+        $this->assertEquals(
+            5,
+            $this->_repository()->deletePolymorph(Debtor::class, $debtor->id)
+        );
+        $this->assertDatabaseCount("entries", 25);
+        $this->assertSoftDeleted($entries[0]);
+        $this->assertSoftDeleted($entries[1]);
+        $this->assertSoftDeleted($entries[2]);
+        $this->assertSoftDeleted($entries[3]);
+        $this->assertSoftDeleted($entries[4]);
+    }
+
+    /**
+     * deve retornar 1
+     */
+    public function test_delete_polymorph_method_leave_model(): void
+    {
+        Leave::factory(10)->create();
+        Leave::factory(10)
+            ->sequence(...Debt::factory(10)->create()->map(function (Debt $debt): array {
+                return ["leaveable_id" => $debt->id];
+            }))
+            ->create([
+                "leaveable_type" => Debt::class
+            ]);
+        $debt = Debt::factory()->create();
+        $leave = Leave::factory()->create([
+            "leaveable_type" => Debt::class,
+            "leaveable_id" => $debt->id
+        ]);
+
+        $this->assertEquals(
+            1,
+            app(LeaveRepositoryContract::class)->deletePolymorph(Debt::class, $debt->id)
+        );
+        $this->assertDatabaseCount(Leave::class, 21);
+        $this->assertSoftDeleted($leave);
+    }
+
+    /**
+     * deve retornar 1
+     */
+    public function test_delete_polymorph_method_movement_model(): void
+    {
+        Movement::factory(10)->create();
+
+        $entry = Entry::factory()->create();
+        $movement = Movement::factory()->create([
+            "movementable_type" => Entry::class,
+            "movementable_id" => $entry->id
+        ]);
+
+        $this->assertEquals(
+            1,
+            app(MovementRepositoryContract::class)->deletePolymorph(Entry::class, $entry->id)
+        );
+        $this->assertDatabaseCount("movements", 11);
+        $this->assertSoftDeleted($movement);
     }
 
 
