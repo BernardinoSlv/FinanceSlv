@@ -6,9 +6,14 @@ use App\Helpers\Alert;
 use App\Http\Requests\StoreInvestimentRequest;
 use App\Http\Requests\UpdateInvestimentRequest;
 use App\Models\Investiment;
+use App\Models\Leave;
 use App\Repositories\Contracts\IdentifierRepositoryContract;
 use App\Repositories\Contracts\InvestimentRepositoryContract;
+use App\Repositories\Contracts\LeaveRepositoryContract;
+use App\Repositories\Contracts\MovementRepositoryContract;
 use App\Repositories\IdentifierRepository;
+use App\Repositories\LeaveRepository;
+use App\Repositories\MovementRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
@@ -47,11 +52,22 @@ class InvestimentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreInvestimentRequest $request)
-    {
-        $this->_investimentRepository->create(auth()->user()->id, [
+    public function store(
+        StoreInvestimentRequest $request,
+        LeaveRepositoryContract $leaveRepository,
+        MovementRepositoryContract $movementRepository
+    ) {
+        $investiment = $this->_investimentRepository->create(auth()->user()->id, [
             ...$request->validated(),
             "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+        $leave = $leaveRepository->create(auth()->id(), [
+            "leaveable_type" => Investiment::class,
+            "leaveable_id" => $investiment->id
+        ]);
+        $movementRepository->create(auth()->id(), [
+            "movementable_type" => Leave::class,
+            "movementable_id" => $leave->id
         ]);
 
         return redirect()->route("investiments.index")->with(
@@ -107,13 +123,20 @@ class InvestimentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Investiment $investiment)
-    {
+    public function destroy(
+        LeaveRepositoryContract $leaveRepository,
+        MovementRepositoryContract $movementRepository,
+        Investiment $investiment
+    ) {
         if (Gate::denies("investiment-edit", $investiment)) {
             abort(404);
         }
-
         $this->_investimentRepository->delete($investiment->id);
+        foreach ($investiment->leaves as $leave) {
+            $movementRepository->deletePolymorph(Leave::class, $leave->id);
+        }
+        $leaveRepository->deletePolymorph(Investiment::class, $investiment->id);
+
 
         return redirect()->route("investiments.index")->with(
             Alert::success("Investimento removido com sucesso.")

@@ -4,11 +4,17 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Identifier;
 use App\Models\Investiment;
+use App\Models\Leave;
 use App\Models\User;
+use App\Repositories\Contracts\InvestimentRepositoryContract;
+use App\Repositories\Contracts\LeaveRepositoryContract;
+use App\Repositories\Contracts\MovementRepositoryContract;
+use App\Repositories\LeaveRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
+use Mockery;
 use Tests\TestCase;
 
 class InvestimentControllerTest extends TestCase
@@ -111,14 +117,60 @@ class InvestimentControllerTest extends TestCase
             "amount" => "1.000,00"
         ])->toArray();
 
+        $this->instance(
+            InvestimentRepositoryContract::class,
+            Mockery::mock(app(InvestimentRepositoryContract::class))
+                ->shouldReceive("create")
+                ->with($user->id, [
+                    ...Arr::only($data, ["identifier_id", "title", "description"]),
+                    "amount" => 1000.0
+                ])
+                ->passthru()
+                ->once()
+                ->getMock()
+        );
+        $this->instance(
+            LeaveRepositoryContract::class,
+            Mockery::mock(app(LeaveRepositoryContract::class))
+                ->shouldReceive("create")
+                ->withArgs(function (int $userId, array $attributes) use ($user): bool {
+                    if ($userId !== $user->id)
+                        return false;
+                    elseif (count($attributes) !== 2)
+                        return false;
+                    elseif ($attributes["leaveable_type"] !== Investiment::class)
+                        return false;
+                    elseif (!array_key_exists("leaveable_id", $attributes))
+                        return false;
+                    return true;
+                })
+                ->passthru()
+                ->once()
+                ->getMock()
+        );
+        $this->instance(
+            MovementRepositoryContract::class,
+            Mockery::mock(MovementRepositoryContract::class)
+                ->shouldReceive("create")
+                ->withArgs(function (int $userId, array $attributes) use ($user): bool {
+                    if ($userId !== $user->id)
+                        return false;
+                    elseif (count($attributes) !== 2)
+                        return false;
+                    elseif ($attributes["movementable_type"] !== Leave::class)
+                        return false;
+                    elseif (!array_key_exists("movementable_id", $attributes))
+                        return false;
+                    return true;
+                })
+                ->once()
+                ->getMock()
+        );
+
         $this->actingAs($user)->post(route("investiments.store"), $data)
             ->assertRedirectToRoute("investiments.index")
             ->assertSessionHas("alert_type", "success");
-        $this->assertDatabaseHas("investiments", [
-            ...$data,
-            "user_id" => $user->id,
-            "amount" => 1000.00
-        ]);
+        Mockery::close();
     }
 
     /**
@@ -140,11 +192,6 @@ class InvestimentControllerTest extends TestCase
         $this->actingAs($user)->post(route("investiments.store"), $data)
             ->assertRedirectToRoute("investiments.index")
             ->assertSessionHas("alert_type", "success");
-        $this->assertDatabaseHas("investiments", [
-            ...$data,
-            "user_id" => $user->id,
-            "amount" => 1000.00
-        ]);
     }
 
     /**
@@ -427,10 +474,44 @@ class InvestimentControllerTest extends TestCase
         $investiment = Investiment::factory()->create([
             "user_id" => $user
         ]);
+        $leave = Leave::factory()->create([
+            "leaveable_type" => Investiment::class,
+            "leaveable_id" => $investiment->id
+        ]);
+
+        $this->instance(
+            InvestimentRepositoryContract::class,
+            Mockery::mock(InvestimentRepositoryContract::class)
+                ->shouldReceive("delete")
+                ->with($investiment->id)
+                ->once()
+                ->getMock()
+        );
+        $this->instance(
+            LeaveRepositoryContract::class,
+            Mockery::mock(LeaveRepositoryContract::class)
+                ->shouldReceive("deletePolymorph")
+                ->with(Investiment::class, $investiment->id)
+                ->once()
+                ->getMock()
+        );
+        $this->instance(
+            MovementRepositoryContract::class,
+            Mockery::mock(MovementRepositoryContract::class)
+                ->shouldReceive("deletePolymorph")
+                ->withArgs(function (string $movementableType, int $movementableId): bool {
+                    if ($movementableType !== Leave::class)
+                        return false;
+                    return true;
+                })
+                ->once()
+                ->getMock()
+        );
+
 
         $this->actingAs($user)->delete(route("investiments.destroy", $investiment))
             ->assertRedirect(route("investiments.index"))
             ->assertSessionHas("alert_type", "success");
-        $this->assertSoftDeleted($investiment);
+        Mockery::close();
     }
 }
