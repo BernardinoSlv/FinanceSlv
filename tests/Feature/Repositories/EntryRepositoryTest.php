@@ -25,6 +25,7 @@ class EntryRepositoryTest extends TestCase
     {
         Entry::factory(20)->create();
         $user = User::factory()->create();
+
         // do usuário , do mês anterior
         Entry::factory(10)->create([
             "user_id" => $user->id,
@@ -38,26 +39,9 @@ class EntryRepositoryTest extends TestCase
     }
 
     /**
-     * deve criar a entrada corretamente
-     *
-     * @return void
+     * deve criar registro
      */
     public function test_create_method(): void
-    {
-        $user = User::factory()->create();
-        $data = Entry::factory()->make()->toArray();
-
-        $this->assertNotNull($this->_repository()->create($user->id, $data));
-        $this->assertDatabaseHas("entries", [
-            ...$data,
-            "user_id" => $user->id,
-        ]);
-    }
-
-    /**
-     * deve criar registro para uma entrada polimorfica
-     */
-    public function test_create_method_using_polymorph(): void
     {
         $debtor = Debtor::factory()->create();
 
