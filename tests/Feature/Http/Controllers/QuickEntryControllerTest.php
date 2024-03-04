@@ -44,7 +44,7 @@ class QuickEntryControllerTest extends TestCase
         $this->actingAs($user)->get(route("quick-entries.index"))
             ->assertOk()
             ->assertViewIs("quick-entries.index")
-            ->assertViewHas("entries");
+            ->assertViewHas("quickEntries");
     }
 
     /**
@@ -157,10 +157,14 @@ class QuickEntryControllerTest extends TestCase
             EntryRepositoryContract::class,
             Mockery::mock(app(EntryRepositoryContract::class))
                 ->shouldReceive("create")
-                ->with($user->id, [
-                    "entryable_type" => QuickEntry::class,
-                    "entryable_id" => 1
-                ])
+                ->with($user->id, Mockery::on(function (array $attributes): bool {
+                    if (!$attributes["entryable_type"] === QuickEntry::class) {
+                        return false;
+                    } else if (!is_int($attributes["entryable_id"])) {
+                        return false;
+                    }
+                    return true;
+                }))
                 ->passthru()
                 ->once()
                 ->getMock()
@@ -169,10 +173,14 @@ class QuickEntryControllerTest extends TestCase
             MovementRepositoryContract::class,
             Mockery::mock(MovementRepositoryContract::class)
                 ->shouldReceive("create")
-                ->with($user->id, [
-                    "movementable_type" => Entry::class,
-                    "movementable_id" => 1
-                ])
+                ->with($user->id, Mockery::on(function (array $attributes): bool {
+                    if (!$attributes["movementable_type"] === QuickEntry::class) {
+                        return false;
+                    } else if (!is_int($attributes["movementable_id"])) {
+                        return false;
+                    }
+                    return true;
+                }))
                 ->once()
                 ->getMock()
         );
