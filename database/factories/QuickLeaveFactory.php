@@ -26,7 +26,7 @@ class QuickLeaveFactory extends Factory
                 "user_id" => $user
             ]),
             "title" => fake("pt-BR")->title(),
-            "description" => fake("text"),
+            "description" => fake()->text(),
             "amount" => 20.00,
         ];
     }

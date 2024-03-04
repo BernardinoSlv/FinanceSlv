@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class QuickLeave extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        "identifier_id",
+        "title",
+        "description",
+        "amount"
+    ];
 }

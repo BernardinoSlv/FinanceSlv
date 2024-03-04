@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\QuickLeave;
 use App\Repositories\Contracts\DebtorRepositoryContract;
 use App\Repositories\Contracts\DebtRepositoryContract;
 use App\Repositories\Contracts\IdentifierRepositoryContract;
@@ -12,6 +13,7 @@ use App\Repositories\Contracts\LeaveRepositoryContract;
 use App\Repositories\Contracts\MovementRepositoryContract;
 use App\Repositories\Contracts\NeedRepositoryContract;
 use App\Repositories\Contracts\QuickEntryRepositoryContract;
+use App\Repositories\Contracts\QuickLeaveRepositoryContract;
 use App\Repositories\Contracts\UserRepositoryContract;
 use App\Repositories\DebtorRepository;
 use App\Repositories\DebtRepository;
@@ -23,6 +25,7 @@ use App\Repositories\LeaveRepository;
 use App\Repositories\MovementRepository;
 use App\Repositories\NeedRepository;
 use App\Repositories\QuickEntryRepository;
+use App\Repositories\QuickLeaveRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -86,6 +89,11 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             QuickEntryRepositoryContract::class,
             QuickEntryRepository::class
+        );
+
+        $this->app->bind(
+            QuickLeaveRepositoryContract::class,
+            QuickLeaveRepository::class
         );
     }
 
