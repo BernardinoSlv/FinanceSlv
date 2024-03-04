@@ -16,10 +16,6 @@ class Entry extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        "identifier_id",
-        "title",
-        "description",
-        "amount",
         "entryable_type",
         "entryable_id"
     ];
