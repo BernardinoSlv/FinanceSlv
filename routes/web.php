@@ -5,7 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DebtController;
 use App\Http\Controllers\DebtorController;
 use App\Http\Controllers\IdentifierController;
-use App\Http\Controllers\EntryController;
+use App\Http\Controllers\QuickEntryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InvestimentController;
 use App\Http\Controllers\LeaveController;
@@ -44,16 +44,16 @@ Route::middleware("checkAuth")->group(function () {
         });
 
     // entries
-    Route::resource("entradas", EntryController::class)
-        ->parameter("entradas", "entry")
+    Route::resource("entradas-rapidas", QuickEntryController::class)
+        ->parameter("entradas-rapidas", "quickEntry")
         ->names([
-            "index" => "entries.index",
-            "create" => "entries.create",
-            "store" => "entries.store",
-            "show" => "entries.show",
-            "edit" => "entries.edit",
-            "update" => "entries.update",
-            "destroy" => "entries.destroy",
+            "index" => "quick-entries.index",
+            "create" => "quick-entries.create",
+            "store" => "quick-entries.store",
+            "show" => "quick-entries.show",
+            "edit" => "quick-entries.edit",
+            "update" => "quick-entries.update",
+            "destroy" => "quick-entries.destroy",
         ]);
 
     // leaves

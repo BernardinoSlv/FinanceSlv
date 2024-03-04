@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="text-end mb-3">
-        <a href="{{ route('entries.create') }}" class="btn btn-primary">Criar nova</a>
+        <a href="{{ route('quick-entries.create') }}" class="btn btn-primary">Criar nova</a>
     </div>
 
     <h3>{{ date('m/Y') }}</h3>
@@ -21,29 +21,23 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($entries as $entry)
+                @foreach ($quickEntries as $quickEntry)
                     <tr>
-                        <td>{{ $entry->id }}</td>
-                        <td>{{ $entry->title }}</td>
-                        <td>R$ {{ $entry->amount }}</td>
+                        <td>{{ $quickEntry->id }}</td>
+                        <td>{{ $quickEntry->title }}</td>
+                        <td>R$ {{ $quickEntry->amount }}</td>
                         <td><span class="badge text-white bg-black">Padrão</span></td>
-                        <td>{{ $entry->created_at_formated }}</td>
+                        <td>{{ $quickEntry->created_at_formated }}</td>
                         <td align="right">
-                            <a class="btn btn-outline-primary btn-sm"
-                                href="{{ route('entries.edit', [
-                                    'entry' => $entry->id,
-                                ]) }}"><i
+                            <a class="btn btn-outline-primary btn-sm" href="{{ route('quick-entries.edit', $quickEntry) }}"><i
                                     class="fas fa-edit"></i></a>
-                            <form
-                                action="{{ route('entries.destroy', [
-                                    'entry' => $entry->id,
-                                ]) }}"
-                                method="POST" class="d-inline-block">
+                            <form action="{{ route('quick-entries.destroy', $quickEntry) }}" method="POST"
+                                class="d-inline-block">
                                 @csrf
                                 @method('DELETE')
 
                                 <button class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Deseja remover a entrada #{{ $entry->id }}')">
+                                    onclick="return confirm('Deseja remover a entrada #{{ $quickEntry->id }}')">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </form>

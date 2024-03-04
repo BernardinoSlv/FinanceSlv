@@ -316,17 +316,17 @@
                             <div class="collapse" id="operations">
                                 <ul class="nav-second-level">
                                     <li>
-                                        <a href="#entries-collapse" data-bs-toggle="collapse">
-                                            <span>Entradas</span>
+                                        <a href="#quick-entries-collapse" data-bs-toggle="collapse">
+                                            <span>Entradas rápidas</span>
                                             <span class="menu-arrow"></span>
                                         </a>
-                                        <div class="collapse" id="entries-collapse">
+                                        <div class="collapse" id="quick-entries-collapse">
                                             <ul class="nav-second-level">
                                                 <li>
-                                                    <a href="{{ route('entries.index') }}">Todas</a>
+                                                    <a href="{{ route('quick-entries.index') }}">Todas</a>
                                                 </li>
                                                 <li>
-                                                    <a href="{{ route('entries.create') }}">Criar</a>
+                                                    <a href="{{ route('quick-entries.create') }}">Criar</a>
                                                 </li>
                                             </ul>
                                         </div>

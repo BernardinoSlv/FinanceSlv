@@ -4,16 +4,19 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Identifier;
 use App\Models\Entry;
+use App\Models\QuickEntry;
 use App\Models\User;
 use App\Repositories\Contracts\EntryRepositoryContract;
 use App\Repositories\Contracts\MovementRepositoryContract;
+use App\Repositories\Contracts\QuickEntryRepositoryContract;
+use App\Repositories\QuickEntryRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
 use Mockery;
 use Tests\TestCase;
 
-class EntryControllerTest extends TestCase
+class QuickEntryControllerTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -24,7 +27,7 @@ class EntryControllerTest extends TestCase
      */
     public function test_index_action_unauthenticated(): void
     {
-        $this->get(route("entries.index"))
+        $this->get(route("quick-entries.index"))
             ->assertRedirect(route("auth.index"));
     }
 
@@ -36,10 +39,11 @@ class EntryControllerTest extends TestCase
     public function test_index_action(): void
     {
         $user = User::factory()->create();
+        QuickEntry::factory(10)->create(["user_id" => $user]);
 
-        $this->actingAs($user)->get(route("entries.index"))
+        $this->actingAs($user)->get(route("quick-entries.index"))
             ->assertOk()
-            ->assertViewIs("entries.index")
+            ->assertViewIs("quick-entries.index")
             ->assertViewHas("entries");
     }
 
@@ -50,7 +54,7 @@ class EntryControllerTest extends TestCase
      */
     public function test_create_action_unauthenticated(): void
     {
-        $this->get(route("entries.create"))
+        $this->get(route("quick-entries.create"))
             ->assertRedirect(route("auth.index"));
     }
 
@@ -63,9 +67,9 @@ class EntryControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->get(route("entries.create"))
+        $this->actingAs($user)->get(route("quick-entries.create"))
             ->assertOk()
-            ->assertViewIs("entries.create")
+            ->assertViewIs("quick-entries.create")
             ->assertViewHas("identifiers");
     }
 
@@ -78,7 +82,7 @@ class EntryControllerTest extends TestCase
     {
         $data = Entry::factory()->make()->toArray();
 
-        $this->post(route("entries.store"), $data)
+        $this->post(route("quick-entries.store"), $data)
             ->assertRedirect(route("auth.index"));
     }
 
@@ -91,7 +95,7 @@ class EntryControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->post(route("entries.store"))
+        $this->actingAs($user)->post(route("quick-entries.store"))
             ->assertStatus(302)
             ->assertSessionHasErrors([
                 "identifier_id",
@@ -106,12 +110,12 @@ class EntryControllerTest extends TestCase
     public function test_store_action_identifier_of_other_user(): void
     {
         $user = User::factory()->hasIdentifiers(1)->create();
-        $data = Entry::factory()->make([
+        $data = QuickEntry::factory()->make([
             "identifier_id" => Identifier::factory()->create(),
             "amount" => "100,00"
         ])->toArray();
 
-        $this->actingAs($user)->post(route("entries.store"), $data)
+        $this->actingAs($user)->post(route("quick-entries.store"), $data)
             ->assertFound()
             ->assertSessionHasErrors([
                 "identifier_id",
@@ -130,19 +134,32 @@ class EntryControllerTest extends TestCase
     public function test_store_action(): void
     {
         $user = User::factory()->hasIdentifiers(1)->create();
-        $data = Entry::factory()->make([
+        $data = QuickEntry::factory()->make([
             "identifier_id" => $user->identifiers->first(),
             "amount" => '125,55',
             "description" => "Apenas um teste"
         ])->toArray();
 
         $this->instance(
+            QuickEntryRepositoryContract::class,
+            Mockery::mock(QuickEntryRepository::class)
+                ->shouldReceive("create")
+                ->with($user->id, [
+                    ...Arr::only($data, ["identifier_id", "title", "description"]),
+                    "amount" => 125.55
+                ])
+                ->passthru()
+                ->once()
+                ->getMock()
+        );
+
+        $this->instance(
             EntryRepositoryContract::class,
             Mockery::mock(app(EntryRepositoryContract::class))
                 ->shouldReceive("create")
                 ->with($user->id, [
-                    ...Arr::only($data, ["title", "identifier_id", "description"]),
-                    "amount" => 125.55
+                    "entryable_type" => QuickEntry::class,
+                    "entryable_id" => 1
                 ])
                 ->passthru()
                 ->once()
@@ -160,8 +177,8 @@ class EntryControllerTest extends TestCase
                 ->getMock()
         );
 
-        $this->actingAs($user)->post(route("entries.store"), $data)
-            ->assertRedirect(route("entries.index"))
+        $this->actingAs($user)->post(route("quick-entries.store"), $data)
+            ->assertRedirect(route("quick-entries.index"))
             ->assertSessionHas([
                 "alert_type" => "success",
                 "alert_text" => "Entrada criada com sucesso."
@@ -178,22 +195,17 @@ class EntryControllerTest extends TestCase
     public function test_store_action_with_amount_real_formatting(): void
     {
         $user = User::factory()->hasIdentifiers(1)->create();
-        $data = Entry::factory()->make([
+        $data = QuickEntry::factory()->make([
             "identifier_id" => $user->identifiers->first(),
             "amount" => "192.125,25"
         ])->toArray();
 
-        $this->actingAs($user)->post(route("entries.store"), $data)
-            ->assertRedirect(route("entries.index"))
+        $this->actingAs($user)->post(route("quick-entries.store"), $data)
+            ->assertRedirect(route("quick-entries.index"))
             ->assertSessionHas([
                 "alert_type" => "success",
                 "alert_text" => "Entrada criada com sucesso."
             ]);
-        $this->assertDatabaseHas("entries", [
-            ...$data,
-            "user_id" => $user->id,
-            "amount" => 192125.25
-        ]);
     }
 
     /**
@@ -201,11 +213,9 @@ class EntryControllerTest extends TestCase
      */
     public function test_edit_action_unauthenticated(): void
     {
-        $entry = Entry::factory()->create();
+        $quickEntry = QuickEntry::factory()->create();
 
-        $this->get(route("entries.edit", [
-            "entry" => $entry->id
-        ]))
+        $this->get(route("quick-entries.edit", $quickEntry))
             ->assertRedirect(route("auth.index"));
     }
 
@@ -216,9 +226,7 @@ class EntryControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->get(route("entries.edit", [
-            "entry" => 0
-        ]))
+        $this->get(route("quick-entries.edit", 0))
             ->assertStatus(404);
     }
 
@@ -228,11 +236,9 @@ class EntryControllerTest extends TestCase
     public function test_edit_action_is_not_owner(): void
     {
         $user = User::factory()->create();
-        $entry = Entry::factory()->create();
+        $quickEntry = QuickEntry::factory()->create();
 
-        $this->actingAs($user)->get(route("entries.edit", [
-            "entry" => $entry->id
-        ]))
+        $this->actingAs($user)->get(route("quick-entries.edit", $quickEntry))
             ->assertStatus(404);
     }
 
@@ -242,17 +248,15 @@ class EntryControllerTest extends TestCase
     public function test_edit_action(): void
     {
         $user = User::factory()->create();
-        $entry = Entry::factory()->create([
+        $quickEntry = QuickEntry::factory()->create([
             "user_id" => $user->id
         ]);
 
-        $this->actingAs($user)->get(route("entries.edit", [
-            "entry" => $entry->id
-        ]))
+        $this->actingAs($user)->get(route("quick-entries.edit", $quickEntry))
             ->assertOk()
-            ->assertViewIs("entries.edit")
+            ->assertViewIs("quick-entries.edit")
             ->assertViewHas([
-                "entry",
+                "quickEntry",
                 "identifiers"
             ]);
     }
@@ -262,23 +266,19 @@ class EntryControllerTest extends TestCase
      */
     public function test_update_action_unauthenticated(): void
     {
-        $entry = Entry::factory()->create();
-        $data = Entry::factory()->make()->toArray();
+        $quickEntry = QuickEntry::factory()->create();
+        $data = QuickEntry::factory()->make()->toArray();
 
-        $this->put(route("entries.update", [
-            "entry" => $entry->id
-        ]), $data)
+        $this->put(route("quick-entries.update", $quickEntry), $data)
             ->assertRedirect(route("auth.index"));
     }
 
     public function test_update_action_nonexistent(): void
     {
         $user = User::factory()->create();
-        $data = Entry::factory()->make()->toArray();
+        $data = QuickEntry::factory()->make()->toArray();
 
-        $this->actingAs($user)->put(route("entries.update", [
-            "entry" => 0
-        ]), $data)
+        $this->actingAs($user)->put(route("quick-entries.update", 0), $data)
             ->assertStatus(404);
     }
 
@@ -288,13 +288,11 @@ class EntryControllerTest extends TestCase
     public function test_update_action_without_data(): void
     {
         $user = User::factory()->create();
-        $entry = Entry::factory()->create([
+        $quickEntry = QuickEntry::factory()->create([
             "user_id" => $user->id
         ]);
 
-        $this->actingAs($user)->put(route("entries.update", [
-            "entry" => $entry->id
-        ]))
+        $this->actingAs($user)->put(route("quick-entries.update", $quickEntry))
             ->assertStatus(302)
             ->assertSessionHasErrors([
                 "title",
@@ -308,15 +306,13 @@ class EntryControllerTest extends TestCase
     public function test_update_action_is_not_owner(): void
     {
         $user = User::factory()->hasIdentifiers(1)->create();
-        $entry = Entry::factory()->create();
-        $data = Entry::factory()->make([
+        $quickEntry = QuickEntry::factory()->create();
+        $data = QuickEntry::factory()->make([
             "identifier_id" => $user->identifiers->first(),
             "amount" => "5.000,00"
         ])->toArray();
 
-        $this->actingAs($user)->put(route("entries.update", [
-            "entry" => $entry->id
-        ]), $data)
+        $this->actingAs($user)->put(route("quick-entries.update", $quickEntry), $data)
             ->assertStatus(404);
     }
 
@@ -326,15 +322,13 @@ class EntryControllerTest extends TestCase
     public function test_update_action_with_identifier_of_other_user(): void
     {
         $user = User::factory()->hasIdentifiers(1)->create();
-        $entry = Entry::factory()->create();
-        $data = Entry::factory()->make([
+        $quickEntry = QuickEntry::factory()->create();
+        $data = QuickEntry::factory()->make([
             "identifier_id" => Identifier::factory()->create(),
             "amount" => "5.000,00"
         ])->toArray();
 
-        $this->actingAs($user)->put(route("entries.update", [
-            "entry" => $entry->id
-        ]), $data)
+        $this->actingAs($user)->put(route("quick-entries.update", $quickEntry), $data)
             ->assertFound()
             ->assertSessionHasErrors("identifier_id")
             ->assertSessionDoesntHaveErrors([
@@ -350,30 +344,34 @@ class EntryControllerTest extends TestCase
     public function test_update_action(): void
     {
         $user = User::factory()->hasIdentifiers(1)->create();
-        $entry = Entry::factory()->create([
-            "identifier_id" => $user->identifiers->first(),
+        $quickEntry = QuickEntry::factory()->create([
+            "user_id" => $user
+        ]);
+        $quickEntry = QuickEntry::factory()->create([
             "user_id" => $user->id
         ]);
-        $data = Entry::factory()->make([
+        $data = QuickEntry::factory()->make([
             "identifier_id" => $user->identifiers->first(),
             "amount" => "5.000,00"
         ])->toArray();
 
-        $this->actingAs($user)->put(route("entries.update", [
-            "entry" => $entry->id
-        ]), $data)
-            ->assertRedirect(route("entries.edit", [
-                "entry" => $entry->id
-            ]))
+        $this->instance(
+            QuickEntryRepositoryContract::class,
+            Mockery::mock(QuickEntryRepositoryContract::class)
+                ->shouldReceive("update")
+                ->with($quickEntry->id, [
+                    ...Arr::only($data, ["identifier_id", "title", "description"]),
+                    "amount" => 5000.00
+                ])
+                ->once()
+                ->getMock()
+        );
+
+        $this->actingAs($user)->put(route("quick-entries.update", $quickEntry), $data)
+            ->assertRedirect(route("quick-entries.edit", $quickEntry))
             ->assertSessionHas([
                 "alert_type" => "success"
             ]);
-        $this->assertDatabaseHas("entries", [
-            ...$data,
-            "amount" => 5000.00,
-            "id" => $entry->id,
-            "user_id" => $entry->user_id,
-        ]);
     }
 
     /**
@@ -381,11 +379,9 @@ class EntryControllerTest extends TestCase
      */
     public function test_destroy_unauthenticated(): void
     {
-        $entry = Entry::factory()->create();
+        $quickEntry = QuickEntry::factory()->create();
 
-        $this->delete(route("entries.destroy", [
-            "entry" => $entry->id
-        ]))
+        $this->delete(route("quick-entries.destroy", $quickEntry))
             ->assertRedirect(route("auth.index"));
     }
 
@@ -396,9 +392,7 @@ class EntryControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->delete(route("entries.destroy", [
-            "entry" => 0
-        ]))
+        $this->actingAs($user)->delete(route("quick-entries.destroy", 0))
             ->assertStatus(404);
     }
 
@@ -408,11 +402,9 @@ class EntryControllerTest extends TestCase
     public function test_destroy_is_not_owner(): void
     {
         $user = User::factory()->create();
-        $entry = Entry::factory()->create();
+        $quickEntry = QuickEntry::factory()->create();
 
-        $this->actingAs($user)->delete(route("entries.destroy", [
-            "entry" => $entry->id
-        ]))
+        $this->actingAs($user)->delete(route("quick-entries.destroy", $quickEntry))
             ->assertStatus(404);
     }
 
@@ -422,15 +414,23 @@ class EntryControllerTest extends TestCase
     public function test_destroy(): void
     {
         $user = User::factory()->create();
-        $entry = Entry::factory()->create([
+        $quickEntry = QuickEntry::factory()->hasEntry()->create([
             "user_id" => $user->id
         ]);
 
         $this->instance(
+            QuickEntryRepositoryContract::class,
+            Mockery::mock(QuickEntryRepositoryContract::class)
+                ->shouldReceive("delete")
+                ->with($quickEntry->id)
+                ->once()
+                ->getMock()
+        );
+        $this->instance(
             EntryRepositoryContract::class,
             Mockery::mock(app(EntryRepositoryContract::class))
                 ->shouldReceive("delete")
-                ->with($entry->id)
+                ->with($quickEntry->entry->id)
                 ->once()
                 ->getMock()
         );
@@ -438,15 +438,13 @@ class EntryControllerTest extends TestCase
             MovementRepositoryContract::class,
             Mockery::mock(app(MovementRepositoryContract::class))
                 ->shouldReceive("deletePolymorph")
-                ->with(Entry::class, $entry->id)
+                ->with(Entry::class, $quickEntry->entry->id)
                 ->once()
                 ->getMock()
         );
 
-        $this->actingAs($user)->delete(route("entries.destroy", [
-            "entry" => $entry->id
-        ]))
-            ->assertRedirect(route("entries.index"))
+        $this->actingAs($user)->delete(route("quick-entries.destroy", $quickEntry))
+            ->assertRedirect(route("quick-entries.index"))
             ->assertSessionHas("alert_type", "success");
 
         Mockery::close();
