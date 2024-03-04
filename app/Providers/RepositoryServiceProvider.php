@@ -11,6 +11,7 @@ use App\Repositories\Contracts\InvestimentRepositoryContract;
 use App\Repositories\Contracts\LeaveRepositoryContract;
 use App\Repositories\Contracts\MovementRepositoryContract;
 use App\Repositories\Contracts\NeedRepositoryContract;
+use App\Repositories\Contracts\QuickEntryRepositoryContract;
 use App\Repositories\Contracts\UserRepositoryContract;
 use App\Repositories\DebtorRepository;
 use App\Repositories\DebtRepository;
@@ -21,6 +22,7 @@ use App\Repositories\InvestimentRepository;
 use App\Repositories\LeaveRepository;
 use App\Repositories\MovementRepository;
 use App\Repositories\NeedRepository;
+use App\Repositories\QuickEntryRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -79,6 +81,11 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             MovementRepositoryContract::class,
             MovementRepository::class
+        );
+
+        $this->app->bind(
+            QuickEntryRepositoryContract::class,
+            QuickEntryRepository::class
         );
     }
 
