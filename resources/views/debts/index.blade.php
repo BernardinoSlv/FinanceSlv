@@ -35,9 +35,24 @@
                                 </button>
 
                                 <ul class="dropdown-menu">
-                                    <li><a href="#" class="dropdown-item">Editar</a></li>
-                                    <li><a href="#" class="dropdown-item">Pagamentos</a></li>
-                                    <li><a href="#" class="dropdown-item">Remover</a></li>
+                                    <li>
+                                        <a href="#" class="dropdown-item">
+                                            <i class="bi bi-pencil-square"></i>
+                                            Editar
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" class="dropdown-item">
+                                            <i class="bi bi-journal-text"></i>
+                                            Pagamentos
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" class="dropdown-item">
+                                            <i class="bi bi-trash"></i>
+                                            Remover
+                                        </a>
+                                    </li>
                                 </ul>
                             </div>
                         </td>
