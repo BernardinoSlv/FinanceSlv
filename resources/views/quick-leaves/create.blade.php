@@ -3,7 +3,7 @@
 @section('content')
     @include('includes.alerts')
 
-    <form action="{{ route('leaves.store') }}" method="POST">
+    <form action="{{ route('quick-leaves.store') }}" method="POST">
         @csrf
 
         <div class="row gy-3 mb-4">

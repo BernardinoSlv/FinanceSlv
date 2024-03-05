@@ -333,16 +333,16 @@
                                     </li>
                                     <li>
                                         <a href="#exits-collapse" data-bs-toggle="collapse">
-                                            <span>Saídas</span>
+                                            <span>Saídas rápidas</span>
                                             <span class="menu-arrow"></span>
                                         </a>
                                         <div class="collapse" id="exits-collapse">
                                             <ul class="nav-second-level">
                                                 <li>
-                                                    <a href="{{ route('leaves.index') }}">Todas</a>
+                                                    <a href="{{ route('quick-leaves.index') }}">Todas</a>
                                                 </li>
                                                 <li>
-                                                    <a href="{{ route('leaves.create') }}">Criar</a>
+                                                    <a href="{{ route('quick-leaves.create') }}">Criar</a>
                                                 </li>
                                             </ul>
                                         </div>
