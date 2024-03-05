@@ -13,6 +13,7 @@ use App\Models\Investiment;
 use App\Models\Leave;
 use App\Models\Need;
 use App\Models\QuickEntry;
+use App\Models\QuickLeave;
 use App\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -37,8 +38,8 @@ class AuthServiceProvider extends ServiceProvider
             return $user->id === $quickEntry->user_id;
         });
 
-        Gate::define("leave-edit", function (User $user, Leave $leave): bool {
-            return $user->id === $leave->user_id;
+        Gate::define("quick-leave-edit", function (User $user, QuickLeave $quickLeave): bool {
+            return $user->id === $quickLeave->user_id;
         });
 
         Gate::define("expense-edit", function (User $user, Expense $expense): bool {

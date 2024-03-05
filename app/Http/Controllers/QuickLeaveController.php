@@ -6,20 +6,22 @@ use App\Helpers\Alert;
 use App\Http\Requests\StoreLeaveRequest;
 use App\Http\Requests\UpdateLeaveRequest;
 use App\Models\Leave;
+use App\Models\QuickLeave;
 use App\Repositories\Contracts\IdentifierRepositoryContract;
 use App\Repositories\Contracts\LeaveRepositoryContract;
+use App\Repositories\Contracts\QuickLeaveRepositoryContract;
 use App\Repositories\Contracts\MovementRepositoryContract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
-class LeaveController extends Controller
+class QuickLeaveController extends Controller
 {
-    protected LeaveRepositoryContract $_leaveRepository;
+    protected QuickLeaveRepositoryContract $_quickLeaveRepository;
 
-    public function __construct(LeaveRepositoryContract $leaveRepository)
+    public function __construct(QuickLeaveRepositoryContract $quickLeaveRepository)
     {
-        $this->_leaveRepository = $leaveRepository;
+        $this->_quickLeaveRepository = $quickLeaveRepository;
     }
 
     /**
@@ -27,10 +29,10 @@ class LeaveController extends Controller
      */
     public function index()
     {
-        $leaves = $this->_leaveRepository->allByUser(auth()->user()->id, true);
+        $quickLeaves = $this->_quickLeaveRepository->allByUser(auth()->user()->id, true);
 
-        return view("leaves.index", compact(
-            "leaves"
+        return view("quick-leaves.index", compact(
+            "quickLeaves"
         ));
     }
 
@@ -41,7 +43,7 @@ class LeaveController extends Controller
     {
         $identifiers = $identifierRepository->allByUser(auth()->id());
 
-        return view("leaves.create", compact(
+        return view("quick-leaves.create", compact(
             "identifiers"
         ));
     }
@@ -51,18 +53,23 @@ class LeaveController extends Controller
      */
     public function store(
         StoreLeaveRequest $request,
+        LeaveRepositoryContract $leaveRepository,
         MovementRepositoryContract $movementRepository
     ) {
-        $leave = $this->_leaveRepository->create(auth()->user()->id, [
+        $quickLeave = $this->_quickLeaveRepository->create(auth()->id(), [
             ...$request->validated(),
             "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+        $leave = $leaveRepository->create(auth()->id(), [
+            "leaveable_type" => QuickLeave::class,
+            "leaveable_id" => $quickLeave->id
         ]);
         $movementRepository->create(auth()->id(), [
             "movementable_type" => Leave::class,
             "movementable_id" => $leave->id
         ]);
 
-        return redirect()->route("leaves.index")->with(
+        return redirect()->route("quick-leaves.index")->with(
             Alert::success("Saída criada com sucesso.")
         );
     }
@@ -70,7 +77,7 @@ class LeaveController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Leave $leave)
+    public function show(QuickLeave $leave)
     {
         //
     }
@@ -78,15 +85,15 @@ class LeaveController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(IdentifierRepositoryContract $identifierRepository, Leave $leave)
+    public function edit(IdentifierRepositoryContract $identifierRepository, QuickLeave $quickLeave)
     {
-        if (!Gate::allows("leave-edit", $leave)) {
+        if (!Gate::allows("quick-leave-edit", $quickLeave)) {
             abort(404);
         }
         $identifiers = $identifierRepository->allByUser(auth()->id());
 
-        return view("leaves.edit", compact(
-            "leave",
+        return view("quick-leaves.edit", compact(
+            "quickLeave",
             "identifiers"
         ));
     }
@@ -94,17 +101,17 @@ class LeaveController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateLeaveRequest $request, Leave $leave)
+    public function update(UpdateLeaveRequest $request, QuickLeave $quickLeave)
     {
-        if (!Gate::allows("leave-edit", $leave)) {
+        if (!Gate::allows("quick-leave-edit", $quickLeave)) {
             abort(404);
         }
-        $this->_leaveRepository->update($leave->id, [
+        $this->_quickLeaveRepository->update($quickLeave->id, [
             ...$request->validated(),
             "amount" => RealToFloatParser::parse($request->input("amount"))
         ]);
 
-        return redirect()->route("leaves.index")->with(
+        return redirect()->route("quick-leaves.index")->with(
             Alert::success("Saída atualizada com sucesso.")
         );
     }
@@ -112,15 +119,19 @@ class LeaveController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(MovementRepositoryContract $movementRepository, Leave $leave)
-    {
-        if (!Gate::allows("leave-edit", $leave)) {
+    public function destroy(
+        LeaveRepositoryContract $leaveRepository,
+        MovementRepositoryContract $movementRepository,
+        QuickLeave $quickLeave
+    ) {
+        if (!Gate::allows("quick-leave-edit", $quickLeave)) {
             abort(404);
         }
-        $this->_leaveRepository->delete($leave->id);
-        $movementRepository->deletePolymorph(Leave::class, $leave->id);
+        $this->_quickLeaveRepository->delete($quickLeave->id);
+        $movementRepository->deletePolymorph(Leave::class, $quickLeave->leave->id);
+        $leaveRepository->delete($quickLeave->leave->id);
 
-        return redirect()->route("leaves.index")->with(
+        return redirect()->route("quick-leaves.index")->with(
             Alert::success("Saída excluída com sucesso.")
         );
     }

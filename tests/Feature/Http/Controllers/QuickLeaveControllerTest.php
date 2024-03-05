@@ -4,9 +4,11 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Identifier;
 use App\Models\Leave;
+use App\Models\QuickLeave;
 use App\Models\User;
 use App\Repositories\Contracts\LeaveRepositoryContract;
 use App\Repositories\Contracts\MovementRepositoryContract;
+use App\Repositories\Contracts\QuickLeaveRepositoryContract;
 use App\Repositories\LeaveRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -14,7 +16,7 @@ use Illuminate\Support\Arr;
 use Mockery;
 use Tests\TestCase;
 
-class LeaveControllerTest extends TestCase
+class QuickLeaveControllerTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -23,7 +25,7 @@ class LeaveControllerTest extends TestCase
      */
     public function test_index_unauthenticated(): void
     {
-        $this->get(route("leaves.index"))
+        $this->get(route("quick-leaves.index"))
             ->assertRedirect(route("auth.index"));
     }
 
@@ -33,11 +35,12 @@ class LeaveControllerTest extends TestCase
     public function test_index(): void
     {
         $user = User::factory()->create();
+        QuickLeave::factory(10)->create(["user_id" => $user]);
 
-        $this->actingAs($user)->get(route("leaves.index"))
+        $this->actingAs($user)->get(route("quick-leaves.index"))
             ->assertOk()
-            ->assertViewIs("leaves.index")
-            ->assertViewHas("leaves");
+            ->assertViewIs("quick-leaves.index")
+            ->assertViewHas("quickLeaves");
     }
 
     /**
@@ -45,7 +48,7 @@ class LeaveControllerTest extends TestCase
      */
     public function test_create_unauthenticated(): void
     {
-        $this->get(route("leaves.create"))
+        $this->get(route("quick-leaves.create"))
             ->assertRedirect(route("auth.index"));
     }
 
@@ -56,9 +59,9 @@ class LeaveControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->get(route("leaves.create"))
+        $this->actingAs($user)->get(route("quick-leaves.create"))
             ->assertOk()
-            ->assertViewIs("leaves.create")
+            ->assertViewIs("quick-leaves.create")
             ->assertViewHas("identifiers");
     }
 
@@ -67,7 +70,7 @@ class LeaveControllerTest extends TestCase
      */
     public function test_store_unauthenticated(): void
     {
-        $this->post(route("leaves.store"))
+        $this->post(route("quick-leaves.store"))
             ->assertRedirect(route("auth.index"));
     }
 
@@ -78,7 +81,7 @@ class LeaveControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->post(route("leaves.store"))
+        $this->actingAs($user)->post(route("quick-leaves.store"))
             ->assertStatus(302)
             ->assertSessionHasErrors([
                 "identifier_id",
@@ -94,11 +97,11 @@ class LeaveControllerTest extends TestCase
     public function test_store_action_using_identifier_is_not_owner(): void
     {
         $user = User::factory()->create();
-        $data = Leave::factory()->make([
+        $data = QuickLeave::factory()->make([
             "amount" => "100,00"
         ])->toArray();
 
-        $this->actingAs($user)->post(route("leaves.store"), $data)
+        $this->actingAs($user)->post(route("quick-leaves.store"), $data)
             ->assertFound()
             ->assertSessionHasErrors([
                 "identifier_id",
@@ -112,7 +115,7 @@ class LeaveControllerTest extends TestCase
     public function test_store_action(): void
     {
         $user = User::factory()->create();
-        $data = Leave::factory()->make([
+        $data = QuickLeave::factory()->make([
             "identifier_id" => Identifier::factory()->create([
                 "user_id" => $user
             ]),
@@ -120,13 +123,30 @@ class LeaveControllerTest extends TestCase
         ])->toArray();
 
         $this->instance(
+            QuickLeaveRepositoryContract::class,
+            Mockery::mock(app(QuickLeaveRepositoryContract::class))
+                ->shouldReceive("create")
+                ->with($user->id, [
+                    ...Arr::only($data, ["title", "description", "identifier_id"]),
+                    "amount" => 15.99
+                ])
+                ->passthru()
+                ->once()
+                ->getMock()
+        );
+
+        $this->instance(
             LeaveRepositoryContract::class,
             Mockery::mock(app(LeaveRepositoryContract::class))
                 ->shouldReceive("create")
-                ->with($user->id, [
-                    ...Arr::only($data, ["identifier_id", "title", "description"]),
-                    "amount" => 15.99
-                ])
+                ->with($user->id, Mockery::on(function (array $attributes): bool {
+                    if ($attributes["leaveable_type"] !== QuickLeave::class) {
+                        return false;
+                    } else if (!is_int($attributes["leaveable_id"])) {
+                        return false;
+                    }
+                    return true;
+                }))
                 ->passthru()
                 ->once()
                 ->getMock()
@@ -135,17 +155,21 @@ class LeaveControllerTest extends TestCase
             MovementRepositoryContract::class,
             Mockery::mock(MovementRepositoryContract::class)
                 ->shouldReceive("create")
-                ->with($user->id, [
-                    "movementable_type" => Leave::class,
-                    "movementable_id" => 1
-                ])
+                ->with($user->id, Mockery::on(function (array $attributes): bool {
+                    if ($attributes["movementable_type"] !== Leave::class) {
+                        return false;
+                    } else if (!is_int($attributes["movementable_id"])) {
+                        return false;
+                    }
+                    return true;
+                }))
                 ->once()
                 ->getMock()
 
         );
 
-        $this->actingAs($user)->post(route("leaves.store"), $data)
-            ->assertRedirect(route("leaves.index"))
+        $this->actingAs($user)->post(route("quick-leaves.store"), $data)
+            ->assertRedirect(route("quick-leaves.index"))
             ->assertSessionHas("alert_type", "success");
         Mockery::close();
     }
@@ -155,9 +179,9 @@ class LeaveControllerTest extends TestCase
      */
     public function test_edit_unauthenticated(): void
     {
-        $leave = Leave::factory()->create();
+        $quickLeave = QuickLeave::factory()->create();
 
-        $this->get(route("leaves.edit", $leave->id))
+        $this->get(route("quick-leaves.edit", $quickLeave))
             ->assertRedirect(route("auth.index"));
     }
 
@@ -166,7 +190,7 @@ class LeaveControllerTest extends TestCase
      */
     public function test_edit_nonexistent(): void
     {
-        $this->actingAs($this->_user())->get(route("leaves.edit", 0))
+        $this->actingAs($this->_user())->get(route("quick-leaves.edit", 0))
             ->assertStatus(404);
     }
 
@@ -177,7 +201,7 @@ class LeaveControllerTest extends TestCase
     {
         $leave = Leave::factory()->create();
 
-        $this->actingAs($this->_user())->get(route("leaves.edit", $leave->id))
+        $this->actingAs($this->_user())->get(route("quick-leaves.edit", $leave->id))
             ->assertStatus(404);
     }
 
@@ -187,14 +211,14 @@ class LeaveControllerTest extends TestCase
     public function test_edit(): void
     {
         $user = $this->_user();
-        $leave = Leave::factory()->create([
+        $quickLeave = QuickLeave::factory()->create([
             "user_id" => $user->id
         ]);
 
-        $this->actingAs($user)->get(route("leaves.edit", $leave->id))
+        $this->actingAs($user)->get(route("quick-leaves.edit", $quickLeave))
             ->assertOk()
-            ->assertViewIs("leaves.edit")
-            ->assertViewHas(["leave", "identifiers"]);
+            ->assertViewIs("quick-leaves.edit")
+            ->assertViewHas(["quickLeave", "identifiers"]);
     }
 
     /**
@@ -202,9 +226,9 @@ class LeaveControllerTest extends TestCase
      */
     public function test_update_unauthenticated(): void
     {
-        $leave = Leave::factory()->create();
+        $quickLeave = QuickLeave::factory()->create();
 
-        $this->put(route("leaves.update", $leave->id))
+        $this->put(route("quick-leaves.update", $quickLeave))
             ->assertRedirect(route("auth.index"));
     }
 
@@ -213,7 +237,7 @@ class LeaveControllerTest extends TestCase
      */
     public function test_update_nonexistent(): void
     {
-        $this->actingAs($this->_user())->put(route("leaves.update", 0))
+        $this->actingAs($this->_user())->put(route("quick-leaves.update", 0))
             ->assertStatus(404);
     }
 
@@ -231,7 +255,7 @@ class LeaveControllerTest extends TestCase
             "amount" => "100,00"
         ])->toArray();
 
-        $this->actingAs($user)->put(route("leaves.update", $leave->id), $data)
+        $this->actingAs($user)->put(route("quick-leaves.update", $leave->id), $data)
             ->assertStatus(404);
     }
 
@@ -241,11 +265,11 @@ class LeaveControllerTest extends TestCase
     public function test_update_without_data(): void
     {
         $user = $this->_user();
-        $leave = Leave::factory()->create([
+        $quickLeave = QuickLeave::factory()->create([
             "user_id" => $user->id
         ]);
 
-        $this->actingAs($this->_user())->put(route("leaves.update", $leave->id))
+        $this->actingAs($this->_user())->put(route("quick-leaves.update", $quickLeave->id))
             ->assertStatus(302)
             ->assertSessionHasErrors([
                 "title",
@@ -260,14 +284,14 @@ class LeaveControllerTest extends TestCase
     public function test_update_action_using_identifier_is_not_owner(): void
     {
         $user = $this->_user();
-        $leave = Leave::factory()->create([
+        $quickLeave = QuickLeave::factory()->create([
             "user_id" => $user->id
         ]);
-        $data = Leave::factory()->make([
+        $data = QuickLeave::factory()->make([
             "amount" => "100,00"
         ])->toArray();
 
-        $this->actingAs($this->_user())->put(route("leaves.update", $leave->id), $data)
+        $this->actingAs($this->_user())->put(route("quick-leaves.update", $quickLeave), $data)
             ->assertFound(302)
             ->assertSessionHasErrors([
                 "identifier_id",
@@ -285,24 +309,34 @@ class LeaveControllerTest extends TestCase
     public function test_update(): void
     {
         $user = $this->_user();
-        $leave = Leave::factory()->create([
+        $quickLeave = QuickLeave::factory()->create([
             "user_id" => $user->id
         ]);
-        $data = Leave::factory()->make([
+        $data = QuickLeave::factory()->make([
             "identifier_id" => Identifier::factory()->create([
                 "user_id" => $user
             ]),
             "amount" => "100,00"
         ])->toArray();
 
-        $this->actingAs($user)->put(route("leaves.update", $leave->id), $data)
-            ->assertRedirect(route("leaves.index"))
+        $this->instance(
+            QuickLeaveRepositoryContract::class,
+            Mockery::mock(QuickLeaveRepositoryContract::class)
+                ->shouldReceive("update")
+                ->with($quickLeave->id, [
+                    ...Arr::only($data, [
+                        "title", "description", "amount", "identifier_id"
+                    ]),
+                    "amount" => 100
+                ])
+                ->once()
+                ->getMock()
+        );
+
+        $this->actingAs($user)->put(route("quick-leaves.update", $quickLeave), $data)
+            ->assertRedirect(route("quick-leaves.index"))
             ->assertSessionHas("alert_type", "success");
-        $this->assertDatabaseHas("leaves", [
-            ...$data,
-            "amount" => 100.00,
-            "user_id" => $user->id
-        ]);
+        Mockery::close();
     }
 
     /**
@@ -310,9 +344,9 @@ class LeaveControllerTest extends TestCase
      */
     public function test_destroy_unauthenticated(): void
     {
-        $leave = Leave::factory()->create();
+        $quickLeave = QuickLeave::factory()->create();
 
-        $this->delete(route("leaves.destroy", $leave->id))
+        $this->delete(route("quick-leaves.destroy", $quickLeave))
             ->assertRedirect(route("auth.index"));
     }
 
@@ -321,7 +355,7 @@ class LeaveControllerTest extends TestCase
      */
     public function test_destroy_nonexistent(): void
     {
-        $this->actingAs($this->_user())->delete(route("leaves.destroy", 0))
+        $this->actingAs($this->_user())->delete(route("quick-leaves.destroy", 0))
             ->assertStatus(404);
     }
 
@@ -332,7 +366,7 @@ class LeaveControllerTest extends TestCase
     {
         $leave = Leave::factory()->create();
 
-        $this->actingAs($this->_user())->delete(route("leaves.destroy", $leave->id))
+        $this->actingAs($this->_user())->delete(route("quick-leaves.destroy", $leave->id))
             ->assertStatus(404);
     }
 
@@ -342,15 +376,21 @@ class LeaveControllerTest extends TestCase
     public function test_destroy(): void
     {
         $user = $this->_user();
-        $leave = Leave::factory()->create([
-            "user_id" => $user->id
-        ]);
+        $quickLeave = QuickLeave::factory()->hasLeave()->create(["user_id" => $user]);
 
+        $this->instance(
+            QuickLeaveRepositoryContract::class,
+            Mockery::mock(QuickLeaveRepositoryContract::class)
+                ->shouldReceive("delete")
+                ->with($quickLeave->id)
+                ->once()
+                ->getMock()
+        );
         $this->instance(
             LeaveRepositoryContract::class,
             Mockery::mock(LeaveRepositoryContract::class)
                 ->shouldReceive("delete")
-                ->with($leave->id)
+                ->with($quickLeave->leave->id)
                 ->once()
                 ->getMock()
         );
@@ -358,13 +398,13 @@ class LeaveControllerTest extends TestCase
             MovementRepositoryContract::class,
             Mockery::mock(MovementRepositoryContract::class)
                 ->shouldReceive("deletePolymorph")
-                ->with(Leave::class, $leave->id)
+                ->with(Leave::class, $quickLeave->leave->id)
                 ->once()
                 ->getMock()
         );
 
-        $this->actingAs($user)->delete(route("leaves.destroy", $leave->id))
-            ->assertRedirect(route("leaves.index"))
+        $this->actingAs($user)->delete(route("quick-leaves.destroy", $quickLeave))
+            ->assertRedirect(route("quick-leaves.index"))
             ->assertSessionHas("alert_type", "success");
         Mockery::close();
     }

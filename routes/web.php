@@ -8,7 +8,7 @@ use App\Http\Controllers\IdentifierController;
 use App\Http\Controllers\QuickEntryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InvestimentController;
-use App\Http\Controllers\LeaveController;
+use App\Http\Controllers\QuickLeaveController;
 use App\Http\Controllers\NeedController;
 use Illuminate\Support\Facades\Route;
 
@@ -57,16 +57,16 @@ Route::middleware("checkAuth")->group(function () {
         ]);
 
     // leaves
-    Route::resource("saidas", LeaveController::class)
-        ->parameter("saidas", "leave")
+    Route::resource("saidas-rapidas", QuickLeaveController::class)
+        ->parameter("saidas-rapidas", "quickLeave")
         ->names([
-            "index" => "leaves.index",
-            "create" => "leaves.create",
-            "store" => "leaves.store",
-            "show" => "leaves.show",
-            "edit" => "leaves.edit",
-            "update" => "leaves.update",
-            "destroy" => "leaves.destroy",
+            "index" => "quick-leaves.index",
+            "create" => "quick-leaves.create",
+            "store" => "quick-leaves.store",
+            "show" => "quick-leaves.show",
+            "edit" => "quick-leaves.edit",
+            "update" => "quick-leaves.update",
+            "destroy" => "quick-leaves.destroy",
         ]);
 
     // expenses
