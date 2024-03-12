@@ -66,4 +66,52 @@ class DebtPaymentControllerTest extends TestCase
                 return true;
             });
     }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_create_action_unauthenticated(): void
+    {
+        $debt = Debt::factory()->create();
+
+        $this->get(route("debts.payments.create", $debt))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_create_action_nonexistent_debt(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->get(route("debts.payments.create", $user))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_create_action_with_debt_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $debt = Debt::factory()->create();
+
+        $this->actingAs($user)->get(route("debts.payments.create", $debt))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 200
+     */
+    public function test_create_action(): void
+    {
+        $user = User::factory()->create();
+        $debt = Debt::factory()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->get(route("debts.payments.create", $debt))
+            ->assertOk()
+            ->assertViewIs("debts.payments.create")
+            ->assertViewHas("debt");
+    }
 }
