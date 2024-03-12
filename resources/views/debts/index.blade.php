@@ -42,7 +42,7 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="#" class="dropdown-item">
+                                        <a href="{{ route('debts.payments.index', $debt) }}" class="dropdown-item">
                                             <i class="bi bi-journal-text"></i>
                                             Pagamentos
                                         </a>

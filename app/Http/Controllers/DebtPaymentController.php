@@ -2,9 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Alert;
+use App\Http\Requests\StoreDebtPaymentRequest;
 use App\Models\Debt;
+use App\Models\Leave;
+use App\Repositories\Contracts\LeaveRepositoryContract;
+use App\Repositories\Contracts\MovementRepositoryContract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Src\Parsers\RealToFloatParser;
 
 class DebtPaymentController extends Controller
 {
@@ -37,9 +43,28 @@ class DebtPaymentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        //
+    public function store(
+        StoreDebtPaymentRequest $request,
+        LeaveRepositoryContract $leaveRepository,
+        MovementRepositoryContract $movementRepository,
+        Debt $debt
+    ) {
+        if (Gate::denies("debt-edit", $debt)) {
+            abort(404);
+        }
+
+        $leave = $leaveRepository->create(auth()->id(), [
+            "leaveable_type" => Debt::class,
+            "leaveable_id" => $debt->id,
+            "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+        $movementRepository->create(auth()->id(), [
+            "movementable_type" => Leave::class,
+            "movementable_id" => $leave->id
+        ]);
+
+        return redirect()->route("debts.payments.index", $debt)
+            ->with(Alert::success("Pagamento adicionado com sucesso"));
     }
 
     /**

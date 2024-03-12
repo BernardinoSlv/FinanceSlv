@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="text-end mb-3">
-        <a href="{{ route('debts.create') }}" class="btn btn-primary">Criar nova</a>
+        <a href="{{ route('debts.payments.create', $debt) }}" class="btn btn-primary">Criar nova</a>
     </div>
 
     {{-- <h3>{{ date('m/Y') }}</h3> --}}
@@ -14,7 +14,6 @@
                 <tr>
                     <th>#</th>
                     <th>Valor</th>
-                    <th>Comprovante</th>
                     <th>Data</th>
                     <th>Ação</th>
                 </tr>
@@ -23,9 +22,7 @@
                 @foreach ($debt->leaves as $leave)
                     <tr>
                         <td>{{ $leave->id }}</td>
-                        <td>R$ {{ $leave->amont }}</td>
-                        <td>...</td>
-                        <td><span class="badge bg-success">Ativo</span></td>
+                        <td>R$ {{ $leave->amount }}</td>
                         <td>{{ $debt->created_at_formated }}</td>
                         <td>
                             <div class="dropdown">

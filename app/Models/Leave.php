@@ -13,6 +13,7 @@ class Leave extends Model
 
     protected $fillable = [
         "leaveable_type",
-        "leaveable_id"
+        "leaveable_id",
+        "amount"
     ];
 }
