@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DebtController;
 use App\Http\Controllers\DebtorController;
+use App\Http\Controllers\DebtPaymentController;
 use App\Http\Controllers\IdentifierController;
 use App\Http\Controllers\QuickEntryController;
 use App\Http\Controllers\ExpenseController;
@@ -106,6 +107,20 @@ Route::middleware("checkAuth")->group(function () {
             "edit" => "debts.edit",
             "update" => "debts.update",
             "destroy" => "debts.destroy",
+        ]);
+    Route::resource("dividas.pagamentos", DebtPaymentController::class)
+        ->parameters([
+            "dividas" => "debt",
+            "pagamentos" => "leave"
+        ])
+        ->names([
+            "index" => "debts.payments.index",
+            "create" => "debts.payments.create",
+            "store" => "debts.payments.store",
+            "show" => "debts.payments.show",
+            "edit" => "debts.payments.edit",
+            "update" => "debts.payments.update",
+            "destroy" => "debts.payments.destroy",
         ]);
 
     // investiments
