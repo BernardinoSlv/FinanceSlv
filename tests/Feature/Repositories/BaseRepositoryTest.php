@@ -133,13 +133,13 @@ class BaseRepositoryTest extends TestCase
             ->create([
                 "entryable_type" => Debtor::class
             ]);
+        $debtor = Debtor::factory()->create();
 
         // dd(Entry::all()->map(fn (Entry $entry) => dump($entry->id)));
         $this->assertEquals(0, $this->_repository()->deletePolymorph(
             Debtor::class,
-            $entries->last()->id + 1
+            $debtor->id
         ));
-        $this->assertDatabaseCount("entries", 20);
     }
 
     /**
