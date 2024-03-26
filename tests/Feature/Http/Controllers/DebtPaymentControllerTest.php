@@ -7,6 +7,7 @@ use App\Models\Leave;
 use App\Models\User;
 use App\Repositories\Contracts\LeaveRepositoryContract;
 use App\Repositories\Contracts\MovementRepositoryContract;
+use App\Repositories\LeaveRepository;
 use App\Repositories\MovementRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -353,5 +354,117 @@ class DebtPaymentControllerTest extends TestCase
             ->assertOk()
             ->assertViewIs("debts.payments.edit")
             ->assertViewHas(["debt", "leave"]);
+    }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_update_action_unauthenticated(): void
+    {
+        $debt = Debt::factory()->create();
+        $leave = Leave::factory()->create([
+            "leaveable_type" => Debt::class,
+            "leaveable_id" => $debt
+        ]);
+
+        $this->put(route("debts.payments.update", [
+            "debt" => $debt,
+            "leave" => $leave
+        ]))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_update_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $debt = Debt::factory()->hasLeaves(1)->create();
+        $leave = $debt->leaves->first();
+        $data = [
+            "amount" => "100,00"
+        ];
+
+        $this->actingAs($user)->put(route("debts.payments.update", [
+            "debt" => $debt,
+            "leave" => $leave
+        ]), $data)
+            ->assertForbidden();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_action_leave_is_not_of_debt(): void
+    {
+        $user = User::factory()->create();
+        $debt = Debt::factory()->create([
+            "user_id" => $user
+        ]);
+        $leave = Leave::factory()->create([
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->put(route("debts.payments.update", [
+            "debt" => $debt,
+            "leave" => $leave
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve redirecionar com erros de validação
+     */
+    public function test_update_action_without_data(): void
+    {
+        $user = User::factory()->create();
+        $debt = Debt::factory()->hasLeaves(1, ["user_id" => $user])->create([
+            "user_id" => $user
+        ]);
+        $leave = $debt->leaves->first();
+
+        $this->actingAs($user)->put(route("debts.payments.update", [
+            "debt" => $debt,
+            "leave" => $leave
+        ]))
+            ->assertFound()
+            ->assertSessionHasErrors("amount");
+    }
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_update_action(): void
+    {
+        $user = User::factory()->create();
+        $debt = Debt::factory()->hasLeaves(1, ["user_id" => $user])->create([
+            "user_id" => $user
+        ]);
+        $leave = $debt->leaves->first();
+        $data = [
+            "amount" => "100,00"
+        ];
+
+        $this->instance(
+            LeaveRepositoryContract::class,
+            Mockery::mock(LeaveRepositoryContract::class)
+                ->shouldReceive("update")
+                ->with($leave->id, [
+                    "amount" => 100.00
+                ])
+                ->once()
+                ->getMock()
+        );
+
+        $this->actingAs($user)->put(route("debts.payments.update", [
+            "debt" => $debt,
+            "leave" => $leave
+        ]), $data)
+            ->assertRedirect(route("debts.payments.edit", [
+                "debt" => $debt,
+                "leave" => $leave
+            ]))
+            ->assertSessionHas("alert_type", "success");
+        Mockery::close();
     }
 }

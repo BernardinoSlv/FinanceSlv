@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Alert;
 use App\Http\Requests\StoreDebtPaymentRequest;
+use App\Http\Requests\UpdateDebtPaymentRequest;
 use App\Models\Debt;
 use App\Models\Leave;
 use App\Repositories\Contracts\LeaveRepositoryContract;
@@ -90,9 +91,24 @@ class DebtPaymentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        //
+    public function update(
+        UpdateDebtPaymentRequest $request,
+        LeaveRepositoryContract $leaveRepository,
+        Debt $debt,
+        Leave $leave
+    ) {
+        if (Gate::denies("leave-edit", $leave)) {
+            abort(403);
+        }
+
+        $leaveRepository->update($leave->id, [
+            "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+
+        return redirect()->route("debts.payments.edit", [
+            "debt" => $debt,
+            "leave" => $leave
+        ])->with(Alert::success("Pagamento atualizado com sucesso"));
     }
 
     /**
