@@ -121,7 +121,7 @@ Route::middleware("checkAuth")->group(function () {
             "edit" => "debts.payments.edit",
             "update" => "debts.payments.update",
             "destroy" => "debts.payments.destroy",
-        ]);
+        ])->scoped();
 
     // investiments
     Route::resource("investimentos", InvestimentController::class)

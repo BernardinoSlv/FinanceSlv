@@ -78,9 +78,13 @@ class DebtPaymentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Debt $debt, Leave $leave)
     {
-        //
+        if (Gate::denies("leave-edit", $leave)) {
+            abort(403);
+        }
+
+        return view("debts.payments.edit", compact("debt", "leave"));
     }
 
     /**

@@ -291,4 +291,67 @@ class DebtPaymentControllerTest extends TestCase
         ]))
             ->assertRedirect(route("auth.index"));
     }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_leave_is_not_of_the_debt(): void
+    {
+        $user = User::factory()->create();
+        $debt = Debt::factory()->create([
+            "user_id" => $user
+        ]);
+        $leave = Leave::factory()->create([
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->get(route("debts.payments.edit", [
+            "debt" => $debt,
+            "leave" => $leave
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_edit_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $debt = Debt::factory()->create([]);
+        $leave = Leave::factory()->create([
+            "leaveable_type" => Debt::class,
+            "leaveable_id" => $debt
+        ]);
+
+        $this->actingAs($user)->get(route("debts.payments.edit", [
+            "debt" => $debt,
+            "leave" => $leave
+        ]))
+            ->assertForbidden();
+    }
+
+    /**
+     * deve ter status 200
+     */
+    public function test_edit_action(): void
+    {
+        $user = User::factory()->create();
+        $debt = Debt::factory()->create([
+            "user_id" => $user
+        ]);
+        $leave = Leave::factory()->create([
+            "leaveable_type" => Debt::class,
+            "leaveable_id" => $debt,
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->get(route("debts.payments.edit", [
+            "debt" => $debt,
+            "leave" => $leave
+        ]))
+            ->assertOk()
+            ->assertViewIs("debts.payments.edit")
+            ->assertViewHas(["debt", "leave"]);
+    }
 }

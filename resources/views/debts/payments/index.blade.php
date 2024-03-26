@@ -31,16 +31,14 @@
                                 </button>
 
                                 <ul class="dropdown-menu">
-                                    {{-- <li>
-                                        <a href="#" class="dropdown-item">
+                                    <li>
+                                        <a href="{{ route('debts.payments.edit', [
+                                            'debt' => $debt,
+                                            'leave' => $leave,
+                                        ]) }}"
+                                            class="dropdown-item">
                                             <i class="bi bi-pencil-square"></i>
                                             Editar
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="dropdown-item">
-                                            <i class="bi bi-journal-text"></i>
-                                            Pagamentos
                                         </a>
                                     </li>
                                     <li>
@@ -48,7 +46,7 @@
                                             <i class="bi bi-trash"></i>
                                             Remover
                                         </a>
-                                    </li> --}}
+                                    </li>
                                 </ul>
                             </div>
                         </td>
