@@ -28,25 +28,33 @@
                         <td>R$ {{ $debtor->amount }}</td>
                         <td><span class="badge bg-success">Ativo</span></td>
                         <td>{{ $debtor->created_at_formated }}</td>
-                        <td >
-                            <a class="btn btn-outline-primary btn-sm"
-                                href="{{ route('debtors.edit', [
-                                    'debtor' => $debtor->id,
-                                ]) }}"><i
-                                    class="fas fa-edit"></i></a>
-                            <form
-                                action="{{ route('debtors.destroy', [
-                                    'debtor' => $debtor->id,
-                                ]) }}"
-                                method="POST" class="d-inline-block">
-                                @csrf
-                                @method('DELETE')
-
-                                <button class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Deseja remover a entrada #{{ $debtor->id }}')">
-                                    <i class="fas fa-trash"></i>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots"></i>
                                 </button>
-                            </form>
+
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="#" class="dropdown-item">
+                                            <i class="bi bi-pencil-square"></i>
+                                            Editar
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('debtors.payments.index', $debtor) }}" class="dropdown-item">
+                                            <i class="bi bi-journal-text"></i>
+                                            Pagamentos
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" class="dropdown-item">
+                                            <i class="bi bi-trash"></i>
+                                            Remover
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </td>
                     </tr>
                 @endforeach
