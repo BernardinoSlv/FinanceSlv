@@ -4,6 +4,7 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Debt;
 use App\Models\Leave;
+use App\Models\Movement;
 use App\Models\User;
 use App\Repositories\Contracts\LeaveRepositoryContract;
 use App\Repositories\Contracts\MovementRepositoryContract;
@@ -464,6 +465,93 @@ class DebtPaymentControllerTest extends TestCase
                 "debt" => $debt,
                 "leave" => $leave
             ]))
+            ->assertSessionHas("alert_type", "success");
+        Mockery::close();
+    }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_destroy_action_unauthenticated(): void
+    {
+        $debt = Debt::factory()->hasLeaves(1)->create([]);
+        $leave = $debt->leaves->first();
+
+        $this->delete(route("debts.payments.destroy", [
+            "debt" => $debt,
+            "leave" => $leave
+        ]))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_leave_is_not_debt(): void
+    {
+        $user = User::factory()->create();
+        $debt = Debt::factory()->create(["user_id" => $user]);
+        $leave = Leave::factory()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->delete(route("debts.payments.destroy", [
+            "debt" => $debt,
+            "leave" => $leave
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_destroy_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $debt = Debt::factory()->hasLeaves(1)->create();
+        $leave = $debt->leaves->first();
+
+        $this->actingAs($user)->delete(route("debts.payments.destroy", [
+            "debt" => $debt,
+            "leave" => $leave
+        ]))
+            ->assertForbidden();
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_destroy_action(): void
+    {
+        $user = User::factory()->create();
+        $debt = Debt::factory()->hasLeaves(1, ["user_id" => $user])
+            ->create(["user_id" => $user]);
+        $leave = $debt->leaves->first();
+        $movement = Movement::factory()->create([
+            "movementable_type" => Leave::class,
+            "movementable_id" => $leave
+        ]);
+
+        $this->instance(
+            LeaveRepositoryContract::class,
+            Mockery::mock(LeaveRepositoryContract::class)
+                ->shouldReceive("delete")
+                ->with($leave->id)
+                ->once()
+                ->getMock()
+        );
+        $this->instance(
+            MovementRepositoryContract::class,
+            Mockery::mock(MovementRepositoryContract::class)
+                ->shouldReceive("delete")
+                ->with($movement->id)
+                ->once()
+                ->getMock()
+        );
+
+        $this->actingAs($user)->delete(route("debts.payments.destroy", [
+            "debt" => $debt,
+            "leave" => $leave
+        ]))
+            ->assertRedirect(route("debts.payments.index", $debt))
             ->assertSessionHas("alert_type", "success");
         Mockery::close();
     }

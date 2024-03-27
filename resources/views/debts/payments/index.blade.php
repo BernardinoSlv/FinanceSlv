@@ -42,10 +42,20 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="#" class="dropdown-item">
-                                            <i class="bi bi-trash"></i>
-                                            Remover
-                                        </a>
+                                        <form
+                                            action="{{ route('debts.payments.destroy', [
+                                                'debt' => $debt,
+                                                'leave' => $leave,
+                                            ]) }}"
+                                            method="POST">
+                                            @method('DELETE')
+                                            @csrf
+
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="bi bi-trash"></i>
+                                                Remover
+                                            </button>
+                                        </form>
                                     </li>
                                 </ul>
                             </div>

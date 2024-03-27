@@ -114,8 +114,20 @@ class DebtPaymentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        //
+    public function destroy(
+        LeaveRepositoryContract $leaveRepository,
+        MovementRepositoryContract $movementRepository,
+        Debt $debt,
+        Leave $leave
+    ) {
+        if (Gate::denies("leave-edit", $leave)) {
+            abort(403);
+        }
+
+        $movementRepository->delete($leave->movement->id);
+        $leaveRepository->delete($leave->id);
+
+        return redirect()->route("debts.payments.index", $debt)
+            ->with(Alert::success("Registro removido com sucesso"));
     }
 }
