@@ -17,6 +17,7 @@ class Entry extends Model
 
     protected $fillable = [
         "entryable_type",
-        "entryable_id"
+        "entryable_id",
+        "amount"
     ];
 }

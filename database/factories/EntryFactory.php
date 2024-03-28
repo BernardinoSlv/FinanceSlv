@@ -30,7 +30,8 @@ class EntryFactory extends Factory
         return [
             "user_id" => $user,
             "entryable_type" => Debtor::class,
-            "entryable_id" => $debtor
+            "entryable_id" => $debtor,
+            "amount" => 500
         ];
     }
 }

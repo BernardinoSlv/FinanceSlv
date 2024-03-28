@@ -44,16 +44,16 @@ class EntryRepositoryTest extends TestCase
     public function test_create_method(): void
     {
         $debtor = Debtor::factory()->create();
-
-        $this->_repository()->create($debtor->user_id, [
+        $data = Entry::factory()->make([
             "entryable_type" => Debtor::class,
-            "entryable_id" => $debtor->id
-        ]);
+            "entryable_id" => $debtor->id,
+            "user_id" => $debtor->user_id
+        ])->toArray();
+
+        $this->_repository()->create($debtor->user_id, $data);
 
         $this->assertDatabaseHas("entries", [
-            "user_id" => $debtor->user_id,
-            "entryable_type" => Debtor::class,
-            "entryable_id" => $debtor->id
+            ...$data,
         ]);
     }
 
