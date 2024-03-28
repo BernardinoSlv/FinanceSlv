@@ -99,7 +99,7 @@ Route::middleware("checkAuth")->group(function () {
     Route::resource("devedores.pagamentos", DebtorPaymentController::class)
         ->parameters([
             "devedores" => "debtor",
-            "pagamentos" => "payments"
+            "pagamentos" => "entry"
         ])
         ->names([
             "index" => "debtors.payments.index",

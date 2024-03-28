@@ -4,7 +4,10 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Debt;
 use App\Models\Debtor;
+use App\Models\Entry;
 use App\Models\User;
+use App\Repositories\Contracts\EntryRepositoryContract;
+use App\Repositories\Contracts\MovementRepositoryContract;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Mockery;
@@ -116,5 +119,109 @@ class DebtorPaymentControllerTest extends TestCase
             ->assertViewHas("debtor", function (Debtor $actualDebtor) use ($debtor): bool {
                 return $debtor->id === $actualDebtor->id;
             });
+    }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_store_action_unauthenticated(): void
+    {
+        $debtor = Debtor::factory()->create();
+
+        $this->post(route("debtors.payments.store", $debtor))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_store_action_nonexistent(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post(route("debtors.payments.store", 0))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve redirecionar com erros de validação
+     */
+    public function test_store_action_without_data(): void
+    {
+        $user = User::factory()->create();
+        $debtor = Debtor::factory()->create([
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->post(route("debtors.payments.store", $debtor))
+            ->assertFound()
+            ->assertSessionHasErrors("amount");
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_store_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $debtor = Debtor::factory()->create();
+        $data = [
+            "amount" => "1.000,00"
+        ];
+
+        $this->actingAs($user)->post(route("debtors.payments.store", $debtor), $data)
+            ->assertForbidden();
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_store_action(): void
+    {
+        $user = User::factory()->create();
+        $debtor = Debtor::factory()->create(["user_id" => $user]);
+        $data = [
+            "amount" => "1.000,00"
+        ];
+
+        $this->instance(
+            EntryRepositoryContract::class,
+            Mockery::mock(app(EntryRepositoryContract::class))
+                ->shouldReceive("create")
+                ->with($user->id, Mockery::on(function (array $attributes): bool {
+
+                    if ($attributes["entryable_type"] !== Debtor::class) {
+                        return false;
+                    } else if (!is_numeric($attributes["entryable_id"])) {
+                        return false;
+                    } else if ($attributes["amount"] !== 1000.0) {
+                        return false;
+                    }
+                    return true;
+                }))
+                ->once()
+                ->passthru()
+                ->getMock()
+        );
+        $this->instance(
+            MovementRepositoryContract::class,
+            Mockery::mock(app(MovementRepositoryContract::class))
+                ->shouldReceive("create")
+                ->with($user->id, Mockery::on(function (array $attributes): bool {
+                    if ($attributes["movementable_type"] !== Entry::class) {
+                        return false;
+                    } else if (!is_int($attributes["movementable_id"])) {
+                        return false;
+                    }
+                    return true;
+                }))
+                ->once()
+                ->getMock()
+        );
+
+        $this->actingAs($user)->post(route("debtors.payments.store", $debtor), $data)
+            ->assertRedirect(route("debtors.payments.index", $debtor))
+            ->assertSessionHas("alert_type", "success");
+        Mockery::close();
     }
 }

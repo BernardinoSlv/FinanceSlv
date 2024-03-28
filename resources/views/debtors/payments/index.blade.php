@@ -33,8 +33,8 @@
                                 <ul class="dropdown-menu">
                                     <li>
                                         <a href="{{ route('debtors.payments.edit', [
-                                            'debt' => $debt,
-                                            'leave' => $entry,
+                                            'debtor' => $debtor,
+                                            'entry' => $entry,
                                         ]) }}"
                                             class="dropdown-item">
                                             <i class="bi bi-pencil-square"></i>
@@ -44,8 +44,8 @@
                                     <li>
                                         <form
                                             action="{{ route('debtors.payments.destroy', [
-                                                'debt' => $debt,
-                                                'leave' => $entry,
+                                                'debtor' => $debtor,
+                                                'entry' => $entry,
                                             ]) }}"
                                             method="POST">
                                             @method('DELETE')

@@ -2,9 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Alert;
+use App\Http\Requests\StoreDebtPaymentRequest;
 use App\Models\Debtor;
+use App\Models\Entry;
+use App\Repositories\Contracts\EntryRepositoryContract;
+use App\Repositories\Contracts\MovementRepositoryContract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Src\Parsers\RealToFloatParser;
 
 class DebtorPaymentController extends Controller
 {
@@ -37,9 +43,29 @@ class DebtorPaymentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        //
+    public function store(
+        StoreDebtPaymentRequest $request,
+        EntryRepositoryContract $entryRepository,
+        MovementRepositoryContract $movementRepository,
+        Debtor $debtor
+    ) {
+        if (Gate::denies("debtor-edit", $debtor)) {
+            abort(403);
+        }
+
+        $entry = $entryRepository->create(auth()->id(), [
+            ...$request->validated(),
+            "entryable_type" => Debtor::class,
+            "entryable_id" => $debtor->id,
+            "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+        $movementRepository->create(auth()->id(), [
+            "movementable_type" => Entry::class,
+            "movementable_id" => $entry->id
+        ]);
+
+        return redirect()->route("debtors.payments.index", $debtor)
+            ->with(Alert::success("Pagamento adicionado com sucesso"));
     }
 
     /**
