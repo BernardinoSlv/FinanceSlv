@@ -25,9 +25,13 @@ class DebtorPaymentController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Debtor $debtor)
     {
-        //
+        if (Gate::denies("debtor-edit", $debtor)) {
+            abort(403);
+        }
+
+        return view("debtors.payments.create", compact("debtor"));
     }
 
     /**
