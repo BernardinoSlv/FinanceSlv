@@ -79,9 +79,13 @@ class DebtorPaymentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Debtor $debtor, Entry $entry)
     {
-        //
+        if (Gate::denies("entry-edit", $entry)) {
+            abort(403);
+        }
+
+        return view("debtors.payments.edit", compact("debtor", "entry"));
     }
 
     /**

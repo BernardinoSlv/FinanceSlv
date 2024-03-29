@@ -224,4 +224,121 @@ class DebtorPaymentControllerTest extends TestCase
             ->assertSessionHas("alert_type", "success");
         Mockery::close();
     }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_edit_action_unauthenticated(): void
+    {
+        $debtor = Debtor::factory()->create();
+        $entry = Entry::factory()->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => $debtor
+        ]);
+
+        $this->get(route("debtors.payments.edit", [
+            "debtor" => $debtor,
+            "entry" => $entry
+        ]))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_nonexistent_debtor_id(): void
+    {
+        $user = User::factory()->create();
+        $entry = Entry::factory()->create([
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->get(route("debtors.payments.edit", [
+            "debtor" => 0,
+            "entry" => $entry
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_nonexistent_id(): void
+    {
+        $user = User::factory()->create();
+        $debtor = Debtor::factory()->create([
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->get(route("debtors.payments.edit", [
+            "debtor" => $debtor,
+            "entry" => 0
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_entry_is_not_of_debtor(): void
+    {
+        $user = User::factory()->create();
+        $debtor = Debtor::factory()->create([
+            "user_id" => $user
+        ]);
+        $entry = Entry::factory()->create([
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->get(route("debtors.payments.edit", [
+            "debtor" => $debtor,
+            "entry" => $entry
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_edit_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $debtor = Debtor::factory()->create([
+            "user_id" => $user
+        ]);
+        $entry = Entry::factory()->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => $debtor
+        ]);
+
+        $this->actingAs($user)->get(route("debtors.payments.edit", [
+            "debtor" => $debtor,
+            "entry" => $entry
+        ]))
+            ->assertForbidden();
+    }
+
+    /**
+     * deve ter status 200
+     */
+    public function test_edit_action(): void
+    {
+        $user = User::factory()->create();
+        $debtor = Debtor::factory()->create([
+            "user_id" => $user
+        ]);
+        $entry = Entry::factory()->create([
+            "user_id" => $user,
+            "entryable_type" => Debtor::class,
+            "entryable_id" => $debtor
+        ]);
+
+        $this->actingAs($user)->get(route("debtors.payments.edit", [
+            "debtor" => $debtor,
+            "entry" => $entry
+        ]))
+            ->assertOk()
+            ->assertViewIs("debtors.payments.edit")
+            ->assertViewHas(["debtor", "entry"]);
+    }
 }

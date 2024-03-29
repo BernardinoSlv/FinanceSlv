@@ -109,7 +109,8 @@ Route::middleware("checkAuth")->group(function () {
             "edit" => "debtors.payments.edit",
             "update" => "debtors.payments.update",
             "destroy" => "debtors.payments.destroy",
-        ]);
+        ])
+        ->scoped();
 
 
     // debts
