@@ -116,8 +116,20 @@ class DebtorPaymentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        //
+    public function destroy(
+        EntryRepositoryContract $entryRepository,
+        MovementRepositoryContract $movementRepository,
+        Debtor $debtor,
+        Entry $entry
+    ) {
+        if (Gate::denies("entry-edit", $entry)) {
+            abort(403);
+        }
+
+        $movementRepository->delete($entry->movement->id);
+        $entryRepository->delete($entry->id);
+
+        return redirect()->route("debtors.payments.index", $debtor)
+            ->with(Alert::success("Pagamento removido"));
     }
 }

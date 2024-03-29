@@ -5,6 +5,7 @@ namespace Tests\Feature\Http\Controllers;
 use App\Models\Debt;
 use App\Models\Debtor;
 use App\Models\Entry;
+use App\Models\Movement;
 use App\Models\User;
 use App\Repositories\Contracts\EntryRepositoryContract;
 use App\Repositories\Contracts\MovementRepositoryContract;
@@ -492,6 +493,140 @@ class DebtorPaymentControllerTest extends TestCase
                 "debtor" => $debtor,
                 "entry" => $entry
             ]))
+            ->assertSessionHas("alert_type", "success");
+    }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_destroy_action_unauthenticated(): void
+    {
+        $debtor = Debtor::factory()->create();
+        $entry = Entry::factory()->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => $debtor
+        ]);
+
+        $this->delete(route("debtors.payments.destroy", [
+            "debtor" => $debtor,
+            "entry" => $entry
+        ]))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_nonexistent_debtor(): void
+    {
+        $user = User::factory()->create();
+        $entry = Entry::factory()->create([
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->delete(route("debtors.payments.destroy", [
+            "debtor" => 0,
+            "entry" => $entry
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_nonexistent(): void
+    {
+        $user = User::factory()->create();
+        $debtor = Debtor::factory()->create([
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->delete(route("debtors.payments.destroy", [
+            "debtor" => $debtor,
+            "entry" => 0
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_entry_is_not_debtor(): void
+    {
+        $user = User::factory()->create();
+        $debtor = Debtor::factory()->create([
+            "user_id" => $user
+        ]);
+        $entry = Entry::factory()->create([
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->delete(route("debtors.payments.destroy", [
+            "debtor" => $debtor,
+            "entry" => $entry
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_destroy_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $debtor = Debtor::factory()->create();
+        $entry = Entry::factory()->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => $debtor
+        ]);
+
+        $this->actingAs($user)->delete(route("debtors.payments.destroy", [
+            "debtor" => $debtor,
+            "entry" => $entry
+        ]))
+            ->assertForbidden();
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_destroy_action(): void
+    {
+        $user = User::factory()->create();
+        $debtor = Debtor::factory()->create(["user_id" => $user]);
+        $entry = Entry::factory()->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => $debtor,
+            "user_id" => $user
+        ]);
+        $movement = Movement::factory()->create([
+            "movementable_type" => Entry::class,
+            "movementable_id" => $entry,
+            "user_id" => $user
+        ]);
+
+        $this->instance(
+            EntryRepositoryContract::class,
+            Mockery::mock(EntryRepositoryContract::class)
+                ->shouldReceive("delete")
+                ->with($entry->id)
+                ->once()
+                ->getMock()
+        );
+        $this->instance(
+            MovementRepositoryContract::class,
+            Mockery::mock(MovementRepositoryContract::class)
+                ->shouldReceive("delete")
+                ->with($movement->id)
+                ->once()
+                ->getMock()
+        );
+
+        $this->actingAs($user)->delete(route("debtors.payments.destroy", [
+            "debtor" => $debtor,
+            "entry" => $entry
+        ]))
+            ->assertRedirect(route("debtors.payments.index", $debtor))
             ->assertSessionHas("alert_type", "success");
     }
 }
