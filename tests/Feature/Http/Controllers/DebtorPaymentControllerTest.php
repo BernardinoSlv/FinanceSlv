@@ -341,4 +341,157 @@ class DebtorPaymentControllerTest extends TestCase
             ->assertViewIs("debtors.payments.edit")
             ->assertViewHas(["debtor", "entry"]);
     }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_update_action_unauthenticated(): void
+    {
+        $debtor = Debtor::factory()->create([]);
+        $entry = Entry::factory()->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => $debtor
+        ]);
+
+        $this->put(route("debtors.payments.update", [
+            "debtor" => $debtor,
+            "entry" => $entry
+        ]))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_action_nonexistent_debtor(): void
+    {
+        $user = User::factory()->create();
+        $entry = Entry::factory()->create([
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->put(route("debtors.payments.update", [
+            "debtor" => 0,
+            "entry" => $entry
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_action_noexistent(): void
+    {
+        $user = User::factory()->create();
+        $debtor = Debtor::factory()->create([
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->put(route("debtors.payments.update", [
+            "debtor" => $debtor,
+            "entry" => 0
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_action_entry_is_not_debtor(): void
+    {
+        $user = User::factory()->create();
+        $debtor = Debtor::factory()->create([
+            "user_id" => $user
+        ]);
+        $entry = Entry::factory()->create([
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->put(route("debtors.payments.update", [
+            "debtor" => $debtor,
+            "entry" => $entry
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve redirecionar com erros de validação
+     */
+    public function test_update_action_without_data(): void
+    {
+        $user = User::factory()->create();
+        $debtor = Debtor::factory()->create(["user_id" => $user]);
+        $entry = Entry::factory()->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => $debtor,
+            "user_id" => $user
+        ]);
+
+        $this->actingAs($user)->put(route("debtors.payments.update", [
+            "debtor" => $debtor,
+            "entry" => $entry
+        ]))
+            ->assertFound()
+            ->assertSessionHasErrors("amount");
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_update_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $debtor = Debtor::factory()->create();
+        $entry = Entry::factory()->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => $debtor,
+        ]);
+        $data = [
+            "amount" => "1.800,00"
+        ];
+
+        $this->actingAs($user)->put(route("debtors.payments.update", [
+            "debtor" => $debtor,
+            "entry" => $entry
+        ]), $data)
+            ->assertForbidden();
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_update_action(): void
+    {
+        $user = User::factory()->create();
+        $debtor = Debtor::factory()->create([
+            "user_id" => $user
+        ]);
+        $entry = Entry::factory()->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => $debtor,
+            "user_id" => $user
+        ]);
+        $data = [
+            "amount" => "1.800,00"
+        ];
+
+        $this->instance(
+            EntryRepositoryContract::class,
+            Mockery::mock(EntryRepositoryContract::class)
+                ->shouldReceive("update")
+                ->with($entry->id, ["amount" => 1800.00])
+                ->once()
+                ->getMock()
+        );
+
+        $this->actingAs($user)->put(route("debtors.payments.update", [
+            "debtor" => $debtor,
+            "entry" => $entry
+        ]), $data)
+            ->assertRedirect(route("debtors.payments.edit", [
+                "debtor" => $debtor,
+                "entry" => $entry
+            ]))
+            ->assertSessionHas("alert_type", "success");
+    }
 }

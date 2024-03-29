@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Alert;
 use App\Http\Requests\StoreDebtPaymentRequest;
+use App\Http\Requests\UpdateDebtorPaymentRequest;
 use App\Models\Debtor;
 use App\Models\Entry;
 use App\Repositories\Contracts\EntryRepositoryContract;
@@ -91,9 +92,25 @@ class DebtorPaymentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        //
+    public function update(
+        UpdateDebtorPaymentRequest $request,
+        EntryRepositoryContract $entryRepository,
+        Debtor $debtor,
+        Entry $entry
+    ) {
+        if (Gate::denies("entry-edit", $entry)) {
+            abort(403);
+        }
+
+        $entryRepository->update($entry->id, [
+            "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+
+        return redirect()->route("debtors.payments.edit", [
+            "debtor" => $debtor,
+            "entry" => $entry
+        ])
+            ->with(Alert::success("Pagamento atualizado com sucesso"));
     }
 
     /**
