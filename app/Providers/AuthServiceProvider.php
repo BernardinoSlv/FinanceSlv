@@ -42,6 +42,10 @@ class AuthServiceProvider extends ServiceProvider
             return $user->id === $quickLeave->user_id;
         });
 
+        Gate::define("entry-edit", function (User $user, Entry $entry): bool {
+            return $user->id === $entry->user_id;
+        });
+
         Gate::define("expense-edit", function (User $user, Expense $expense): bool {
             return $user->id === $expense->user_id;
         });
