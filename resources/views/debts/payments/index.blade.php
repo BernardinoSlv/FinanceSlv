@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="text-end mb-3">
-        <a href="{{ route('debts.create') }}" class="btn btn-primary">Criar nova</a>
+        <a href="{{ route('debts.payments.create', $debt) }}" class="btn btn-primary">Criar nova</a>
     </div>
 
     {{-- <h3>{{ date('m/Y') }}</h3> --}}
@@ -13,20 +13,16 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Título</th>
                     <th>Valor</th>
-                    <th>Status</th>
                     <th>Data</th>
                     <th>Ação</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($debts as $debt)
+                @foreach ($debt->leaves as $leave)
                     <tr>
-                        <td>{{ $debt->id }}</td>
-                        <td>{{ $debt->title }}</td>
-                        <td>R$ {{ $debt->amount }}</td>
-                        <td><span class="badge bg-success">Ativo</span></td>
+                        <td>{{ $leave->id }}</td>
+                        <td>R$ {{ $leave->amount }}</td>
                         <td>{{ $debt->created_at_formated }}</td>
                         <td>
                             <div class="dropdown">
@@ -36,22 +32,30 @@
 
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a href="#" class="dropdown-item">
+                                        <a href="{{ route('debts.payments.edit', [
+                                            'debt' => $debt,
+                                            'leave' => $leave,
+                                        ]) }}"
+                                            class="dropdown-item">
                                             <i class="bi bi-pencil-square"></i>
                                             Editar
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('debts.payments.index', $debt) }}" class="dropdown-item">
-                                            <i class="bi bi-journal-text"></i>
-                                            Pagamentos
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="dropdown-item">
-                                            <i class="bi bi-trash"></i>
-                                            Remover
-                                        </a>
+                                        <form
+                                            action="{{ route('debts.payments.destroy', [
+                                                'debt' => $debt,
+                                                'leave' => $leave,
+                                            ]) }}"
+                                            method="POST">
+                                            @method('DELETE')
+                                            @csrf
+
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="bi bi-trash"></i>
+                                                Remover
+                                            </button>
+                                        </form>
                                     </li>
                                 </ul>
                             </div>

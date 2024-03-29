@@ -4,6 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DebtController;
 use App\Http\Controllers\DebtorController;
+use App\Http\Controllers\DebtorPaymentController;
+use App\Http\Controllers\DebtPaymentController;
 use App\Http\Controllers\IdentifierController;
 use App\Http\Controllers\QuickEntryController;
 use App\Http\Controllers\ExpenseController;
@@ -94,6 +96,22 @@ Route::middleware("checkAuth")->group(function () {
             "update" => "debtors.update",
             "destroy" => "debtors.destroy",
         ]);
+    Route::resource("devedores.pagamentos", DebtorPaymentController::class)
+        ->parameters([
+            "devedores" => "debtor",
+            "pagamentos" => "entry"
+        ])
+        ->names([
+            "index" => "debtors.payments.index",
+            "create" => "debtors.payments.create",
+            "store" => "debtors.payments.store",
+            "show" => "debtors.payments.show",
+            "edit" => "debtors.payments.edit",
+            "update" => "debtors.payments.update",
+            "destroy" => "debtors.payments.destroy",
+        ])
+        ->scoped();
+
 
     // debts
     Route::resource("dividas", DebtController::class)
@@ -107,6 +125,20 @@ Route::middleware("checkAuth")->group(function () {
             "update" => "debts.update",
             "destroy" => "debts.destroy",
         ]);
+    Route::resource("dividas.pagamentos", DebtPaymentController::class)
+        ->parameters([
+            "dividas" => "debt",
+            "pagamentos" => "leave"
+        ])
+        ->names([
+            "index" => "debts.payments.index",
+            "create" => "debts.payments.create",
+            "store" => "debts.payments.store",
+            "show" => "debts.payments.show",
+            "edit" => "debts.payments.edit",
+            "update" => "debts.payments.update",
+            "destroy" => "debts.payments.destroy",
+        ])->scoped();
 
     // investiments
     Route::resource("investimentos", InvestimentController::class)

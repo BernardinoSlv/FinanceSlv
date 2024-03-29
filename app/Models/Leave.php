@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Leave extends Model
@@ -13,6 +14,12 @@ class Leave extends Model
 
     protected $fillable = [
         "leaveable_type",
-        "leaveable_id"
+        "leaveable_id",
+        "amount"
     ];
+
+    public function movement(): MorphOne
+    {
+        return $this->morphOne(Movement::class, "movementable");
+    }
 }

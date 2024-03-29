@@ -30,7 +30,8 @@ class LeaveFactory extends Factory
         return [
             "user_id" => $user,
             "leaveable_type" => Debt::class,
-            "leaveable_id" => $debt
+            "leaveable_id" => $debt,
+            "amount" => 200
         ];
     }
 }

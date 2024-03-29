@@ -42,6 +42,10 @@ class AuthServiceProvider extends ServiceProvider
             return $user->id === $quickLeave->user_id;
         });
 
+        Gate::define("entry-edit", function (User $user, Entry $entry): bool {
+            return $user->id === $entry->user_id;
+        });
+
         Gate::define("expense-edit", function (User $user, Expense $expense): bool {
             return $user->id === $expense->user_id;
         });
@@ -64,6 +68,10 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::define("identifier-edit", function (User $user, Identifier $identifier): bool {
             return $user->id === $identifier->user_id;
+        });
+
+        Gate::define("leave-edit", function (User $user, Leave $leave): bool {
+            return $user->id === $leave->user_id;
         });
     }
 }
