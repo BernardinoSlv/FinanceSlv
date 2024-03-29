@@ -28,6 +28,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
+        integrity="sha512-dPXYcDub/aeb08c63jRq/k6GaKccl256JQy/AnOq7CAnEZ9FzSL9wSbcZkMp4R26vBsMLFYH4kQ67/bbV8XaCQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <!-- body start -->
@@ -305,40 +309,40 @@
 
                         <li>
                             <a href="#operations" data-bs-toggle="collapse">
-                                <i class="mdi mdi-email"></i>
+                                <i class="mdi mdi-database-arrow-left-outline"></i>
                                 <span> Operações </span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <div class="collapse" id="operations">
                                 <ul class="nav-second-level">
                                     <li>
-                                        <a href="#entries-collapse" data-bs-toggle="collapse">
-                                            <span>Entradas</span>
+                                        <a href="#quick-entries-collapse" data-bs-toggle="collapse">
+                                            <span>Entradas rápidas</span>
                                             <span class="menu-arrow"></span>
                                         </a>
-                                        <div class="collapse" id="entries-collapse">
+                                        <div class="collapse" id="quick-entries-collapse">
                                             <ul class="nav-second-level">
                                                 <li>
-                                                    <a href="{{ route('entries.index') }}">Todas</a>
+                                                    <a href="{{ route('quick-entries.index') }}">Todas</a>
                                                 </li>
                                                 <li>
-                                                    <a href="{{ route('entries.create') }}">Criar</a>
+                                                    <a href="{{ route('quick-entries.create') }}">Criar</a>
                                                 </li>
                                             </ul>
                                         </div>
                                     </li>
                                     <li>
                                         <a href="#exits-collapse" data-bs-toggle="collapse">
-                                            <span>Saídas</span>
+                                            <span>Saídas rápidas</span>
                                             <span class="menu-arrow"></span>
                                         </a>
                                         <div class="collapse" id="exits-collapse">
                                             <ul class="nav-second-level">
                                                 <li>
-                                                    <a href="{{ route('leaves.index') }}">Todas</a>
+                                                    <a href="{{ route('quick-leaves.index') }}">Todas</a>
                                                 </li>
                                                 <li>
-                                                    <a href="{{ route('leaves.create') }}">Criar</a>
+                                                    <a href="{{ route('quick-leaves.create') }}">Criar</a>
                                                 </li>
                                             </ul>
                                         </div>
@@ -383,7 +387,7 @@
                                         <div class="collapse" id="debtors-collapse">
                                             <ul class="nav-second-level">
                                                 <li>
-                                                    <a href="{{ route('debtors.index') }}">Todas</a>
+                                                    <a href="{{ route('debtors.index') }}">Todos</a>
                                                 </li>
                                                 <li>
                                                     <a href="{{ route('debtors.create') }}">Criar</a>
@@ -399,10 +403,10 @@
                                         <div class="collapse" id="investiments-collapse">
                                             <ul class="nav-second-level">
                                                 <li>
-                                                    <a href="#">Todas</a>
+                                                    <a href="{{ route('investiments.index') }}">Todos</a>
                                                 </li>
                                                 <li>
-                                                    <a href="#">Criar</a>
+                                                    <a href="{{ route('investiments.create') }}">Criar</a>
                                                 </li>
                                             </ul>
                                         </div>
@@ -415,15 +419,21 @@
                                         <div class="collapse" id="needs-collapse">
                                             <ul class="nav-second-level">
                                                 <li>
-                                                    <a href="#">Todas</a>
+                                                    <a href="{{ route('needs.index') }}">Todas</a>
                                                 </li>
                                                 <li>
-                                                    <a href="#">Criar</a>
+                                                    <a href="{{ route('needs.create') }}">Criar</a>
                                                 </li>
                                             </ul>
                                         </div>
                                     </li>
                                 </ul>
+                        </li>
+                        <li>
+                            <a href="{{ route('identifiers.index') }}">
+                                <i class="mdi mdi-account-group"></i>
+                                <span> Identificadores </span>
+                            </a>
                         </li>
                     </ul>
 

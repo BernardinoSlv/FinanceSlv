@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Repositories\Contracts\BaseRepositoryContract;
+use App\Repositories\Contracts\EntryRepositoryContract;
+use App\Repositories\Contracts\LeaveRepositoryContract;
+use App\Repositories\Contracts\MovementRepositoryContract;
+use Error;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-abstract class BaseRepository
+abstract class BaseRepository implements BaseRepositoryContract
 {
     protected Model $_model;
 
@@ -30,20 +35,44 @@ abstract class BaseRepository
 
     public function update(int $id, array $attributes): bool
     {
-        if (!($entity = $this->_model->find($id))) {
+        if (!($identifier = $this->_model->find($id))) {
             return false;
         }
-        $entity->fill($attributes);
-        $entity->save();
+        $identifier->fill($attributes);
+        $identifier->save();
         return true;
     }
 
     public function delete(int $id): bool
     {
-        if (!($entity = $this->_model->query()->find($id))) {
+        if (!($identifier = $this->_model->query()->find($id))) {
             return false;
         }
-        $entity->delete();
+        $identifier->delete();
         return true;
+    }
+
+    public function deletePolymorph(string $polymorphType, int $polymorphId): int
+    {
+        if ($this instanceof EntryRepositoryContract) {
+            return $this->_model->query()->where([
+                "entryable_type" => $polymorphType,
+                "entryable_id" => $polymorphId
+            ])
+                ->delete();
+        } elseif ($this instanceof LeaveRepositoryContract) {
+            return $this->_model->query()->where([
+                "leaveable_type" => $polymorphType,
+                "leaveable_id" => $polymorphId
+            ])
+                ->delete();
+        } elseif ($this instanceof MovementRepositoryContract) {
+            return $this->_model->query()->where([
+                "movementable_type" => $polymorphType,
+                "movementable_id" => $polymorphId
+            ])
+                ->delete();
+        }
+        throw new Error("Method is not allowed");
     }
 }

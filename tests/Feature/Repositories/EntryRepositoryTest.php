@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Repositories;
 
+use App\Models\Debtor;
 use App\Models\Entry;
+use App\Models\Expense;
 use App\Models\User;
 use App\Repositories\Contracts\EntryRepositoryContract;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -23,6 +25,7 @@ class EntryRepositoryTest extends TestCase
     {
         Entry::factory(20)->create();
         $user = User::factory()->create();
+
         // do usuário , do mês anterior
         Entry::factory(10)->create([
             "user_id" => $user->id,
@@ -36,21 +39,24 @@ class EntryRepositoryTest extends TestCase
     }
 
     /**
-     * deve criar a entrada corretamente
-     *
-     * @return void
+     * deve criar registro
      */
     public function test_create_method(): void
     {
-        $user = User::factory()->create();
-        $data = Entry::factory()->make()->toArray();
+        $debtor = Debtor::factory()->create();
+        $data = Entry::factory()->make([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => $debtor->id,
+            "user_id" => $debtor->user_id
+        ])->toArray();
 
-        $this->assertNotNull($this->_repository()->create($user->id, $data));
+        $this->_repository()->create($debtor->user_id, $data);
+
         $this->assertDatabaseHas("entries", [
             ...$data,
-            "user_id" => $user->id,
         ]);
     }
+
 
     protected function _repository(): EntryRepositoryContract
     {

@@ -2,15 +2,23 @@
 
 namespace Tests\Feature\Http\Controllers;
 
+use App\Models\Entry;
 use App\Models\Expense;
+use App\Models\Identifier;
 use App\Models\User;
+use App\Repositories\Contracts\EntryRepositoryContract;
+use App\Repositories\Contracts\ExpenseRepositoryContract;
+use App\Repositories\Contracts\LeaveRepositoryContract;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
+use Mockery;
 use Tests\TestCase;
 
 class ExpenseControllerTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * deve redirecionar para página de login
      */
@@ -26,7 +34,7 @@ class ExpenseControllerTest extends TestCase
     {
         $this->actingAs($this->_user())->get(route("expenses.index"))
             ->assertOk()
-            ->assertViewIs("expense.index")
+            ->assertViewIs("expenses.index")
             ->assertViewHas("expenses");
     }
 
@@ -45,7 +53,8 @@ class ExpenseControllerTest extends TestCase
     {
         $this->actingAs($this->_user())->get(route("expenses.create"))
             ->assertOk()
-            ->assertViewIs("expense.create");
+            ->assertViewIs("expenses.create")
+            ->assertViewHas("identifiers");
     }
 
     /**
@@ -65,36 +74,11 @@ class ExpenseControllerTest extends TestCase
         $this->actingAs($this->_user())->post(route("expenses.store"))
             ->assertStatus(302)
             ->assertSessionHasErrors([
+                "identifier_id",
                 "title",
                 "amount"
             ])
             ->assertSessionDoesntHaveErrors([
-                "quantity",
-                "description",
-                "effetive_at"
-            ]);
-    }
-
-    /**
-     * deve redirecionar com erro no campo title
-     */
-    public function test_store_duplicated_title(): void
-    {
-        $user = $this->_user();
-
-        $expense = Expense::factory()->create([
-            "user_id" => $user->id
-        ]);
-        $data = [
-            "title" => $expense->title,
-            "amount" => "10,00",
-        ];
-
-        $this->actingAs($user)->post(route("expenses.store"), $data)
-            ->assertStatus(302)
-            ->assertSessionHasErrors("title")
-            ->assertSessionDoesntHaveErrors([
-                "amount",
                 "quantity",
                 "description",
                 "effetive_at"
@@ -108,6 +92,7 @@ class ExpenseControllerTest extends TestCase
     {
         $user = $this->_user();
         $data = Expense::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "amount" => "100,00"
         ])->toArray();
 
@@ -122,6 +107,31 @@ class ExpenseControllerTest extends TestCase
     }
 
     /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_store_duplicated_title(): void
+    {
+        $user = $this->_user();
+
+        $expense = Expense::factory()->create([
+            "user_id" => $user->id
+        ]);
+        $data = Expense::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
+            "amount" => "10,00",
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("expenses.store"), $data)
+            ->assertRedirect(route("expenses.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("expenses", [
+            ...Arr::except($data, "user_id"),
+            "user_id" => $user->id,
+            "amount" => 10.00
+        ]);
+    }
+
+    /**
      * deve persistir mesmo se existir mesmo titúlo de despesa, desde que ela seja de outro usuário
      */
     public function test_store_duplicated_title_of_the_other_user(): void
@@ -129,6 +139,7 @@ class ExpenseControllerTest extends TestCase
         $user = $this->_user();
         $expenseOtherUser = Expense::factory()->create();
         $data = Expense::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "title" => $expenseOtherUser->title,
             "amount" => "100,00"
         ])->toArray();
@@ -150,19 +161,25 @@ class ExpenseControllerTest extends TestCase
     {
         $user = $this->_user();
         $data = Expense::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "amount" => "100,00",
         ])->toArray();
         $data = Arr::except($data, "effetive_at");
+
+        $this->instance(
+            LeaveRepositoryContract::class,
+            Mockery::mock(LeaveRepositoryContract::class)
+                ->shouldReceive("create")
+                ->once()
+                ->withSomeOfArgs($user->id)
+                ->getMock()
+        );
 
         $this->assertArrayNotHasKey("effetive_at", $data);
         $this->actingAs($user)->post(route("expenses.store"), $data)
             ->assertRedirect(route("expenses.index"))
             ->assertSessionHas("alert_type", "success");
-        $this->assertDatabaseHas("expenses", [
-            ...Arr::except($data, "user_id"),
-            "user_id" => $user->id,
-            "amount" => 100.00
-        ]);
+        Mockery::close();
     }
 
     /**
@@ -208,8 +225,9 @@ class ExpenseControllerTest extends TestCase
 
         $this->actingAs($user)->get(route("expenses.edit", $expense))
             ->assertOk()
-            ->assertViewIs("expense.edit")
+            ->assertViewIs("expenses.edit")
             ->assertViewHas([
+                "identifiers",
                 "expense"
             ]);
     }
@@ -235,12 +253,14 @@ class ExpenseControllerTest extends TestCase
      */
     public function test_update_action_is_not_owner(): void
     {
+        $user = $this->_user();
         $expense = Expense::factory()->create();
         $data = Expense::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "amount" => "10,00"
         ])->toArray();
 
-        $this->actingAs($this->_user())->put(route("expenses.update", $expense), $data)
+        $this->actingAs($user)->put(route("expenses.update", $expense), $data)
             ->assertStatus(404);
     }
 
@@ -265,32 +285,6 @@ class ExpenseControllerTest extends TestCase
     }
 
     /**
-     * deve redirecionar com erro no campo title
-     */
-    public function test_update_action_duplicated_title(): void
-    {
-        $user = $this->_user();
-        $otherExpense = Expense::factory()->create([
-            "user_id" => $user->id
-        ]);
-        $expense = Expense::factory()->create();
-        $data = Expense::factory()->make([
-            "amount" => "10,00",
-            "title" => $otherExpense->title
-        ])->toArray();
-
-        $this->actingAs($user)->put(route("expenses.update", $expense), $data)
-            ->assertStatus(302)
-            ->assertSessionHasErrors("title")
-            ->assertSessionDoesntHaveErrors([
-                "amount",
-                "quantity",
-                "description",
-                "effetive_at",
-            ]);
-    }
-
-    /**
      * deve atualizar despesa
      */
     public function test_update_action(): void
@@ -300,6 +294,7 @@ class ExpenseControllerTest extends TestCase
             "user_id" => $user->id
         ]);
         $data = Expense::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "amount" => "99,00",
         ])->toArray();
 
@@ -313,6 +308,37 @@ class ExpenseControllerTest extends TestCase
         ]);
     }
 
+    /**
+     * deve redirecionar com mensagem de suceso
+     */
+    public function test_update_action_duplicated_title(): void
+    {
+        $user = $this->_user();
+        $otherExpense = Expense::factory()->create([
+            "user_id" => $user->id
+        ]);
+        $expense = Expense::factory()->create([
+            "user_id" => $user,
+        ]);
+        $data = Expense::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
+            "amount" => "10,00",
+            "title" => $otherExpense->title
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("expenses.update", $expense), $data)
+            ->assertRedirect(route("expenses.edit", $expense))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("expenses", [
+            ...$data,
+            "amount" => 10,
+            "user_id" => $user->id
+        ]);
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
     public function test_update_action_same_title(): void
     {
         $user = $this->_user();
@@ -320,6 +346,7 @@ class ExpenseControllerTest extends TestCase
             "user_id" => $user->id
         ]);
         $data = Expense::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "amount" => "99,00",
             "title" => $expense->title,
         ])->toArray();
@@ -373,10 +400,31 @@ class ExpenseControllerTest extends TestCase
         $expense = Expense::factory()->create([
             "user_id" => $user->id
         ]);
+        $entry = Entry::factory()->create([
+            "entryable_type" => Expense::class,
+            "entryable_id" => $expense->id
+        ]);
+
+        $this->instance(
+            ExpenseRepositoryContract::class,
+            Mockery::mock(ExpenseRepositoryContract::class)
+                ->shouldReceive("delete")
+                ->with($expense->id)
+                ->once()
+                ->getMock()
+        );
+        $this->instance(
+            LeaveRepositoryContract::class,
+            Mockery::mock(LeaveRepositoryContract::class)
+                ->shouldReceive("deletePolymorph")
+                ->with(Expense::class, $expense->id)
+                ->once()
+                ->getMock()
+        );
 
         $this->actingAs($user)->delete(route("expenses.destroy", $expense))
             ->assertRedirect(route("expenses.index"))
             ->assertSessionHas("alert_type", "success");
-        $this->assertSoftDeleted($expense);
+        Mockery::close();
     }
 }

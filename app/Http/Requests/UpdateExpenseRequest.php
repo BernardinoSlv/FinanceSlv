@@ -26,16 +26,12 @@ class UpdateExpenseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "title" => [
+            "identifier_id" => [
                 "required",
-                "min:1",
-                "max:256",
-                Rule::unique("expenses")
-                    ->where(function (Builder $query): void {
-                        $query->where("user_id", auth()->user()->id);
-                    })
-                    ->ignore($this->expense->id)
+                Rule::exists("identifiers", "id")
+                    ->where("user_id", auth()->id())
             ],
+            "title" => ["required", "min:1", "max:256"],
             "amount" => ["required", "regex:" . RegexEnum::AMOUNT->value],
             "quantity" => ["nullable", "numeric"],
             "description" => ["nullable"],

@@ -26,12 +26,11 @@ class StoreInvestimentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "title" => [
-                "required", "min:1", "max:256",
-                Rule::unique("investiments", "title")->where(
-                    fn (Builder $query) => $query->where("user_id", auth()->user()->id)
-                )
+            "identifier_id" => [
+                "required",
+                Rule::exists("identifiers", "id")->where("user_id", auth()->user()),
             ],
+            "title" => ["required", "min:1", "max:256",],
             "amount" => ["required", "regex:" . RegexEnum::AMOUNT->value],
             "description" => ["nullable"]
         ];

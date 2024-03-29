@@ -16,9 +16,9 @@ class InvestimentRepository extends BaseRepository implements InvestimentReposit
 
     public function create(int $userId, array $attributes): Investiment
     {
-        $this->_model->fill($attributes);
-        $this->_model->user_id = $userId;
-        $this->_model->save();
-        return $this->_model;
+        $investiment = new Investiment($attributes);
+        $investiment->user_id = $userId;
+        $investiment->save();
+        return $investiment;
     }
 }

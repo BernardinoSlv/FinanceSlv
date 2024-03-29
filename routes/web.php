@@ -4,10 +4,14 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DebtController;
 use App\Http\Controllers\DebtorController;
-use App\Http\Controllers\EntryController;
+use App\Http\Controllers\DebtorPaymentController;
+use App\Http\Controllers\DebtPaymentController;
+use App\Http\Controllers\IdentifierController;
+use App\Http\Controllers\QuickEntryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InvestimentController;
-use App\Http\Controllers\LeaveController;
+use App\Http\Controllers\QuickLeaveController;
+use App\Http\Controllers\NeedController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -42,29 +46,29 @@ Route::middleware("checkAuth")->group(function () {
         });
 
     // entries
-    Route::resource("entradas", EntryController::class)
-        ->parameter("entradas", "entry")
+    Route::resource("entradas-rapidas", QuickEntryController::class)
+        ->parameter("entradas-rapidas", "quickEntry")
         ->names([
-            "index" => "entries.index",
-            "create" => "entries.create",
-            "store" => "entries.store",
-            "show" => "entries.show",
-            "edit" => "entries.edit",
-            "update" => "entries.update",
-            "destroy" => "entries.destroy",
+            "index" => "quick-entries.index",
+            "create" => "quick-entries.create",
+            "store" => "quick-entries.store",
+            "show" => "quick-entries.show",
+            "edit" => "quick-entries.edit",
+            "update" => "quick-entries.update",
+            "destroy" => "quick-entries.destroy",
         ]);
 
     // leaves
-    Route::resource("saidas", LeaveController::class)
-        ->parameter("saidas", "leave")
+    Route::resource("saidas-rapidas", QuickLeaveController::class)
+        ->parameter("saidas-rapidas", "quickLeave")
         ->names([
-            "index" => "leaves.index",
-            "create" => "leaves.create",
-            "store" => "leaves.store",
-            "show" => "leaves.show",
-            "edit" => "leaves.edit",
-            "update" => "leaves.update",
-            "destroy" => "leaves.destroy",
+            "index" => "quick-leaves.index",
+            "create" => "quick-leaves.create",
+            "store" => "quick-leaves.store",
+            "show" => "quick-leaves.show",
+            "edit" => "quick-leaves.edit",
+            "update" => "quick-leaves.update",
+            "destroy" => "quick-leaves.destroy",
         ]);
 
     // expenses
@@ -92,6 +96,22 @@ Route::middleware("checkAuth")->group(function () {
             "update" => "debtors.update",
             "destroy" => "debtors.destroy",
         ]);
+    Route::resource("devedores.pagamentos", DebtorPaymentController::class)
+        ->parameters([
+            "devedores" => "debtor",
+            "pagamentos" => "entry"
+        ])
+        ->names([
+            "index" => "debtors.payments.index",
+            "create" => "debtors.payments.create",
+            "store" => "debtors.payments.store",
+            "show" => "debtors.payments.show",
+            "edit" => "debtors.payments.edit",
+            "update" => "debtors.payments.update",
+            "destroy" => "debtors.payments.destroy",
+        ])
+        ->scoped();
+
 
     // debts
     Route::resource("dividas", DebtController::class)
@@ -105,6 +125,20 @@ Route::middleware("checkAuth")->group(function () {
             "update" => "debts.update",
             "destroy" => "debts.destroy",
         ]);
+    Route::resource("dividas.pagamentos", DebtPaymentController::class)
+        ->parameters([
+            "dividas" => "debt",
+            "pagamentos" => "leave"
+        ])
+        ->names([
+            "index" => "debts.payments.index",
+            "create" => "debts.payments.create",
+            "store" => "debts.payments.store",
+            "show" => "debts.payments.show",
+            "edit" => "debts.payments.edit",
+            "update" => "debts.payments.update",
+            "destroy" => "debts.payments.destroy",
+        ])->scoped();
 
     // investiments
     Route::resource("investimentos", InvestimentController::class)
@@ -117,5 +151,29 @@ Route::middleware("checkAuth")->group(function () {
             "edit" => "investiments.edit",
             "update" => "investiments.update",
             "destroy" => "investiments.destroy",
+        ]);
+
+    Route::resource("necessidades", NeedController::class)
+        ->parameter("necessidades", "need")
+        ->names([
+            "index" => "needs.index",
+            "create" => "needs.create",
+            "store" => "needs.store",
+            "show" => "needs.show",
+            "edit" => "needs.edit",
+            "update" => "needs.update",
+            "destroy" => "needs.destroy",
+        ]);
+
+    Route::resource("identificadores", IdentifierController::class)
+        ->parameter("identificadores", "identifier")
+        ->names([
+            "index" => "identifiers.index",
+            "create" => "identifiers.create",
+            "store" => "identifiers.store",
+            "show" => "identifiers.show",
+            "edit" => "identifiers.edit",
+            "update" => "identifiers.update",
+            "destroy" => "identifiers.destroy",
         ]);
 });

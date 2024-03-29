@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Debt;
+use App\Models\Identifier;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -17,11 +19,19 @@ class LeaveFactory extends Factory
      */
     public function definition(): array
     {
+        $user = User::factory()->create();
+        $debt = Debt::factory()->create([
+            "user_id" => $user,
+            "identifier_id" => Identifier::factory()->create([
+                "user_id" => $user
+            ])
+        ]);
+
         return [
-            "user_id" => User::factory()->create()->id,
-            "title" => fake("pt-BR")->title(),
-            // "description" => ,
-            "amount" => 20.00,
+            "user_id" => $user,
+            "leaveable_type" => Debt::class,
+            "leaveable_id" => $debt,
+            "amount" => 200
         ];
     }
 }

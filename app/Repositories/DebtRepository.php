@@ -16,9 +16,9 @@ class DebtRepository extends BaseRepository implements DebtRepositoryContract
 
     public function create(int $userId, array $attributes): Debt
     {
-        $this->_model->fill($attributes);
-        $this->_model->user_id = $userId;
-        $this->_model->save();
-        return $this->_model;
+        $debt = new Debt($attributes);
+        $debt->user_id = $userId;
+        $debt->save();
+        return $debt;
     }
 }

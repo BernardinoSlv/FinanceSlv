@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Debtor;
+use App\Models\Identifier;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -17,11 +19,19 @@ class EntryFactory extends Factory
      */
     public function definition(): array
     {
+        $user = User::factory()->create();
+        $debtor = Debtor::factory()->create([
+            "user_id" => $user,
+            "identifier_id" => Identifier::factory()->create([
+                "user_id" => $user
+            ])
+        ]);
+
         return [
-            "user_id" => User::factory()->create()->id,
-            "title" => fake("pt_BR")->title(),
-            "description" => null,
-            "amount" => 10000
+            "user_id" => $user,
+            "entryable_type" => Debtor::class,
+            "entryable_id" => $debtor,
+            "amount" => 500
         ];
     }
 }
