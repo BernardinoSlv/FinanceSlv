@@ -24,4 +24,9 @@ class Investiment extends Model
     {
         return $this->morphMany(Leave::class, "leaveable");
     }
+
+    public function entries(): MorphMany
+    {
+        return $this->morphMany(Entry::class, "entryable");
+    }
 }

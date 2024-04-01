@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Models;
 
+use App\Models\Entry;
 use App\Models\Investiment;
 use App\Models\Leave;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -51,5 +52,31 @@ class InvestimentTest extends TestCase
         ]);
 
         $this->assertCount(10, $investiment->leaves);
+    }
+
+    /**
+     * deve retornar uma coleção vazia
+     */
+    public function test_entries_method_without_entries(): void
+    {
+        Entry::factory(10)->create();
+        $investiment = Investiment::factory()->create();
+
+        $this->assertCount(0, $investiment->entries);
+    }
+
+    /**
+     * deve retornar 5 entradas
+     */
+    public function test_entries_method(): void
+    {
+        Entry::factory(10)->create();
+        $investiment = Investiment::factory()->create();
+        Entry::factory(5)->create([
+            "entryable_type" => Investiment::class,
+            "entryable_id" => $investiment
+        ]);
+
+        $this->assertCount(5, $investiment->entries);
     }
 }
