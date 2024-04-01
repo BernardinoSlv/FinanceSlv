@@ -10,6 +10,7 @@ use App\Http\Controllers\IdentifierController;
 use App\Http\Controllers\QuickEntryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InvestimentController;
+use App\Http\Controllers\InvestimentEntryController;
 use App\Http\Controllers\QuickLeaveController;
 use App\Http\Controllers\NeedController;
 use Illuminate\Support\Facades\Route;
@@ -151,6 +152,20 @@ Route::middleware("checkAuth")->group(function () {
             "edit" => "investiments.edit",
             "update" => "investiments.update",
             "destroy" => "investiments.destroy",
+        ]);
+    Route::resource("investimentos.depositos", InvestimentEntryController::class)
+        ->parameters([
+            "investimentos" => "investiment",
+            "depositos" => "entry"
+        ])
+        ->names([
+            "index" => "investiments.entries.index",
+            "create" => "investiments.entries.create",
+            "store" => "investiments.entries.store",
+            "show" => "investiments.entries.show",
+            "edit" => "investiments.entries.edit",
+            "update" => "investiments.entries.update",
+            "destroy" => "investiments.entries.destroy",
         ]);
 
     Route::resource("necessidades", NeedController::class)
