@@ -17,15 +17,21 @@ class InvestimentEntryController extends Controller
             abort(403);
         }
 
+        $investiment->load("entries");
+
         return view("investiments.entries.index", compact("investiment"));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Investiment $investiment)
     {
-        //
+        if (Gate::denies("investiment-edit", $investiment)) {
+            abort(403);
+        }
+
+        return view("investiments.entries.create", compact("investiment"));
     }
 
     /**
