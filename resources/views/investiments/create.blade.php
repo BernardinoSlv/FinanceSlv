@@ -15,11 +15,6 @@
                 <input type="text" name="title" class="form-control" value="{{ old('title') }}">
                 <div class="form-text">Ex: Pagamento do fulano</div>
             </div>
-            <div class="col-sm-6">
-                <label for="" class="form-label">Valor</label>
-                <input type="text" name="amount" class="form-control" value="{{ old('amount') }}">
-                <div class="form-text">Ex: 125,50</div>
-            </div>
             <div class="col-12">
                 <label for="" class="form-label">Descrição</label>
                 <textarea name="description" class="form-control" style="height: 140px">{{ old('description') }}</textarea>

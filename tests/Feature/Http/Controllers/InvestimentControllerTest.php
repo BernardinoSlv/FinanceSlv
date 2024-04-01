@@ -84,7 +84,6 @@ class InvestimentControllerTest extends TestCase
             ->assertFound()
             ->assertSessionHasErrors([
                 "title",
-                "amount"
             ])
             ->assertSessionDoesntHaveErrors("description");
     }
@@ -97,7 +96,6 @@ class InvestimentControllerTest extends TestCase
         $user = $this->_user();
         $data = Investiment::factory()->make([
             "identifier_id" => Identifier::factory()->create(),
-            "amount" => "1.000,00"
         ])->toArray();
 
         $this->actingAs($user)->post(route("investiments.store"), $data)
@@ -114,7 +112,6 @@ class InvestimentControllerTest extends TestCase
         $user = $this->_user();
         $data = Investiment::factory()->make([
             "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
-            "amount" => "1.000,00"
         ])->toArray();
 
         $this->instance(
@@ -123,7 +120,6 @@ class InvestimentControllerTest extends TestCase
                 ->shouldReceive("create")
                 ->with($user->id, [
                     ...Arr::only($data, ["identifier_id", "title", "description"]),
-                    "amount" => 1000.0
                 ])
                 ->passthru()
                 ->once()
@@ -185,7 +181,6 @@ class InvestimentControllerTest extends TestCase
         $data = Investiment::factory()->make([
             "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "title" => $investiment->title,
-            "amount" => "1.000,00"
         ])->toArray();
 
 
@@ -202,7 +197,6 @@ class InvestimentControllerTest extends TestCase
         $user = $this->_user();
         $data = Investiment::factory()->make([
             "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
-            "amount" => "1.000,00",
             "title" => Investiment::factory()->create()->title
         ])->toArray();
 
@@ -212,7 +206,6 @@ class InvestimentControllerTest extends TestCase
         $this->assertDatabaseHas("investiments", [
             ...$data,
             "user_id" => $user->id,
-            "amount" => 1000.00
         ]);
     }
 
@@ -282,7 +275,6 @@ class InvestimentControllerTest extends TestCase
         $investiment = Investiment::factory()->create();
         $data = Investiment::factory()->make([
             "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
-            "amount" => "5.000,00"
         ])->toArray();
 
         $this->actingAs($user)->put(route("investiments.update", $investiment), $data)
@@ -303,7 +295,6 @@ class InvestimentControllerTest extends TestCase
             ->assertFound()
             ->assertSessionHasErrors([
                 "title",
-                "amount"
             ])
             ->assertSessionDoesntHaveErrors("description");
     }
@@ -319,7 +310,6 @@ class InvestimentControllerTest extends TestCase
         ]);
         $data = Investiment::factory()->make([
             "identifier_id" => Identifier::factory()->create(),
-            "amount" => "5.000,00"
         ])->toArray();
 
         $this->actingAs($user)->put(route("investiments.update", $investiment), $data)
@@ -339,7 +329,6 @@ class InvestimentControllerTest extends TestCase
         ]);
         $data = Investiment::factory()->make([
             "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
-            "amount" => "5.000,00"
         ])->toArray();
 
         $this->actingAs($user)->put(route("investiments.update", $investiment), $data)
@@ -349,7 +338,6 @@ class InvestimentControllerTest extends TestCase
             ...$data,
             "id" => $investiment->id,
             "user_id" => $user->id,
-            "amount" => 5000.00
         ]);
     }
 
@@ -368,7 +356,6 @@ class InvestimentControllerTest extends TestCase
         $data = Investiment::factory()->make([
             "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "title" => $otherInvestiment->title,
-            "amount" => "5.000,00"
         ])->toArray();
 
         $this->actingAs($user)->put(route("investiments.update", $investiment), $data)
@@ -378,7 +365,6 @@ class InvestimentControllerTest extends TestCase
             ...$data,
             "id" => $investiment->id,
             "user_id" => $user->id,
-            "amount" => 5000.00
         ]);
     }
 
@@ -394,7 +380,6 @@ class InvestimentControllerTest extends TestCase
         $data = Investiment::factory()->make([
             "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "title" => $investiment->title,
-            "amount" => "5.000,00"
         ])->toArray();
 
         $this->actingAs($user)->put(route("investiments.update", $investiment), $data)
@@ -404,7 +389,6 @@ class InvestimentControllerTest extends TestCase
             ...$data,
             "id" => $investiment->id,
             "user_id" => $user->id,
-            "amount" => 5000.00
         ]);
     }
 
@@ -420,7 +404,6 @@ class InvestimentControllerTest extends TestCase
         $data = Investiment::factory()->make([
             "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
             "title" => Investiment::factory()->create()->title,
-            "amount" => "5.000,00"
         ])->toArray();
 
         $this->actingAs($user)->put(route("investiments.update", $investiment), $data)
@@ -430,7 +413,6 @@ class InvestimentControllerTest extends TestCase
             ...$data,
             "id" => $investiment->id,
             "user_id" => $user->id,
-            "amount" => 5000.00
         ]);
     }
 

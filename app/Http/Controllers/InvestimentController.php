@@ -11,10 +11,6 @@ use App\Repositories\Contracts\IdentifierRepositoryContract;
 use App\Repositories\Contracts\InvestimentRepositoryContract;
 use App\Repositories\Contracts\LeaveRepositoryContract;
 use App\Repositories\Contracts\MovementRepositoryContract;
-use App\Repositories\IdentifierRepository;
-use App\Repositories\LeaveRepository;
-use App\Repositories\MovementRepository;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
@@ -58,8 +54,7 @@ class InvestimentController extends Controller
         MovementRepositoryContract $movementRepository
     ) {
         $investiment = $this->_investimentRepository->create(auth()->user()->id, [
-            ...$request->validated(),
-            "amount" => RealToFloatParser::parse($request->input("amount"))
+            ...$request->validated()
         ]);
         $leave = $leaveRepository->create(auth()->id(), [
             "leaveable_type" => Investiment::class,

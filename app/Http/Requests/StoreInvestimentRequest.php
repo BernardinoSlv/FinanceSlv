@@ -31,7 +31,6 @@ class StoreInvestimentRequest extends FormRequest
                 Rule::exists("identifiers", "id")->where("user_id", auth()->user()),
             ],
             "title" => ["required", "min:1", "max:256",],
-            "amount" => ["required", "regex:" . RegexEnum::AMOUNT->value],
             "description" => ["nullable"]
         ];
     }

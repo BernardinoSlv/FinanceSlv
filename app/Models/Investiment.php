@@ -17,7 +17,6 @@ class Investiment extends Model
     protected $fillable = [
         "identifier_id",
         "title",
-        "amount",
         "description"
     ];
 

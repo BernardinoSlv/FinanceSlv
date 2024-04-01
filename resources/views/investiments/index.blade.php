@@ -26,25 +26,37 @@
                         <td>R$ {{ $investiment->amount }}</td>
                         <td><span class="badge text-white bg-black">Padrão</span></td>
                         <td>{{ $investiment->created_at_formated }}</td>
-                        <td align="right">
-                            <a class="btn btn-outline-primary btn-sm"
-                                href="{{ route('investiments.edit', [
-                                    'investiment' => $investiment->id,
-                                ]) }}"><i
-                                    class="fas fa-edit"></i></a>
-                            <form
-                                action="{{ route('investiments.destroy', [
-                                    'investiment' => $investiment->id,
-                                ]) }}"
-                                method="POST" class="d-inline-block">
-                                @csrf
-                                @method('DELETE')
-
-                                <button class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Deseja remover a entrada #{{ $investiment->id }}')">
-                                    <i class="fas fa-trash"></i>
+                        <td>
+                            <div class="dropdown">
+                                <button class="dropdown-toggle btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots"></i>
                                 </button>
-                            </form>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item"
+                                            href="{{ route('investiments.edit', [
+                                                'investiment' => $investiment->id,
+                                            ]) }}">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <form
+                                            action="{{ route('investiments.destroy', [
+                                                'investiment' => $investiment->id,
+                                            ]) }}"
+                                            method="POST">
+                                            @csrf
+                                            @method('DELETE')
+
+                                            <button class="dropdown-item"
+                                                onclick="return confirm('Deseja remover a entrada #{{ $investiment->id }}')">
+                                                <i class="fas fa-trash"></i> Remover
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
                         </td>
                     </tr>
                 @endforeach
