@@ -207,4 +207,111 @@ class InvestimentEntryControllerTest extends TestCase
             ->assertSessionHas("alert_type", "success");
         Mockery::close();
     }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_edit_action_unauthenticated(): void
+    {
+        $investiment = Investiment::factory()->create();
+        $entry = Entry::factory()->create([
+            "entryable_type" => Investiment::class,
+            "entryable_id" => $investiment
+        ]);
+
+        $this->get(route("investiments.entries.edit", [
+            "investiment" => $investiment,
+            "entry" => $entry
+        ]))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_nonexistent_investiment(): void
+    {
+        $user = User::factory()->create();
+        $entry = Entry::factory()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->get(route("investiments.entries.edit", [
+            "investiment" => 0,
+            "entry" => $entry
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_nonexistent(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->get(route("investiments.entries.edit", [
+            "investiment" => $investiment,
+            "entry" => 0
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_is_not_of_the_investiment(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->create(["user_id" => $user]);
+        $entry = Entry::factory()->create([
+            "user_id" => $user,
+        ]);
+
+        $this->actingAs($user)->get(route("investiments.entries.edit", [
+            "investiment" => $investiment,
+            "entry" => $entry
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_edit_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->create(["user_id" => $user]);
+        $entry = Entry::factory()->create([
+            "entryable_type" => Investiment::class,
+            "entryable_id" => $investiment
+        ]);
+
+        $this->actingAs($user)->get(route("investiments.entries.edit", [
+            "investiment" => $investiment,
+            "entry" => $entry
+        ]))
+            ->assertForbidden();
+    }
+
+    /**
+     * deve ter status 200
+     */
+    public function test_edit_action(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->create(["user_id" => $user]);
+        $entry = Entry::factory()->create([
+            "user_id" => $user,
+            "entryable_type" => Investiment::class,
+            "entryable_id" => $investiment
+        ]);
+
+        $this->actingAs($user)->get(route("investiments.entries.edit", [
+            "investiment" => $investiment,
+            "entry" => $entry
+        ]))
+            ->assertOk()
+            ->assertViewIs("investiments.entries.edit")
+            ->assertViewHas(["investiment", "entry"]);
+    }
 }

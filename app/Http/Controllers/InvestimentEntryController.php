@@ -78,9 +78,13 @@ class InvestimentEntryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Investiment $investiment, Entry $entry)
     {
-        //
+        if (Gate::denies("entry-edit", $entry)) {
+            abort(403);
+        }
+
+        return view("investiments.entries.edit", compact("investiment", "entry"));
     }
 
     /**

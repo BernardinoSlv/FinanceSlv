@@ -166,7 +166,7 @@ Route::middleware("checkAuth")->group(function () {
             "edit" => "investiments.entries.edit",
             "update" => "investiments.entries.update",
             "destroy" => "investiments.entries.destroy",
-        ]);
+        ])->scoped();
 
     Route::resource("necessidades", NeedController::class)
         ->parameter("necessidades", "need")
