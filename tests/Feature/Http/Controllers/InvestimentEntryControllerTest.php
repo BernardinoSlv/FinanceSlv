@@ -314,4 +314,145 @@ class InvestimentEntryControllerTest extends TestCase
             ->assertViewIs("investiments.entries.edit")
             ->assertViewHas(["investiment", "entry"]);
     }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_update_action_unauthenticated(): void
+    {
+        $investiment = Investiment::factory()->hasEntries(1)->create();
+
+        $this->put(route("investiments.entries.update", [
+            "investiment" => $investiment,
+            "entry" => $investiment->entries->first()
+        ]))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_action_nonexistent_investiment(): void
+    {
+        $user = User::factory()->create();
+        $entry = Entry::factory()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->put(route("investiments.entries.update", [
+            "investiment" => 0,
+            "entry" => $entry
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_action_nonexistent(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->put(route("investiments.entries.update", [
+            "investiment" => $investiment,
+            "entry" => 0
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_action_is_not_of_the_investiment(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->create(["user_id" => $user]);
+        $entry = Entry::factory()->create([
+            "user_id" => $user,
+            "entryable_type" => Investiment::class,
+            "entryable_id" => Investiment::factory()->create()
+        ]);
+
+        $this->actingAs($user)->put(route("investiments.entries.update", [
+            "investiment" => $investiment,
+            "entry" => $entry
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve redirecionar com erros de validação
+     */
+    public function test_update_action_without_data(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->hasEntries(1, ["user_id" => $user])
+            ->create(["user_id" => $user]);
+        $entry = $investiment->entries->first();
+
+
+        $this->actingAs($user)->put(route("investiments.entries.update", [
+            "investiment" => $investiment,
+            "entry" => $entry
+        ]))
+            ->assertFound()
+            ->assertSessionHasErrors("amount");
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_update_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()
+            ->hasEntries(1, ["user_id" => User::factory()->create()])
+            ->create(["user_id" => $user]);
+        $entry = $investiment->entries->first();
+        $data = [
+            "amount" => "8.000,00"
+        ];
+
+
+        $this->actingAs($user)->put(route("investiments.entries.update", [
+            "investiment" => $investiment,
+            "entry" => $entry
+        ]), $data)
+            ->assertForbidden();
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_update_action(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->hasEntries(1, ["user_id" => $user])
+            ->create(["user_id" => $user]);
+        $entry = $investiment->entries->first();
+        $data = [
+            "amount" => "8.000,00"
+        ];
+
+        $this->instance(
+            EntryRepositoryContract::class,
+            Mockery::mock(EntryRepositoryContract::class)
+                ->shouldReceive("update")
+                ->with($entry->id, [
+                    "amount" => 8000.00
+                ])
+                ->once()
+                ->getMock()
+        );
+
+        $this->actingAs($user)->put(route("investiments.entries.update", [
+            "investiment" => $investiment,
+            "entry" => $entry
+        ]), $data)
+            ->assertRedirect(route("investiments.entries.edit", [
+                "investiment" => $investiment,
+                "entry" => $entry
+            ]))
+            ->assertSessionHas("alert_type", "success");
+        Mockery::close();
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Alert;
 use App\Http\Requests\StoreInvestimentEntryRequest;
+use App\Http\Requests\UpdateInvestimentEntryRequest;
 use App\Models\Entry;
 use App\Models\Investiment;
 use App\Repositories\Contracts\EntryRepositoryContract;
@@ -64,7 +65,7 @@ class InvestimentEntryController extends Controller
         ]);
 
         return redirect()->route("investiments.entries.index", $investiment)
-            ->with(Alert::success("Entrada registrada com sucesso"));
+            ->with(Alert::success("Depósito adicionado com sucesso"));
     }
 
     /**
@@ -90,9 +91,24 @@ class InvestimentEntryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        //
+    public function update(
+        UpdateInvestimentEntryRequest $request,
+        EntryRepositoryContract $entryRepository,
+        Investiment $investiment,
+        Entry $entry
+    ) {
+        if (Gate::denies("entry-edit", $entry)) {
+            abort(403);
+        }
+
+        $entryRepository->update($entry->id, [
+            "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+
+        return redirect()->route("investiments.entries.edit", [
+            "investiment" => $investiment,
+            "entry" => $entry
+        ])->with(Alert::success("Depósito atualizado com sucesso"));
     }
 
     /**
