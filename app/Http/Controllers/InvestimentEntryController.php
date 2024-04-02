@@ -2,9 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Alert;
+use App\Http\Requests\StoreInvestimentEntryRequest;
+use App\Models\Entry;
 use App\Models\Investiment;
+use App\Repositories\Contracts\EntryRepositoryContract;
+use App\Repositories\Contracts\MovementRepositoryContract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Src\Parsers\RealToFloatParser;
 
 class InvestimentEntryController extends Controller
 {
@@ -37,9 +43,28 @@ class InvestimentEntryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        //
+    public function store(
+        StoreInvestimentEntryRequest $request,
+        EntryRepositoryContract $entryRepository,
+        MovementRepositoryContract $movementRepository,
+        Investiment $investiment
+    ) {
+        if (Gate::denies("investiment-edit", $investiment)) {
+            abort(403);
+        }
+
+        $entry = $entryRepository->create(auth()->id(), [
+            "entryable_type" => Investiment::class,
+            "entryable_id" => $investiment->id,
+            "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+        $movementRepository->create(auth()->id(), [
+            "movementable_type" => Entry::class,
+            "movementable_id" => $entry->id
+        ]);
+
+        return redirect()->route("investiments.entries.index", $investiment)
+            ->with(Alert::success("Entrada registrada com sucesso"));
     }
 
     /**

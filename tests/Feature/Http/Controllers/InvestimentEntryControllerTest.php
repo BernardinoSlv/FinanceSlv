@@ -2,10 +2,14 @@
 
 namespace Tests\Feature\Http\Controllers;
 
+use App\Models\Entry;
 use App\Models\Investiment;
 use App\Models\User;
+use App\Repositories\Contracts\EntryRepositoryContract;
+use App\Repositories\Contracts\MovementRepositoryContract;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Mockery;
 use Tests\TestCase;
 
 class InvestimentEntryControllerTest extends TestCase
@@ -108,5 +112,99 @@ class InvestimentEntryControllerTest extends TestCase
             ->assertOk()
             ->assertViewIs("investiments.entries.create")
             ->assertViewHas("investiment", $investiment);
+    }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_store_action_unauthenticated(): void
+    {
+        $investiment = Investiment::factory()->create();
+
+        $this->post(route("investiments.entries.store", $investiment))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /** deve ter status 404 */
+    public function test_store_action_nonexistent(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post(route("investiments.entries.store", 0))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve redirecionar com erros de validação
+     */
+    public function test_store_action_without_data(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->post(route("investiments.entries.store", $investiment))
+            ->assertFound()
+            ->assertSessionHasErrors(["amount"]);
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_store_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->create();
+        $data = [
+            "amount" => "1.800,00"
+        ];
+
+        $this->actingAs($user)->post(route("investiments.entries.store", $investiment), $data)
+            ->assertForbidden();
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_store_action(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->create(["user_id" => $user]);
+        $data = [
+            "amount" => "1.800,00"
+        ];
+
+        $this->instance(
+            EntryRepositoryContract::class,
+            Mockery::mock(app(EntryRepositoryContract::class))
+                ->shouldReceive("create")
+                ->with($user->id, [
+                    "entryable_type" => Investiment::class,
+                    "entryable_id" => $investiment->id,
+                    "amount" => 1800.00
+                ])
+                ->passthru()
+                ->once()
+                ->getMock()
+        );
+        $this->instance(
+            MovementRepositoryContract::class,
+            Mockery::mock(MovementRepositoryContract::class)
+                ->shouldReceive("create")
+                ->with($user->id, Mockery::on(function (array $attributes): bool {
+                    if ($attributes["movementable_type"] !== Entry::class) {
+                        return false;
+                    } else if (!is_int($attributes["movementable_id"])) {
+                        return false;
+                    }
+                    return true;
+                }))
+                ->once()
+                ->getMock()
+        );
+
+        $this->actingAs($user)->post(route("investiments.entries.store", $investiment), $data)
+            ->assertFound()
+            ->assertSessionHas("alert_type", "success");
+        Mockery::close();
     }
 }

@@ -10,7 +10,7 @@
                 <label for="" class="form-label">Comprovante</label>
                 <input type="file" name="" class="form-control">
             </div>
-            <div class="col-12">
+            <div class="col-6">
                 <label for="" class="form-label">Valor</label>
                 <input type="text" name="amount" value="{{ old('amount') }}" class="form-control">
             </div>
