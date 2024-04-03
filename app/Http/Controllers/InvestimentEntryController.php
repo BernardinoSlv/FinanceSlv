@@ -7,6 +7,7 @@ use App\Http\Requests\StoreInvestimentEntryRequest;
 use App\Http\Requests\UpdateInvestimentEntryRequest;
 use App\Models\Entry;
 use App\Models\Investiment;
+use App\Models\Movement;
 use App\Repositories\Contracts\EntryRepositoryContract;
 use App\Repositories\Contracts\MovementRepositoryContract;
 use Illuminate\Http\Request;
@@ -114,8 +115,20 @@ class InvestimentEntryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        //
+    public function destroy(
+        MovementRepositoryContract $movementRepository,
+        EntryRepositoryContract $entryRepository,
+        Investiment $investiment,
+        Entry $entry
+    ) {
+        if (Gate::denies("entry-edit", $entry)) {
+            abort(403);
+        }
+
+        $movementRepository->delete($entry->movement->id);
+        $entryRepository->delete($entry->id);
+
+        return redirect()->route("investiments.entries.index", $investiment)
+            ->with(Alert::success("Depósito removido com sucesso"));
     }
 }
