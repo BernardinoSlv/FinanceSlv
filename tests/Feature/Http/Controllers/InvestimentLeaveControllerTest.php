@@ -208,4 +208,100 @@ class InvestimentLeaveControllerTest extends TestCase
             ->assertSessionHas("alert_type", "success");
         Mockery::close();
     }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_edit_action_unauthenticated(): void
+    {
+        $investiment = Investiment::factory()->hasLeaves(1)->create();
+        $leave = $investiment->leaves->first();
+
+        $this->get(route("investiments.leaves.edit", [
+            "investiment" => $investiment,
+            "leave" => $leave
+        ]))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_nonexistent_investiment(): void
+    {
+        $user = User::factory()->create();
+        $leave = Leave::factory()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->get(route("investiments.leaves.edit", [
+            "investiment" => 0,
+            "leave" => $leave
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_nonexistent(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->get(route("investiments.leaves.edit", [
+            "investiment" => $investiment,
+            "leave" => 0
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_is_not_of_the_investiment(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->create(["user_id" => $user]);
+        $leave = Leave::factory()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->get(route("investiments.leaves.edit", [
+            "investiment" => $investiment,
+            "leave" => $leave
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_edit_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->hasLeaves(1)->create(["user_id" => $user]);
+        $leave = $investiment->leaves->first();
+
+        $this->actingAs($user)->get(route("investiments.leaves.edit", [
+            "investiment" => $investiment,
+            "leave" => $leave
+        ]))
+            ->assertForbidden();
+    }
+
+    /**
+     * deve ter status 200
+     */
+    public function test_edit_action(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->hasLeaves(1, ["user_id" => $user])
+            ->create(["user_id" => $user]);
+        $leave = $investiment->leaves->first();
+
+        $this->actingAs($user)->get(route("investiments.leaves.edit", [
+            "investiment" => $investiment,
+            "leave" => $leave
+        ]))
+            ->assertOk()
+            ->assertViewIs("investiments.leaves.edit")
+            ->assertViewHas(["investiment", "leave"]);
+    }
 }
