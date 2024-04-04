@@ -66,7 +66,7 @@ class InvestimentEntryController extends Controller
         ]);
 
         return redirect()->route("investiments.entries.index", $investiment)
-            ->with(Alert::success("Depósito adicionado com sucesso"));
+            ->with(Alert::success("Retirada adicionado com sucesso"));
     }
 
     /**
@@ -109,7 +109,7 @@ class InvestimentEntryController extends Controller
         return redirect()->route("investiments.entries.edit", [
             "investiment" => $investiment,
             "entry" => $entry
-        ])->with(Alert::success("Depósito atualizado com sucesso"));
+        ])->with(Alert::success("Retirada atualizado com sucesso"));
     }
 
     /**
@@ -129,6 +129,6 @@ class InvestimentEntryController extends Controller
         $entryRepository->delete($entry->id);
 
         return redirect()->route("investiments.entries.index", $investiment)
-            ->with(Alert::success("Depósito removido com sucesso"));
+            ->with(Alert::success("Retirada removido com sucesso"));
     }
 }

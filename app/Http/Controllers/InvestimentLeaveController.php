@@ -2,9 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Alert;
+use App\Http\Requests\StoreInvestimentLeaveRequest;
 use App\Models\Investiment;
+use App\Models\Leave;
+use App\Repositories\Contracts\LeaveRepositoryContract;
+use App\Repositories\Contracts\MovementRepositoryContract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Src\Parsers\RealToFloatParser;
 
 class InvestimentLeaveController extends Controller
 {
@@ -37,9 +43,28 @@ class InvestimentLeaveController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        //
+    public function store(
+        StoreInvestimentLeaveRequest $request,
+        LeaveRepositoryContract $leaveRepository,
+        MovementRepositoryContract $movementRepository,
+        Investiment $investiment
+    ) {
+        if (Gate::denies("investiment-edit", $investiment)) {
+            abort(403);
+        }
+
+        $leave = $leaveRepository->create(auth()->id(), [
+            "leaveable_type" => Investiment::class,
+            "leaveable_id" => $investiment->id,
+            "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+        $movementRepository->create(auth()->id(), [
+            "movementable_type" => Leave::class,
+            "movementable_id" => $leave->id
+        ]);
+
+        return redirect()->route("investiments.leaves.index", $investiment)
+            ->with(Alert::success("Depósito adicionado com sucesso"));
     }
 
     /**
