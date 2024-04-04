@@ -61,4 +61,53 @@ class InvestimentLeaveControllerTest extends TestCase
                 return $investiment->relationLoaded("leaves");
             });
     }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_create_action_unauthenticated(): void
+    {
+        $investiment = Investiment::factory()->create();
+
+        $this->get(route("investiments.leaves.create", $investiment))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_create_action_nonexistent(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->get(route("investiments.leaves.create", 0))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_create_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->create();
+
+        $this->actingAs($user)->get(route("investiments.leaves.create", $investiment))
+            ->assertForbidden();
+    }
+
+
+    /**
+     * deve ter status 200
+     */
+    public function test_create_action(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->get(route("investiments.leaves.create", $investiment))
+            ->assertOk()
+            ->assertViewIs("investiments.leaves.create")
+            ->assertViewHas("investiment");
+    }
 }

@@ -25,9 +25,13 @@ class InvestimentLeaveController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Investiment $investiment)
     {
-        //
+        if (Gate::denies("investiment-edit", $investiment)) {
+            abort(403);
+        }
+
+        return view("investiments.leaves.create", compact("investiment"));
     }
 
     /**
