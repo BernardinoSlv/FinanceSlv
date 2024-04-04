@@ -11,6 +11,7 @@ use App\Http\Controllers\QuickEntryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InvestimentController;
 use App\Http\Controllers\InvestimentEntryController;
+use App\Http\Controllers\InvestimentLeaveController;
 use App\Http\Controllers\QuickLeaveController;
 use App\Http\Controllers\NeedController;
 use Illuminate\Support\Facades\Route;
@@ -153,10 +154,10 @@ Route::middleware("checkAuth")->group(function () {
             "update" => "investiments.update",
             "destroy" => "investiments.destroy",
         ]);
-    Route::resource("investimentos.depositos", InvestimentEntryController::class)
+    Route::resource("investimentos.retiradas", InvestimentEntryController::class)
         ->parameters([
             "investimentos" => "investiment",
-            "depositos" => "entry"
+            "retiradas" => "entry"
         ])
         ->names([
             "index" => "investiments.entries.index",
@@ -166,6 +167,20 @@ Route::middleware("checkAuth")->group(function () {
             "edit" => "investiments.entries.edit",
             "update" => "investiments.entries.update",
             "destroy" => "investiments.entries.destroy",
+        ])->scoped();
+    Route::resource("investimentos.depositos", InvestimentLeaveController::class)
+        ->parameters([
+            "investimentos" => "investiment",
+            "depositos" => "leave"
+        ])
+        ->names([
+            "index" => "investiments.leaves.index",
+            "create" => "investiments.leaves.create",
+            "store" => "investiments.leaves.store",
+            "show" => "investiments.leaves.show",
+            "edit" => "investiments.leaves.edit",
+            "update" => "investiments.leaves.update",
+            "destroy" => "investiments.leaves.destroy",
         ])->scoped();
 
     Route::resource("necessidades", NeedController::class)
