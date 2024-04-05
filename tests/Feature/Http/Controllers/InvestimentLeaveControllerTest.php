@@ -304,4 +304,137 @@ class InvestimentLeaveControllerTest extends TestCase
             ->assertViewIs("investiments.leaves.edit")
             ->assertViewHas(["investiment", "leave"]);
     }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_update_action_unauthenticated(): void
+    {
+        $investiment = Investiment::factory()->hasLeaves(1)->create();
+        $leave = $investiment->leaves->first();
+
+        $this->put(route("investiments.leaves.update", [
+            "investiment" => $investiment,
+            "leave" => $leave
+        ]))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_action_nonexistent_investiment(): void
+    {
+        $user = User::factory()->create();
+        $leave = Leave::factory()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->put(route("investiments.leaves.update", [
+            "investiment" => 0,
+            "leave" => $leave
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_action_nonexistent(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->put(route("investiments.leaves.update", [
+            "investiment" => $investiment,
+            "leave" => 0
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_action_is_not_of_the_investiment(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->create(["user_id" => $user]);
+        $leave = Leave::factory()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->put(route("investiments.leaves.update", [
+            "investiment" => $investiment,
+            "leave" => $leave
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve redirecionar com erro de validação
+     */
+    public function test_update_action_without_data(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->hasLeaves(1)->create(["user_id" => $user]);
+        $leave = $investiment->leaves->first();
+
+        $this->actingAs($user)->put(route("investiments.leaves.update", [
+            "investiment" => $investiment,
+            "leave" => $leave
+        ]))
+            ->assertFound()
+            ->assertSessionHasErrors("amount");
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_update_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->hasLeaves(1)->create(["user_id" => $user]);
+        $leave = $investiment->leaves->first();
+        $data = [
+            "amount" => "2.500,00"
+        ];
+
+        $this->actingAs($user)->put(route("investiments.leaves.update", [
+            "investiment" => $investiment,
+            "leave" => $leave
+        ]), $data)
+            ->assertForbidden();
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_update_action(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->hasLeaves(1, ["user_id" => $user])
+            ->create(["user_id" => $user]);
+        $leave = $investiment->leaves->first();
+        $data = [
+            "amount" => "2.500,00"
+        ];
+
+        $this->instance(
+            LeaveRepositoryContract::class,
+            Mockery::mock(LeaveRepositoryContract::class)
+                ->shouldReceive("update")
+                ->with($leave->id, [
+                    "amount" => 2500.00
+                ])
+                ->once()
+                ->getMock()
+        );
+
+        $this->actingAs($user)->put(route("investiments.leaves.update", [
+            "investiment" => $investiment,
+            "leave" => $leave
+        ]), $data)
+            ->assertRedirect(route("investiments.leaves.edit", [
+                "investiment" => $investiment,
+                "leave" => $leave
+            ]))
+            ->assertSessionHas("alert_type", "success");
+        Mockery::close();
+    }
 }

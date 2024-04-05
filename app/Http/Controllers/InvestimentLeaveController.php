@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Alert;
 use App\Http\Requests\StoreInvestimentLeaveRequest;
+use App\Http\Requests\UpdateInvestimentLeaveRequest;
 use App\Models\Investiment;
 use App\Models\Leave;
 use App\Repositories\Contracts\LeaveRepositoryContract;
@@ -90,9 +91,24 @@ class InvestimentLeaveController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        //
+    public function update(
+        UpdateInvestimentLeaveRequest $request,
+        LeaveRepositoryContract $leaveRepository,
+        Investiment $investiment,
+        Leave $leave
+    ) {
+        if (Gate::denies("leave-edit", $leave)) {
+            abort(403);
+        }
+
+        $leaveRepository->update($leave->id, [
+            "amount" => RealToFloatParser::parse($request->input("amount"))
+        ]);
+
+        return redirect()->route("investiments.leaves.edit", [
+            "investiment" => $investiment,
+            "leave" => $leave
+        ])->with(Alert::success("Depósito atualizado com sucesso"));
     }
 
     /**
