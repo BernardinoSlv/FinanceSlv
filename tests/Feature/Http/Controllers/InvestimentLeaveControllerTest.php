@@ -4,7 +4,9 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Investiment;
 use App\Models\Leave;
+use App\Models\Movement;
 use App\Models\User;
+use App\Repositories\Contracts\InvestimentRepositoryContract;
 use App\Repositories\Contracts\LeaveRepositoryContract;
 use App\Repositories\Contracts\MovementRepositoryContract;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -434,6 +436,123 @@ class InvestimentLeaveControllerTest extends TestCase
                 "investiment" => $investiment,
                 "leave" => $leave
             ]))
+            ->assertSessionHas("alert_type", "success");
+        Mockery::close();
+    }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_destroy_action_unauthenticated(): void
+    {
+        $investiment = Investiment::factory()->hasLeaves(1)->create();
+        $leave = $investiment->leaves->first();
+
+        $this->delete(route("investiments.leaves.destroy", [
+            "investiment" => $investiment,
+            "leave" => $leave
+        ]))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_nonexistent_investiment(): void
+    {
+        $user = User::factory()->create();
+        $leave = Leave::factory()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->delete(route("investiments.leaves.destroy", [
+            "investiment" => 0,
+            "leave" => $leave
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_nonexistent(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->delete(route("investiments.leaves.destroy", [
+            "investiment" => $investiment,
+            "leave" => 0
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_delete_action_is_not_of_the_investiment(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->create(["user_id" => $user]);
+        $leave = Leave::factory()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->delete(route("investiments.leaves.destroy", [
+            "investiment" => $investiment,
+            "leave" => $leave
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_destroy_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->hasLeaves(1)->create(["user_id" => $user]);
+        $leave = $investiment->leaves->first();
+
+        $this->actingAs($user)->delete(route("investiments.leaves.destroy", [
+            "investiment" => $investiment,
+            "leave" => $leave
+        ]))
+            ->assertForbidden();
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_destroy_action(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->hasLeaves(1, ["user_id" => $user])
+            ->create(["user_id" => $user]);
+        $leave = $investiment->leaves->first();
+        $movement = Movement::factory()->create([
+            "movementable_type" => Leave::class,
+            "movementable_id" => $leave
+        ]);
+
+        $this->instance(
+            MovementRepositoryContract::class,
+            Mockery::mock(MovementRepositoryContract::class)
+                ->shouldReceive("delete")
+                ->with($movement->id)
+                ->once()
+                ->getMock()
+        );
+        $this->instance(
+            LeaveRepositoryContract::class,
+            Mockery::mock(LeaveRepositoryContract::class)
+                ->shouldReceive("delete")
+                ->with($leave->id)
+                ->once()
+                ->getMock()
+        );
+
+        $this->actingAs($user)->delete(route("investiments.leaves.destroy", [
+            "investiment" => $investiment,
+            "leave" => $leave
+        ]))
+            ->assertRedirect(route("investiments.leaves.index", $investiment))
             ->assertSessionHas("alert_type", "success");
         Mockery::close();
     }

@@ -7,6 +7,7 @@ use App\Http\Requests\StoreInvestimentLeaveRequest;
 use App\Http\Requests\UpdateInvestimentLeaveRequest;
 use App\Models\Investiment;
 use App\Models\Leave;
+use App\Repositories\Contracts\InvestimentRepositoryContract;
 use App\Repositories\Contracts\LeaveRepositoryContract;
 use App\Repositories\Contracts\MovementRepositoryContract;
 use Illuminate\Http\Request;
@@ -114,8 +115,22 @@ class InvestimentLeaveController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        //
+    public function destroy(
+        MovementRepositoryContract $movementRepository,
+        LeaveRepositoryContract $leaveRepository,
+        InvestimentRepositoryContract $investimentRepository,
+        Investiment $investiment,
+        Leave $leave
+    ) {
+        if (Gate::denies("leave-edit", $leave)) {
+            abort(403);
+        }
+
+        $movementRepository->delete($leave->movement->id);
+        $leaveRepository->delete($leave->id);
+
+        return redirect()->route("investiments.leaves.index", [
+            "investiment" => $investiment
+        ])->with(Alert::success("Depósito removido com sucesso"));
     }
 }
