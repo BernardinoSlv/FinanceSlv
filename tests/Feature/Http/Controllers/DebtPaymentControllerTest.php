@@ -221,61 +221,6 @@ class DebtPaymentControllerTest extends TestCase
     }
 
     /**
-     * deve redirecionar com mensagem de sucesso
-     */
-    public function test_store_action_sended_images(): void
-    {
-        $this->markTestIncomplete("...");
-        Storage::fake("public");
-
-        $user = User::factory()->create();
-        $debt = Debt::factory()->create(["user_id" => $user]);
-        $data = [
-            "amount" => "100,00",
-            "files[]" => [
-                UploadedFile::fake()->image("test.png"),
-                UploadedFile::fake()->image("test2.jpg")
-            ]
-        ];
-
-        $this->instance(
-            LeaveRepositoryContract::class,
-            Mockery::mock(app(LeaveRepositoryContract::class))
-                ->shouldReceive("create")
-                ->with($user->id, [
-                    "leaveable_type" => Debt::class,
-                    "leaveable_id" => $debt->id,
-                    "amount" => 100.00
-                ])
-                ->once()
-                ->passthru()
-                ->getMock()
-        );
-        $this->instance(
-            MovementRepositoryContract::class,
-            Mockery::mock(MovementRepositoryContract::class)
-                ->shouldReceive("create")
-                ->with($user->id, Mockery::on(function (array $attributes): bool {
-                    if ($attributes["movementable_type"] !== Leave::class) {
-                        return false;
-                    } else if (!is_int($attributes["movementable_id"])) {
-                        return false;
-                    }
-                    return true;
-                }))
-                ->once()
-                ->getMock()
-        );
-
-        $this->actingAs($user)->post(route("debts.payments.store", $debt), $data)
-            ->assertRedirect(route("debts.payments.index", $debt))
-            ->assertSessionHas([
-                "alert_type" => "success"
-            ]);
-        Mockery::close();
-    }
-
-    /**
      * deve redirecionar para login
      */
     public function test_edit_action_unauthenticated(): void

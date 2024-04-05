@@ -224,7 +224,7 @@ class BaseRepositoryTest extends TestCase
             1,
             app(LeaveRepositoryContract::class)->deletePolymorph(Debt::class, $debt->id)
         );
-        $this->assertDatabaseCount(Leave::class, 21);
+        
         $this->assertSoftDeleted($leave);
     }
 

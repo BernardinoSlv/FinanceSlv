@@ -109,7 +109,6 @@ class InvestimentControllerTest extends TestCase
      */
     public function test_store_action(): void
     {
-        $this->markTestIncomplete("whats is the amount?");
         $user = $this->_user();
         $data = Investiment::factory()->make([
             "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
