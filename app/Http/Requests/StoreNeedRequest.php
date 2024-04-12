@@ -31,7 +31,6 @@ class StoreNeedRequest extends FormRequest
             ],
             "title" => [
                 "required", "min:1", "max:256",
-                Rule::unique("needs", "title")->where("user_id", auth()->id())
             ],
             "amount" => ["required", "regex:" . RegexEnum::AMOUNT->value],
             "description" => ["nullable"]
