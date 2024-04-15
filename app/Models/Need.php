@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Need extends Model
@@ -18,4 +19,9 @@ class Need extends Model
         "description",
         "completed"
     ];
+
+    public function leave(): MorphOne
+    {
+        return $this->morphOne(Leave::class, "leaveable");
+    }
 }
