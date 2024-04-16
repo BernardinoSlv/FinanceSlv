@@ -33,7 +33,7 @@ class UpdateNeedRequest extends FormRequest
             "title" => [
                 "required", "min:1", "max:256",
             ],
-            "amount" => ["required", "regex:" . RegexEnum::AMOUNT->value],
+            "amount" => ["nullable", "required_if:completed,1", "regex:" . RegexEnum::AMOUNT->value],
             "description" => ["nullable"],
             "completed" => ["nullable", "in:0,1"],
         ];

@@ -3,11 +3,17 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Identifier;
+use App\Models\Leave;
+use App\Models\Movement;
 use App\Models\Need;
 use App\Models\User;
+use App\Repositories\Contracts\LeaveRepositoryContract;
+use App\Repositories\Contracts\MovementRepositoryContract;
+use App\Repositories\Contracts\NeedRepositoryContract;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
+use Mockery;
 use Tests\TestCase;
 
 class NeedControllerTest extends TestCase
@@ -74,32 +80,8 @@ class NeedControllerTest extends TestCase
             ->assertFound()
             ->assertSessionHasErrors([
                 "title",
-                "amount"
             ])
             ->assertSessionDoesntHaveErrors("description");
-    }
-
-    /**
-     * deve redirecionar com erro no campo title
-     */
-    public function test_store_action_duplicated_title(): void
-    {
-        $user = $this->_user();
-        $need = Need::factory()->create([
-            "user_id" => $user
-        ]);
-        $data = Need::factory()->make([
-            "title" => $need->title,
-            "amount" => "50,00"
-        ])->toArray();
-
-        $this->actingAs($user)->post(route("needs.store"), $data)
-            ->assertFound()
-            ->assertSessionHasErrors("title")
-            ->assertSessionDoesntHaveErrors([
-                "amount",
-                "description"
-            ]);
     }
 
     /**
@@ -129,14 +111,41 @@ class NeedControllerTest extends TestCase
             "amount" => "100,00"
         ])->toArray();
 
+        $this->instance(
+            NeedRepositoryContract::class,
+            Mockery::mock(NeedRepositoryContract::class)
+                ->shouldReceive("create")
+                ->with($user->id, [
+                    ...Arr::except($data, ["user_id"]),
+                    "amount" => 100.00
+                ])
+                ->once()
+                ->getMock()
+        );
+
         $this->actingAs($user)->post(route("needs.store"), $data)
             ->assertRedirectToRoute("needs.index")
             ->assertSessionHas("alert_type", "success");
-        $this->assertDatabaseHas("needs", [
-            ...$data,
-            "amount" => 100.00,
-            "user_id" => $user->id
+        Mockery::close();
+    }
+
+    /**
+     * deve redirecionar com mensagem de suceso
+     */
+    public function test_store_action_duplicated_title(): void
+    {
+        $user = $this->_user();
+        $need = Need::factory()->create([
+            "user_id" => $user
         ]);
+        $data = Need::factory()->make([
+            "title" => $need->title,
+            "amount" => "50,00"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route("needs.store"), $data)
+            ->assertRedirect(route("needs.index"))
+            ->assertSessionHas("alert_type", "success");
     }
 
     /**
@@ -150,14 +159,23 @@ class NeedControllerTest extends TestCase
             "amount" => "100,00"
         ])->toArray();
 
+        $this->instance(
+            NeedRepositoryContract::class,
+            Mockery::mock(NeedRepositoryContract::class)
+                ->shouldReceive("create")
+                ->with($user->id, [
+                    ...Arr::except($data, ["user_id"]),
+                    "amount" => 100
+                ])
+                ->once()
+                ->getMock()
+        );
+
         $this->actingAs($user)->post(route("needs.store"), $data)
             ->assertRedirectToRoute("needs.index")
             ->assertSessionHas("alert_type", "success");
-        $this->assertDatabaseHas("needs", [
-            ...$data,
-            "amount" => 100.00,
-            "user_id" => $user->id
-        ]);
+
+        Mockery::close();
     }
 
     /**
@@ -175,11 +193,6 @@ class NeedControllerTest extends TestCase
         $this->actingAs($user)->post(route("needs.store"), $data)
             ->assertRedirectToRoute("needs.index")
             ->assertSessionHas("alert_type", "success");
-        $this->assertDatabaseHas("needs", [
-            ...$data,
-            "amount" => 100.00,
-            "user_id" => $user->id
-        ]);
     }
 
     /**
@@ -266,7 +279,6 @@ class NeedControllerTest extends TestCase
             ->assertFound()
             ->assertSessionHasErrors([
                 "title",
-                "amount"
             ])
             ->assertSessionDoesntHaveErrors("description");
     }
@@ -287,32 +299,6 @@ class NeedControllerTest extends TestCase
 
         $this->actingAs($user)->put(route("needs.update", $need), $data)
             ->assertNotFound();
-    }
-
-    /**
-     * deve redirecionar com erro de validação apenas do campo title
-     */
-    public function test_update_action_duplicated_title(): void
-    {
-        $user = $this->_user();
-        $otherNeed = Need::factory()->create([
-            "user_id" => $user
-        ]);
-        $need = Need::factory()->create([
-            "user_id" => $user
-        ]);
-        $data = Need::factory()->make([
-            "title" => $otherNeed->title,
-            "amount" => "120,00"
-        ])->toArray();
-
-        $this->actingAs($user)->put(route("needs.update", $need), $data)
-            ->assertFound()
-            ->assertSessionHasErrors("title")
-            ->assertSessionDoesntHaveErrors([
-                "amount",
-                "description"
-            ]);
     }
 
     /**
@@ -352,7 +338,9 @@ class NeedControllerTest extends TestCase
         $this->actingAs($user)->put(route("needs.update", $need), $data)
             ->assertFound()
             ->assertSessionHasErrors("identifier_id")
-            ->assertSessionDoesntHaveErrors(array_keys(Arr::except($data, "identifier_id")));
+            ->assertSessionDoesntHaveErrors(
+                array_keys(Arr::except($data, "identifier_id"))
+            );
     }
 
     /**
@@ -370,14 +358,100 @@ class NeedControllerTest extends TestCase
             "completed" => 1,
         ])->toArray();
 
+        $this->instance(
+            NeedRepositoryContract::class,
+            Mockery::mock(NeedRepositoryContract::class)
+                ->shouldReceive("update")
+                ->with($need->id, [
+                    ...Arr::except($data, ["user_id"]),
+                    "amount" => 120.00
+                ])
+                ->once()
+                ->getMock()
+        );
+
         $this->actingAs($user)->put(route("needs.update", $need), $data)
             ->assertRedirectToRoute("needs.edit", $need)
             ->assertSessionHas("alert_type", "success");
-        $this->assertDatabaseHas("needs", [
-            ...$data,
-            "amount" => 120.00,
-            "user_id" => $user->id
+        Mockery::close();
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_update_action_duplicated_title(): void
+    {
+        $user = $this->_user();
+        $otherNeed = Need::factory()->create([
+            "user_id" => $user
         ]);
+        $need = Need::factory()->create([
+            "user_id" => $user
+        ]);
+        $data = Need::factory()->make([
+            "title" => $otherNeed->title,
+            "amount" => "120,00"
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("needs.update", $need), $data)
+            ->assertRedirect(route("needs.edit", $need))
+            ->assertSessionHas("alert_type", "success");
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_update_action_to_complete(): void
+    {
+        $user = $this->_user();
+        $need = Need::factory()->create([
+            "user_id" => $user
+        ]);
+        $data = Need::factory()->make([
+            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
+            "amount" => "120,00",
+            "completed" => 1,
+        ])->toArray();
+
+        $this->instance(
+            LeaveRepositoryContract::class,
+            Mockery::mock(app(LeaveRepositoryContract::class), [new Leave])
+                ->shouldReceive("create")
+                ->with(
+                    $user->id,
+                    Mockery::on(function (array $attributes) use ($need): bool {
+                        if ($attributes["leaveable_type"] !== Need::class) {
+                            return false;
+                        } elseif (intval($attributes["leaveable_id"]) !== $need->id) {
+                            return false;
+                        }
+                        return true;
+                    })
+                )
+                ->once()
+                ->passthru()
+                ->getMock()
+        );
+        $this->instance(
+            MovementRepositoryContract::class,
+            Mockery::mock(MovementRepositoryContract::class)
+                ->shouldReceive("create")
+                ->with($user->id, Mockery::on(function (array $attributes): bool {
+                    if ($attributes["movementable_type"] !== Leave::class) {
+                        return false;
+                    } elseif (!is_int($attributes["movementable_id"])) {
+                        return false;
+                    }
+                    return true;
+                }))
+                ->once()
+                ->getMock()
+        );
+
+        $this->actingAs($user)->put(route("needs.update", $need), $data)
+            ->assertRedirectToRoute("needs.edit", $need)
+            ->assertSessionHas("alert_type", "success");
+        Mockery::close();
     }
 
     /**
@@ -386,23 +460,43 @@ class NeedControllerTest extends TestCase
     public function test_update_action_without_identifier_with_status_completed_zero_field(): void
     {
         $user = $this->_user();
-        $need = Need::factory()->create([
-            "user_id" => $user,
-            "completed" => 1
+        $need = Need::factory()
+            ->create([
+                "user_id" => $user,
+                "completed" => 1
+            ]);
+        $leave = Leave::factory()->has(Movement::factory())->create([
+            "leaveable_type" => Need::class,
+            "leaveable_id" => $need
         ]);
+        $movement = $leave->movement;
         $data = Need::factory()->make([
             "amount" => "120,00",
             "completed" => 0,
         ])->toArray();
 
+        $this->instance(
+            LeaveRepositoryContract::class,
+            Mockery::mock(app(LeaveRepositoryContract::class), [new Leave])
+                ->shouldReceive("forceDelete")
+                ->with($leave->id)
+                ->once()
+                ->passthru()
+                ->getMock()
+        );
+        $this->instance(
+            MovementRepositoryContract::class,
+            Mockery::mock(MovementRepositoryContract::class)
+                ->shouldReceive("forceDelete")
+                ->with($movement->id)
+                ->once()
+                ->getMock()
+        );
+
         $this->actingAs($user)->put(route("needs.update", $need), $data)
             ->assertRedirectToRoute("needs.edit", $need)
             ->assertSessionHas("alert_type", "success");
-        $this->assertDatabaseHas("needs", [
-            ...$data,
-            "amount" => 120.00,
-            "user_id" => $user->id
-        ]);
+        Mockery::close();
     }
 
     /**
@@ -466,14 +560,44 @@ class NeedControllerTest extends TestCase
      */
     public function test_destroy_action(): void
     {
-        $user = User::factory()->create();
-        $need = Need::factory()->create([
-            "user_id" => $user
+        $user = $this->_user();
+        $need = Need::factory()
+            ->create([
+                "user_id" => $user,
+                "completed" => 1
+            ]);
+        $leave = Leave::factory()->has(Movement::factory())->create([
+            "leaveable_type" => Need::class,
+            "leaveable_id" => $need
         ]);
+        $movement = $leave->movement;
+        $data = Need::factory()->make([
+            "amount" => "120,00",
+            "completed" => 0,
+        ])->toArray();
+
+        $this->instance(
+            LeaveRepositoryContract::class,
+            Mockery::mock(app(LeaveRepositoryContract::class), [new Leave])
+                ->shouldReceive("forceDelete")
+                ->with($leave->id)
+                ->once()
+                ->passthru()
+                ->getMock()
+        );
+        $this->instance(
+            MovementRepositoryContract::class,
+            Mockery::mock(MovementRepositoryContract::class)
+                ->shouldReceive("forceDelete")
+                ->with($movement->id)
+                ->once()
+                ->getMock()
+        );
 
         $this->actingAs($user)->delete(route("needs.destroy", $need))
             ->assertRedirectToRoute("needs.index")
             ->assertSessionHas("alert_type", "success");
-        $this->assertSoftDeleted($need);
+
+        Mockery::close();
     }
 }

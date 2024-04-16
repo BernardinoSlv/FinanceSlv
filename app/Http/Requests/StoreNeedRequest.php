@@ -32,7 +32,7 @@ class StoreNeedRequest extends FormRequest
             "title" => [
                 "required", "min:1", "max:256",
             ],
-            "amount" => ["required", "regex:" . RegexEnum::AMOUNT->value],
+            "amount" => ["nullable", "regex:" . RegexEnum::AMOUNT->value],
             "description" => ["nullable"]
         ];
     }
