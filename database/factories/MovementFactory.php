@@ -20,8 +20,8 @@ class MovementFactory extends Factory
     {
         return [
             "user_id" => User::factory()->create(),
-            "movementable_type" => Entry::class,
-            "movementable_id" => Entry::factory()->create()
+            // "movementable_type" => ,
+            // "movementable_id" =>
         ];
     }
 }

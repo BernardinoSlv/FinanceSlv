@@ -19,19 +19,11 @@ class EntryFactory extends Factory
      */
     public function definition(): array
     {
-        $user = User::factory()->create();
-        $debtor = Debtor::factory()->create([
-            "user_id" => $user,
-            "identifier_id" => Identifier::factory()->create([
-                "user_id" => $user
-            ])
-        ]);
-
         return [
-            "user_id" => $user,
-            "entryable_type" => Debtor::class,
-            "entryable_id" => $debtor,
-            "amount" => 500
+            "user_id" => User::factory()->create(),
+            // "entryable_type" => ,
+            // "entryable_id" => ,
+            "amount" => rand(0, 500)
         ];
     }
 }
