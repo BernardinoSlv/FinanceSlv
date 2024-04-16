@@ -224,7 +224,7 @@ class BaseRepositoryTest extends TestCase
             1,
             app(LeaveRepositoryContract::class)->deletePolymorph(Debt::class, $debt->id)
         );
-        
+
         $this->assertSoftDeleted($leave);
     }
 
@@ -249,6 +249,29 @@ class BaseRepositoryTest extends TestCase
         $this->assertSoftDeleted($movement);
     }
 
+    /**
+     * deve retornar false
+     */
+    public function test_force_delete_method_nonexistent()
+    {
+        $this->assertFalse($this->_repository()->forceDelete(0));
+    }
+
+    /**
+     * deve retornar true
+     */
+    public function test_force_delete_method(): void
+    {
+        $entry = Entry::factory()->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => Debtor::factory()->create()
+        ]);
+
+        $this->assertTrue($this->_repository()->forceDelete($entry->id));
+        $this->assertDatabaseMissing("entries", [
+            "id" => $entry->id
+        ]);
+    }
 
     protected function _repository(): EntryRepositoryContract
     {

@@ -35,11 +35,11 @@ abstract class BaseRepository implements BaseRepositoryContract
 
     public function update(int $id, array $attributes): bool
     {
-        if (!($identifier = $this->_model->find($id))) {
+        if (!($entity = $this->_model->query()->find($id))) {
             return false;
         }
-        $identifier->fill($attributes);
-        $identifier->save();
+        $entity->fill($attributes);
+        $entity->save();
         return true;
     }
 
@@ -74,5 +74,14 @@ abstract class BaseRepository implements BaseRepositoryContract
                 ->delete();
         }
         throw new Error("Method is not allowed");
+    }
+
+    public function forceDelete(int $id): bool
+    {
+        if (!($entity = $this->_model->query()->find($id))) {
+            return false;
+        }
+        $entity->forceDelete();
+        return true;
     }
 }
