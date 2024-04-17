@@ -7,6 +7,7 @@ use App\Models\Debtor;
 use App\Models\Entry;
 use App\Models\Leave;
 use App\Models\Movement;
+use App\Models\QuickEntry;
 use App\Models\User;
 use App\Repositories\Contracts\EntryRepositoryContract;
 use App\Repositories\Contracts\ExpenseRepositoryContract;
@@ -24,12 +25,13 @@ class BaseRepositoryTest extends TestCase
 
     /**
      * deve retornar uma coleção vazia
-     *
-     * @return void
      */
     public function test_all_by_user_method_nonexistent_user(): void
     {
-        Entry::factory(20)->create();
+        Entry::factory(20)->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => Debtor::factory()->create()
+        ]);
 
         $this->assertCount(0, $this->_repository()->allByUser(0));
     }
@@ -42,7 +44,10 @@ class BaseRepositoryTest extends TestCase
     public function test_all_by_user_method_without_entries(): void
     {
         // entradas de outros usuários
-        Entry::factory(20)->create();
+        Entry::factory(20)->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => Debtor::factory()->create()
+        ]);
         $user = User::factory()->create();
 
         $this->assertCount(0, $this->_repository()->allByUser($user->id));
@@ -56,10 +61,15 @@ class BaseRepositoryTest extends TestCase
     public function test_all_by_user_method(): void
     {
         // entradas de outros usuários
-        Entry::factory(20)->create();
+        Entry::factory(20)->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => Debtor::factory()->create()
+        ]);
         $user = User::factory()->create();
         Entry::factory(2)->create([
-            "user_id" => $user->id
+            "user_id" => $user->id,
+            "entryable_type" => Debtor::class,
+            "entryable_id" => Debtor::factory()->create()
         ]);
 
         $this->assertCount(2, $this->_repository()->allByUser($user->id));
@@ -77,7 +87,10 @@ class BaseRepositoryTest extends TestCase
 
     public function test_update_method(): void
     {
-        $entry = Entry::factory()->create();
+        $entry = Entry::factory()->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => Debtor::factory()->create()
+        ]);
         $data = Entry::factory()->make()->toArray();
 
         $this->assertTrue($this->_repository()->update($entry->id, $data));
@@ -101,7 +114,10 @@ class BaseRepositoryTest extends TestCase
      */
     public function test_delete(): void
     {
-        $entry = Entry::factory()->create();
+        $entry = Entry::factory()->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => Debtor::factory()->create()
+        ]);
 
         $this->assertTrue($this->_repository()->delete($entry->id));
         $this->assertSoftDeleted($entry);
@@ -123,7 +139,10 @@ class BaseRepositoryTest extends TestCase
      */
     public function test_delete_polymorph_method_without_entry(): void
     {
-        Entry::factory(10)->create();
+        Entry::factory(10)->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => Debtor::factory()->create()
+        ]);
         $entries = Entry::factory(10)
             ->sequence(
                 ...Debtor::factory(10)->create()->map(function (Debtor $debtor): array {
@@ -147,7 +166,10 @@ class BaseRepositoryTest extends TestCase
      */
     public function test_delete_polymorph_method_with_one_entry(): void
     {
-        Entry::factory(10)->create();
+        Entry::factory(10)->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => Debtor::factory()->create()
+        ]);
         Entry::factory(10)
             ->sequence(
                 ...Debtor::factory(10)->create()->map(function (Debtor $debtor): array {
@@ -173,7 +195,10 @@ class BaseRepositoryTest extends TestCase
      */
     public function test_delete_polymorph_method(): void
     {
-        Entry::factory(10)->create();
+        Entry::factory(10)->create([
+            "entryable_type" => QuickEntry::class,
+            "entryable_id" => QuickEntry::factory()->create()
+        ]);
         Entry::factory(10)
             ->sequence(
                 ...Debtor::factory(10)->create()->map(function (Debtor $debtor): array {
@@ -206,7 +231,10 @@ class BaseRepositoryTest extends TestCase
      */
     public function test_delete_polymorph_method_leave_model(): void
     {
-        Leave::factory(10)->create();
+        Leave::factory(10)->create([
+            "leaveable_type" => Debt::class,
+            "leaveable_id" => Debt::factory()->create()
+        ]);
         Leave::factory(10)
             ->sequence(...Debt::factory(10)->create()->map(function (Debt $debt): array {
                 return ["leaveable_id" => $debt->id];
@@ -233,9 +261,18 @@ class BaseRepositoryTest extends TestCase
      */
     public function test_delete_polymorph_method_movement_model(): void
     {
-        Movement::factory(10)->create();
+        Movement::factory(10)->create([
+            "movementable_type" => Entry::class,
+            "movementable_id" => Entry::factory([
+                "entryable_type" => Debtor::class,
+                "entryable_id" => Debtor::factory()->create()
+            ])->create()
+        ]);
 
-        $entry = Entry::factory()->create();
+        $entry = Entry::factory()->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => Debtor::factory()->create()
+        ]);
         $movement = Movement::factory()->create([
             "movementable_type" => Entry::class,
             "movementable_id" => $entry->id

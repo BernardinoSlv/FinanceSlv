@@ -6,6 +6,7 @@ use App\Models\Debt;
 use App\Models\Debtor;
 use App\Models\Entry;
 use App\Models\Movement;
+use App\Models\QuickEntry;
 use App\Models\User;
 use App\Repositories\Contracts\EntryRepositoryContract;
 use App\Repositories\Contracts\MovementRepositoryContract;
@@ -251,6 +252,8 @@ class DebtorPaymentControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $entry = Entry::factory()->create([
+            "entryable_type" => QuickEntry::class,
+            "entryable_id" => QuickEntry::factory()->create(),
             "user_id" => $user
         ]);
 
@@ -288,6 +291,8 @@ class DebtorPaymentControllerTest extends TestCase
             "user_id" => $user
         ]);
         $entry = Entry::factory()->create([
+            "entryable_type" => QuickEntry::class,
+            "entryable_id" => QuickEntry::factory()->create(),
             "user_id" => $user
         ]);
 
@@ -368,6 +373,8 @@ class DebtorPaymentControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $entry = Entry::factory()->create([
+            "entryable_type" => QuickEntry::class,
+            "entryable_id" => QuickEntry::factory()->create(),
             "user_id" => $user
         ]);
 
@@ -405,6 +412,8 @@ class DebtorPaymentControllerTest extends TestCase
             "user_id" => $user
         ]);
         $entry = Entry::factory()->create([
+            "entryable_type" => QuickEntry::class,
+            "entryable_id" => QuickEntry::factory()->create(),
             "user_id" => $user
         ]);
 
@@ -521,6 +530,8 @@ class DebtorPaymentControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $entry = Entry::factory()->create([
+            "entryable_type" => QuickEntry::class,
+            "entryable_id" => QuickEntry::factory()->create(),
             "user_id" => $user
         ]);
 
@@ -558,6 +569,8 @@ class DebtorPaymentControllerTest extends TestCase
             "user_id" => $user
         ]);
         $entry = Entry::factory()->create([
+            "entryable_type" => QuickEntry::class,
+            "entryable_id" => QuickEntry::factory()->create(),
             "user_id" => $user
         ]);
 

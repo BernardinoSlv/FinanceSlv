@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Models;
 
+use App\Models\Debt;
+use App\Models\Debtor;
 use App\Models\Entry;
 use App\Models\Movement;
 use Illuminate\Database\Eloquent\Collection;
@@ -18,7 +20,10 @@ class EntryTest extends TestCase
      */
     public function test_movements_method_without_movements(): void
     {
-        $entry = Entry::factory()->create();
+        $entry = Entry::factory()->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => Debtor::factory()->create()
+        ]);
 
         $this->assertNull($entry->movement);
     }
@@ -28,7 +33,10 @@ class EntryTest extends TestCase
      */
     public function test_movements(): void
     {
-        $entry = Entry::factory()->create();
+        $entry = Entry::factory()->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => Debtor::factory()->create()
+        ]);
         $movement = Movement::factory()->create([
             "movementable_type" => Entry::class,
             "movementable_id" => $entry

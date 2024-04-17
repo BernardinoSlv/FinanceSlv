@@ -5,6 +5,7 @@ namespace Tests\Feature\Http\Controllers;
 use App\Models\Investiment;
 use App\Models\Leave;
 use App\Models\Movement;
+use App\Models\QuickLeave;
 use App\Models\User;
 use App\Repositories\Contracts\InvestimentRepositoryContract;
 use App\Repositories\Contracts\LeaveRepositoryContract;
@@ -232,7 +233,11 @@ class InvestimentLeaveControllerTest extends TestCase
     public function test_edit_action_nonexistent_investiment(): void
     {
         $user = User::factory()->create();
-        $leave = Leave::factory()->create(["user_id" => $user]);
+        $leave = Leave::factory()->create([
+            "leaveable_type" => QuickLeave::class,
+            "leaveable_id" => QuickLeave::factory()->create(),
+            "user_id" => $user
+        ]);
 
         $this->actingAs($user)->get(route("investiments.leaves.edit", [
             "investiment" => 0,
@@ -263,7 +268,11 @@ class InvestimentLeaveControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $investiment = Investiment::factory()->create(["user_id" => $user]);
-        $leave = Leave::factory()->create(["user_id" => $user]);
+        $leave = Leave::factory()->create([
+            "leaveable_type" => QuickLeave::class,
+            "leaveable_id" => QuickLeave::factory()->create(),
+            "user_id" => $user
+        ]);
 
         $this->actingAs($user)->get(route("investiments.leaves.edit", [
             "investiment" => $investiment,
@@ -328,7 +337,11 @@ class InvestimentLeaveControllerTest extends TestCase
     public function test_update_action_nonexistent_investiment(): void
     {
         $user = User::factory()->create();
-        $leave = Leave::factory()->create(["user_id" => $user]);
+        $leave = Leave::factory()->create([
+            "leaveable_type" => QuickLeave::class,
+            "leaveable_id" => QuickLeave::factory()->create(),
+            "user_id" => $user
+        ]);
 
         $this->actingAs($user)->put(route("investiments.leaves.update", [
             "investiment" => 0,
@@ -359,7 +372,11 @@ class InvestimentLeaveControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $investiment = Investiment::factory()->create(["user_id" => $user]);
-        $leave = Leave::factory()->create(["user_id" => $user]);
+        $leave = Leave::factory()->create([
+            "leaveable_type" => QuickLeave::class,
+            "leaveable_id" => QuickLeave::factory()->create(),
+            "user_id" => $user
+        ]);
 
         $this->actingAs($user)->put(route("investiments.leaves.update", [
             "investiment" => $investiment,
@@ -461,7 +478,11 @@ class InvestimentLeaveControllerTest extends TestCase
     public function test_destroy_action_nonexistent_investiment(): void
     {
         $user = User::factory()->create();
-        $leave = Leave::factory()->create(["user_id" => $user]);
+        $leave = Leave::factory()->create([
+            "leaveable_type" => QuickLeave::class,
+            "leaveable_id" => QuickLeave::factory()->create(),
+            "user_id" => $user
+        ]);
 
         $this->actingAs($user)->delete(route("investiments.leaves.destroy", [
             "investiment" => 0,
@@ -492,7 +513,11 @@ class InvestimentLeaveControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $investiment = Investiment::factory()->create(["user_id" => $user]);
-        $leave = Leave::factory()->create(["user_id" => $user]);
+        $leave = Leave::factory()->create([
+            "leaveable_type" => QuickLeave::class,
+            "leaveable_id" => QuickLeave::factory()->create(),
+            "user_id" => $user
+        ]);
 
         $this->actingAs($user)->delete(route("investiments.leaves.destroy", [
             "investiment" => $investiment,

@@ -18,7 +18,10 @@ class DebtorTest extends TestCase
      */
     public function test_entries_method_without_entries(): void
     {
-        Entry::factory(10)->create();
+        Entry::factory(10)->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => Debtor::factory()->create()
+        ]);
         $debtor = Debtor::factory()->create();
 
         $this->assertInstanceOf(Collection::class, $debtor->entries);
@@ -30,7 +33,11 @@ class DebtorTest extends TestCase
      */
     public function test_entries_method(): void
     {
-        Entry::factory(10)->create();
+        Entry::factory(10)->create([
+            "entryable_type" => Debtor::class,
+            "entryable_id" => Debtor::factory()->create()
+        ]);
+
         $debtor = Debtor::factory()->create();
         Entry::factory(5)->create([
             "entryable_type" => Debtor::class,

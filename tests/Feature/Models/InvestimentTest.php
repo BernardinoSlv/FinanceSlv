@@ -18,7 +18,10 @@ class InvestimentTest extends TestCase
      */
     public function test_leaves_method_without_leaves(): void
     {
-        Leave::factory(10)->create();
+        Leave::factory(10)->create([
+            "leaveable_type" => Investiment::class,
+            "leaveable_id" => Investiment::factory()->create()
+        ]);
         $investiment = Investiment::factory()->create();
 
         $this->assertCount(0, $investiment->leaves);
@@ -29,7 +32,10 @@ class InvestimentTest extends TestCase
      */
     public function test_leaves_method_one_leave(): void
     {
-        Leave::factory(10)->create();
+        Leave::factory(10)->create([
+            "leaveable_type" => Investiment::class,
+            "leaveable_id" => Investiment::factory()->create()
+        ]);
         $investiment = Investiment::factory()->create();
         Leave::factory()->create([
             "leaveable_type" => Investiment::class,
@@ -44,7 +50,10 @@ class InvestimentTest extends TestCase
      */
     public function test_leaves_method(): void
     {
-        Leave::factory(10)->create();
+        Leave::factory(10)->create([
+            "leaveable_type" => Investiment::class,
+            "leaveable_id" => Investiment::factory()->create()
+        ]);
         $investiment = Investiment::factory()->create();
         Leave::factory(10)->create([
             "leaveable_type" => Investiment::class,
@@ -59,7 +68,10 @@ class InvestimentTest extends TestCase
      */
     public function test_entries_method_without_entries(): void
     {
-        Entry::factory(10)->create();
+        Entry::factory(10)->create([
+            "entryable_type" => Investiment::class,
+            "entryable_id" => Investiment::factory()->create()
+        ]);
         $investiment = Investiment::factory()->create();
 
         $this->assertCount(0, $investiment->entries);
@@ -70,7 +82,11 @@ class InvestimentTest extends TestCase
      */
     public function test_entries_method(): void
     {
-        Entry::factory(10)->create();
+        Entry::factory(10)->create([
+            "entryable_type" => Investiment::class,
+            "entryable_id" => Investiment::factory()->create()
+        ]);
+
         $investiment = Investiment::factory()->create();
         Entry::factory(5)->create([
             "entryable_type" => Investiment::class,

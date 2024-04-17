@@ -5,6 +5,7 @@ namespace Tests\Feature\Http\Controllers;
 use App\Models\Debt;
 use App\Models\Leave;
 use App\Models\Movement;
+use App\Models\QuickLeave;
 use App\Models\User;
 use App\Repositories\Contracts\LeaveRepositoryContract;
 use App\Repositories\Contracts\MovementRepositoryContract;
@@ -249,6 +250,8 @@ class DebtPaymentControllerTest extends TestCase
             "user_id" => $user
         ]);
         $leave = Leave::factory()->create([
+            "leaveable_type" => QuickLeave::class,
+            "leaveable_id" => QuickLeave::factory()->create(),
             "user_id" => $user
         ]);
 
@@ -349,6 +352,8 @@ class DebtPaymentControllerTest extends TestCase
             "user_id" => $user
         ]);
         $leave = Leave::factory()->create([
+            "leaveable_type" => QuickLeave::class,
+            "leaveable_id" => QuickLeave::factory()->create(),
             "user_id" => $user
         ]);
 
@@ -436,7 +441,11 @@ class DebtPaymentControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $debt = Debt::factory()->create(["user_id" => $user]);
-        $leave = Leave::factory()->create(["user_id" => $user]);
+        $leave = Leave::factory()->create([
+            "leaveable_type" => QuickLeave::class,
+            "leaveable_id" => QuickLeave::factory()->create(),
+            "user_id" => $user
+        ]);
 
         $this->actingAs($user)->delete(route("debts.payments.destroy", [
             "debt" => $debt,

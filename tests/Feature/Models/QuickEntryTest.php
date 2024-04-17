@@ -17,7 +17,10 @@ class QuickEntryTest extends TestCase
      */
     public function test_entry_method_without_entry(): void
     {
-        Entry::factory(10)->create();
+        Entry::factory(10)->create([
+            "entryable_type" => QuickEntry::class,
+            "entryable_id" => QuickEntry::factory()->create()
+        ]);
         $quickEntry = QuickEntry::factory()->create();
 
         $this->assertNull($quickEntry->entry);
@@ -28,7 +31,10 @@ class QuickEntryTest extends TestCase
      */
     public function test_entry_method(): void
     {
-        Entry::factory(10)->create();
+        Entry::factory(10)->create([
+            "entryable_type" => QuickEntry::class,
+            "entryable_id" => QuickEntry::factory()->create()
+        ]);
         $quickEntry = QuickEntry::factory()->create();
         $entry = Entry::factory()->create([
             "entryable_type" => QuickEntry::class,

@@ -5,6 +5,7 @@ namespace Tests\Feature\Http\Controllers;
 use App\Models\Entry;
 use App\Models\Investiment;
 use App\Models\Movement;
+use App\Models\QuickEntry;
 use App\Models\User;
 use App\Repositories\Contracts\EntryRepositoryContract;
 use App\Repositories\Contracts\InvestimentRepositoryContract;
@@ -234,7 +235,11 @@ class InvestimentEntryControllerTest extends TestCase
     public function test_edit_action_nonexistent_investiment(): void
     {
         $user = User::factory()->create();
-        $entry = Entry::factory()->create(["user_id" => $user]);
+        $entry = Entry::factory()->create([
+            "entryable_type" => QuickEntry::class,
+            "entryable_id" => QuickEntry::factory()->create(),
+            "user_id" => $user
+        ]);
 
         $this->actingAs($user)->get(route("investiments.entries.edit", [
             "investiment" => 0,
@@ -264,8 +269,12 @@ class InvestimentEntryControllerTest extends TestCase
     public function test_edit_action_is_not_of_the_investiment(): void
     {
         $user = User::factory()->create();
-        $investiment = Investiment::factory()->create(["user_id" => $user]);
+        $investiment = Investiment::factory()->create([
+            "user_id" => $user
+        ]);
         $entry = Entry::factory()->create([
+            "entryable_type" => QuickEntry::class,
+            "entryable_id" => QuickEntry::factory()->create(),
             "user_id" => $user,
         ]);
 
@@ -337,7 +346,11 @@ class InvestimentEntryControllerTest extends TestCase
     public function test_update_action_nonexistent_investiment(): void
     {
         $user = User::factory()->create();
-        $entry = Entry::factory()->create(["user_id" => $user]);
+        $entry = Entry::factory()->create([
+            "entryable_type" => QuickEntry::class,
+            "entryable_id" => QuickEntry::factory()->create(),
+            "user_id" => $user
+        ]);
 
         $this->actingAs($user)->put(route("investiments.entries.update", [
             "investiment" => 0,
@@ -479,7 +492,11 @@ class InvestimentEntryControllerTest extends TestCase
     public function test_destroy_action_nonexistent_investiment(): void
     {
         $user = User::factory()->create();
-        $entry = Entry::factory()->create(["user_id" => $user]);
+        $entry = Entry::factory()->create([
+            "entryable_type" => QuickEntry::class,
+            "entryable_id" => QuickEntry::factory()->create(),
+            "user_id" => $user
+        ]);
 
         $this->actingAs($user)->delete(route("investiments.entries.destroy", [
             "investiment" => 0,
@@ -510,7 +527,11 @@ class InvestimentEntryControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $investiment =  Investiment::factory()->create(["user_id" => $user]);
-        $entry = Entry::factory()->create(["user_id" => $user]);
+        $entry = Entry::factory()->create([
+            "entryable_type" => QuickEntry::class,
+            "entryable_id" => QuickEntry::factory()->create(),
+            "user_id" => $user
+        ]);
 
         $this->actingAs($user)->delete(route("investiments.entries.destroy", [
             "investiment" => $investiment,

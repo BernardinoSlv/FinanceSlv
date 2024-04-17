@@ -199,7 +199,10 @@ class QuickLeaveControllerTest extends TestCase
      */
     public function test_edit_is_not_owner(): void
     {
-        $leave = Leave::factory()->create();
+        $leave = Leave::factory()->create([
+            "leaveable_type" => QuickLeave::class,
+            "leaveable_id" => QuickLeave::factory()->create()
+        ]);
 
         $this->actingAs($this->_user())->get(route("quick-leaves.edit", $leave->id))
             ->assertStatus(404);
@@ -247,7 +250,10 @@ class QuickLeaveControllerTest extends TestCase
     public function test_update_is_not_owner(): void
     {
         $user = $this->_user();
-        $leave = Leave::factory()->create();
+        $leave = Leave::factory()->create([
+            "leaveable_type" => QuickLeave::class,
+            "leaveable_id" => QuickLeave::factory()->create()
+        ]);
         $data = Leave::factory()->make([
             "identifier_id" => Identifier::factory()->create([
                 "user_id" => $user
@@ -364,7 +370,10 @@ class QuickLeaveControllerTest extends TestCase
      */
     public function test_destroy_is_not_owner(): void
     {
-        $leave = Leave::factory()->create();
+        $leave = Leave::factory()->create([
+            "leaveable_type" => QuickLeave::class,
+            "leaveable_id" => QuickLeave::factory()->create()
+        ]);
 
         $this->actingAs($this->_user())->delete(route("quick-leaves.destroy", $leave->id))
             ->assertStatus(404);
