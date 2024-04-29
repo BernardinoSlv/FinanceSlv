@@ -631,6 +631,26 @@
                         </li>
                     </ul>
                 </li>
+                <li class="menu-label">Contatos</li>
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><span class="material-symbols-outlined">
+                                contact_page
+                            </span>
+                        </div>
+                        <div class="menu-title">Identificadores</div>
+                    </a>
+                    <ul>
+                        <li> <a href="{{ route('identifiers.create') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
+                                Criar</a>
+                        </li>
+                        <li> <a href="{{ route('identifiers.index') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
+                                Ver tudo</a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
             <!--end navigation-->
 
