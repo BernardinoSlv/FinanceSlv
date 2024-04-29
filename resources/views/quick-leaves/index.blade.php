@@ -107,24 +107,29 @@
                                     <td>R$ {{ $quickLeave->amount }}</td>
                                     <td>{{ $quickLeave->created_at_formated }}</td>
                                     <td align="right">
-                                        <a class="btn btn-outline-primary btn-sm"
-                                            href="{{ route('quick-leaves.edit', [
-                                                'quickLeave' => $quickLeave->id,
-                                            ]) }}"><i
-                                                class="fas fa-edit"></i></a>
-                                        <form
-                                            action="{{ route('quick-leaves.destroy', [
-                                                'quickLeave' => $quickLeave->id,
-                                            ]) }}"
-                                            method="POST" class="d-inline-block">
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button class="btn btn-danger btn-sm"
-                                                onclick="return confirm('Deseja remover a entrada #{{ $quickLeave->id }}')">
-                                                <i class="fas fa-trash"></i>
+                                        <div class="dropdown">
+                                            <button
+                                                class="btn btn-sm btn-light border dropdown-toggle dropdown-toggle-nocaret"
+                                                type="button" data-bs-toggle="dropdown">
+                                                <i class="bi bi-three-dots"></i>
                                             </button>
-                                        </form>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('quick-leaves.edit', $quickLeave) }}">Editar</a>
+                                                </li>
+                                                <li>
+                                                    <form action="{{ route('quick-leaves.destroy', $quickLeave) }}"
+                                                        method="POST">
+                                                        @method('DELETE')
+                                                        @csrf
+
+                                                        <button type="submit" class="dropdown-item"
+                                                            onclick="return confirm('Deseja excluir? ')">Remover</button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach

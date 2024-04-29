@@ -89,8 +89,8 @@
         <div class="card-body">
             <div class="product-table">
                 <div class="table-responsive white-space-nowrap">
-                    <table class="table align-middle">
-                        <thead class="table-light">
+                    <table class="table align-middle table-hover">
+                        <thead class="">
                             <tr>
                                 <th>#</th>
                                 <th>Título</th>
