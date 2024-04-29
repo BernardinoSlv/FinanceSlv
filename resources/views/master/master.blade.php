@@ -545,10 +545,12 @@
                         <div class="menu-title">Saídas rápidas</div>
                     </a>
                     <ul>
-                        <li> <a href="widget-data.html"><span class="material-symbols-outlined">arrow_right</span>
+                        <li> <a href="{{ route('quick-leaves.create') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
                                 Criar</a>
                         </li>
-                        <li> <a href="widget-static.html"><span class="material-symbols-outlined">arrow_right</span>
+                        <li> <a href="{{ route('quick-leaves.index') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
                                 Ver tudo</a>
                         </li>
                     </ul>
@@ -562,10 +564,12 @@
                         <div class="menu-title">Dívidas</div>
                     </a>
                     <ul>
-                        <li> <a href="widget-data.html"><span class="material-symbols-outlined">arrow_right</span>
+                        <li> <a href="{{ route('debts.create') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
                                 Criar</a>
                         </li>
-                        <li> <a href="widget-static.html"><span class="material-symbols-outlined">arrow_right</span>
+                        <li> <a href="{{ route('debts.index') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
                                 Ver tudo</a>
                         </li>
                     </ul>
@@ -579,10 +583,12 @@
                         <div class="menu-title">Devedores</div>
                     </a>
                     <ul>
-                        <li> <a href="widget-data.html"><span class="material-symbols-outlined">arrow_right</span>
+                        <li> <a href="{{ route('debtors.create') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
                                 Criar</a>
                         </li>
-                        <li> <a href="widget-static.html"><span class="material-symbols-outlined">arrow_right</span>
+                        <li> <a href="{{ route('debtors.index') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
                                 Ver tudo</a>
                         </li>
                     </ul>
@@ -596,10 +602,12 @@
                         <div class="menu-title">Investimentos</div>
                     </a>
                     <ul>
-                        <li> <a href="widget-data.html"><span class="material-symbols-outlined">arrow_right</span>
+                        <li> <a href="{{ route('investiments.create') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
                                 Criar</a>
                         </li>
-                        <li> <a href="widget-static.html"><span class="material-symbols-outlined">arrow_right</span>
+                        <li> <a href="{{ route('investiments.index') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
                                 Ver tudo</a>
                         </li>
                     </ul>
@@ -613,10 +621,12 @@
                         <div class="menu-title">Necessidades</div>
                     </a>
                     <ul>
-                        <li> <a href="widget-data.html"><span class="material-symbols-outlined">arrow_right</span>
+                        <li> <a href="{{ route('needs.create') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
                                 Criar</a>
                         </li>
-                        <li> <a href="widget-static.html"><span class="material-symbols-outlined">arrow_right</span>
+                        <li> <a href="{{ route('needs.index') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
                                 Ver tudo</a>
                         </li>
                     </ul>
@@ -672,7 +682,7 @@
 
     <!--start main content-->
     <main class="page-content">
-        @yield("content")
+        @yield('content')
     </main>
     <!--end main content-->
 
@@ -765,8 +775,7 @@
 
 
     <!--start theme customization-->
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="ThemeCustomizer"
-        aria-labelledby="ThemeCustomizerLable">
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="ThemeCustomizer" aria-labelledby="ThemeCustomizerLable">
         <div class="offcanvas-header border-bottom">
             <h5 class="offcanvas-title" id="ThemeCustomizerLable">Theme Customizer</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
