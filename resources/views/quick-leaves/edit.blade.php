@@ -8,7 +8,7 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 p-0">
                     <li class="breadcrumb-item"><a href="{{ route('quick-entries.index') }}">Entradas rápidas</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Editar #{{ $quickEntry->id }}</li>
+                    <li class="breadcrumb-item active" aria-current="page">Editar #</li>
                 </ol>
             </nav>
         </div>
@@ -19,9 +19,10 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('quick-leaves.update', [
-                        'quickLeave' => $quickLeave,
-                    ]) }}"
+                    <form
+                        action="{{ route('quick-leaves.update', [
+                            'quickLeave' => $quickLeave,
+                        ]) }}"
                         method="POST">
                         @method('PUT')
                         @csrf
