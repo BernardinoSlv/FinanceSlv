@@ -7,7 +7,13 @@
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 p-0">
-                    <li class="breadcrumb-item"><a href="{{ route('quick-entries.index') }}">Entradas rápidas</a></li>
+                    <li class="breadcrumb-item" aria-current="page">
+                        <a href="{{ route('debtors.index') }}">Devedores</a>
+                    </li>
+                    <li class="breadcrumb-item" aria-current="page">{{ $debtor->id }}</li>
+                    <li class="breadcrumb-item" aria-current="page">
+                        <a href="{{ route('debtors.payments.index', $debtor) }}">Pagamentos</a>
+                    </li>
                     <li class="breadcrumb-item active" aria-current="page">Criar</li>
                 </ol>
             </nav>

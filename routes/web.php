@@ -14,6 +14,13 @@ use App\Http\Controllers\InvestimentEntryController;
 use App\Http\Controllers\InvestimentLeaveController;
 use App\Http\Controllers\QuickLeaveController;
 use App\Http\Controllers\NeedController;
+use App\Models\Debt;
+use App\Models\Debtor;
+use App\Models\Identifier;
+use App\Models\Investiment;
+use App\Models\Need;
+use App\Models\QuickEntry;
+use App\Models\QuickLeave;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,6 +47,17 @@ Route::controller(AuthController::class)
 
 // rotas protegidas
 Route::middleware("checkAuth")->group(function () {
+    Route::get("insert", function () {
+        $userId = auth()->id();
+        Identifier::factory(100)->create(["user_id" => $userId]);
+        QuickEntry::factory(100)->create(["user_id" => $userId]);
+        QuickLeave::factory(100)->create(["user_id" => $userId]);
+        Debt::factory(100)->create(["user_id" => $userId]);
+        Debtor::factory(100)->create(["user_id" => $userId]);
+        Investiment::factory(100)->create(["user_id" => $userId]);
+        Need::factory(100)->create(["user_id" => $userId]);
+    });
+
     // dashboard
     Route::controller(DashboardController::class)
         ->as("dashboard.")

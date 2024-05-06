@@ -2,11 +2,11 @@
 
 @section('content')
     <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
-        <div class="breadcrumb-title pe-3">eCommerce</div>
+        <div class="breadcrumb-title pe-3">Operações</div>
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 p-0">
-                    <li class="breadcrumb-item active" aria-current="page">Products</li>
+                    <li class="breadcrumb-item active" aria-current="page">Necessidades</li>
                 </ol>
             </nav>
         </div>
@@ -79,7 +79,7 @@
         <div class="col-auto">
             <div class="d-flex align-items-center gap-2 justify-content-lg-end">
                 <button class="btn btn-light px-4"><i class="bi bi-box-arrow-right me-2"></i>Export</button>
-                <a class="btn btn-primary px-4" href="{{ route('quick-entries.create') }}"><i
+                <a class="btn btn-primary px-4" href="{{ route('needs.create') }}"><i
                         class="bi bi-plus-lg me-2"></i>Criar</a>
             </div>
         </div>
@@ -90,7 +90,7 @@
             <div class="product-table">
                 <div class="table-responsive white-space-nowrap">
                     <table class="table table-hover" style="min-width: 700px">
-                        <thead>
+                        <thead class="table-light">
                             <tr>
                                 <th>#</th>
                                 <th>Título</th>
@@ -114,7 +114,7 @@
                                         @endif
                                     </td>
                                     <td>{{ $need->created_at_formated }}</td>
-                                    <td align="right">
+                                    <td>
                                         <div class="dropdown">
                                             <button
                                                 class="btn btn-sm btn-light border dropdown-toggle dropdown-toggle-nocaret"

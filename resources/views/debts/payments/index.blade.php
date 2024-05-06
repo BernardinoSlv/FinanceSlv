@@ -2,11 +2,17 @@
 
 @section('content')
     <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
-        <div class="breadcrumb-title pe-3">eCommerce</div>
+        <div class="breadcrumb-title pe-3">Operações</div>
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 p-0">
-                    <li class="breadcrumb-item active" aria-current="page">Products</li>
+                    <li class="breadcrumb-item"><a href="{{ route('debts.index') }}">Dívidas</a></li>
+                    <li class="breadcrumb-item">
+                        #{{ $debt->id }}
+                    </li>
+                    <li class="breadcrumb-item active">
+                        Pagamentos
+                    </li>
                 </ol>
             </nav>
         </div>
@@ -79,7 +85,7 @@
         <div class="col-auto">
             <div class="d-flex align-items-center gap-2 justify-content-lg-end">
                 <button class="btn btn-light px-4"><i class="bi bi-box-arrow-right me-2"></i>Export</button>
-                <a class="btn btn-primary px-4" href="{{ route('quick-entries.create') }}"><i
+                <a class="btn btn-primary px-4" href="{{ route('debts.payments.create', $debt) }}"><i
                         class="bi bi-plus-lg me-2"></i>Criar</a>
             </div>
         </div>
@@ -90,7 +96,7 @@
             <div class="product-table">
                 <div class="table-responsive white-space-nowrap">
                     <table class="table align-middle">
-                        <thead>
+                        <thead class="table-light">
                             <tr>
                                 <th>#</th>
                                 <th>Valor</th>
@@ -106,7 +112,7 @@
                                     <td>{{ $debt->created_at_formated }}</td>
                                     <td>
                                         <div class="dropdown">
-                                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                            <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
                                                 <i class="bi bi-three-dots"></i>
                                             </button>
 

@@ -2,11 +2,11 @@
 
 @section('content')
     <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
-        <div class="breadcrumb-title pe-3">eCommerce</div>
+        <div class="breadcrumb-title pe-3">Operações</div>
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 p-0">
-                    <li class="breadcrumb-item active" aria-current="page">Products</li>
+                    <li class="breadcrumb-item active" aria-current="page">Saídas rápidas</li>
                 </ol>
             </nav>
         </div>
@@ -90,7 +90,7 @@
             <div class="product-table">
                 <div class="table-responsive white-space-nowrap">
                     <table class="table align-middle">
-                        <thead>
+                        <thead class="table-light">
                             <tr>
                                 <th>#</th>
                                 <th>Título</th>
@@ -106,7 +106,7 @@
                                     <td>{{ $quickLeave->title }}</td>
                                     <td>R$ {{ $quickLeave->amount }}</td>
                                     <td>{{ $quickLeave->created_at_formated }}</td>
-                                    <td align="right">
+                                    <td>
                                         <div class="dropdown">
                                             <button
                                                 class="btn btn-sm btn-light border dropdown-toggle dropdown-toggle-nocaret"

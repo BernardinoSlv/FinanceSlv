@@ -7,8 +7,18 @@
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 p-0">
-                    <li class="breadcrumb-item"><a href="{{ route('quick-entries.index') }}">Entradas rápidas</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Criar</li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ route('investiments.index') }}">Investimentos</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        {{ $investiment->id }}
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ route('investiments.entries.index', $investiment) }}">Retiradas</a>
+                    </li>
+                    <li class="breadcrumb-item active">
+                        Criar
+                    </li>
                 </ol>
             </nav>
         </div>
