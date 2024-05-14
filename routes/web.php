@@ -16,6 +16,7 @@ use App\Http\Controllers\QuickLeaveController;
 use App\Http\Controllers\NeedController;
 use App\Models\Debt;
 use App\Models\Debtor;
+use App\Models\Expense;
 use App\Models\Identifier;
 use App\Models\Investiment;
 use App\Models\Need;
@@ -54,6 +55,7 @@ Route::middleware("checkAuth")->group(function () {
         QuickLeave::factory(100)->create(["user_id" => $userId]);
         Debt::factory(100)->create(["user_id" => $userId]);
         Debtor::factory(100)->create(["user_id" => $userId]);
+        Expense::factory(100)->create(["user_id" => $userId]);
         Investiment::factory(100)->create(["user_id" => $userId]);
         Need::factory(100)->create(["user_id" => $userId]);
     });
