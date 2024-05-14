@@ -206,6 +206,63 @@ class InvestimentControllerTest extends TestCase
     }
 
     /**
+     * deve redirecionar para página de login
+     */
+    public function test_show_action_unauthenticated(): void
+    {
+        $investiment = Investiment::factory()->create();
+
+        $this->get(route("investiments.show", $investiment))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_show_action_nonexistent(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->get(route("investiments.show", 0))
+            ->assertNotFound();
+    }
+
+    /**deve ter status 404 */
+    public function test_show_action_trashed(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->trashed()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->get(route("investiments.show", $investiment))
+            ->assertNotFound();
+    }
+
+    /** deve ter status 403 */
+    public function test_show_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->create();
+
+        $this->actingAs($user)->get(route("investiments.show", $investiment))
+            ->assertForbidden();
+    }
+
+    /**
+     * deve ter status 200 e view investiments.show
+     */
+    public function test_show_action(): void
+    {
+        $user = User::factory()->create();
+        $investiment = Investiment::factory()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->get(route("investiments.show", $investiment))
+            ->assertOk()
+            ->assertViewIs("investiments.show")
+            ->assertViewHas("investiment");
+    }
+
+
+    /**
      * deve redirecionar para login
      */
     public function test_edit_action_unauthenticated(): void
