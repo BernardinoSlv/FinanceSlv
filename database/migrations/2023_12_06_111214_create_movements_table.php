@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('movements', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger("user_id");
-            $table->decimal("amount");
+            $table->foreignId("user_id")->references("id")->on("users");
             $table->morphs("movementable");
+            $table->string("type");
+            $table->decimal("amount");
             $table->timestamps();
-
-            $table->foreign("user_id")->references("id")->on("users");
+            $table->softDeletes();
         });
     }
 

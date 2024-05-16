@@ -75,7 +75,14 @@ class InvestimentController extends Controller
      */
     public function show(Investiment $investiment)
     {
-        //
+        if (Gate::denies("investiment-edit", $investiment)) {
+            abort(403);
+        }
+
+        $investiment->entries()->orderBy("id")->limit(10);
+        $investiment->entries()->orderBy("id")->limit(10);
+
+        return view("investiments.show", compact("investiment"));
     }
 
     /**

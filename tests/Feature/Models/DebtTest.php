@@ -17,7 +17,10 @@ class DebtTest extends TestCase
      */
     public function test_leaves_method_without_leave(): void
     {
-        Leave::factory(10)->create();
+        Leave::factory(10)->create([
+            "leaveable_type" => Debt::class,
+            "leaveable_id" => Debt::factory()->create()
+        ]);
         $debt = Debt::factory()->create();
 
         $this->assertCount(0, $debt->leaves);
@@ -28,7 +31,11 @@ class DebtTest extends TestCase
      */
     public function test_leaves_method(): void
     {
-        Leave::factory(10)->create();
+        Leave::factory(10)->create([
+            "leaveable_type" => Debt::class,
+            "leaveable_id" => Debt::factory()->create()
+        ]);
+
         $debt = Debt::factory()->create();
         Leave::factory(10)->create([
             "leaveable_type" => Debt::class,

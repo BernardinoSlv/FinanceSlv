@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Repositories;
 
+use App\Models\Debtor;
 use App\Models\Leave;
 use App\Models\User;
 use App\Repositories\Contracts\LeaveRepositoryContract;
@@ -15,7 +16,10 @@ class LeaveRepositoryTest extends TestCase
     public function test_create(): void
     {
         $user = User::factory()->create();
-        $data = Leave::factory()->make()->toArray();
+        $data = Leave::factory()->make([
+            "leaveable_type" => Debtor::class,
+            "leaveable_id" => Debtor::factory()->create()
+        ])->toArray();
 
         $this->_repository()->create($user->id, $data);
         $this->assertDatabaseHas("leaves", [
