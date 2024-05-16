@@ -11,17 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('debts', function (Blueprint $table) {
+        Schema::create('files', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger("user_id");
-            $table->string("title");
+            $table->foreignId("user_id")->references("id")->on("users");
+            $table->morphs("fileable");
+            $table->string("type");
+            $table->string("path");
+            $table->unsignedBigInteger("size");
             $table->text("description")->nullable();
-            $table->decimal("amount");
-            $table->dateTime("effetive_at")->nullable();
             $table->timestamps();
             $table->softDeletes();
-
-            $table->foreign("user_id")->references("id")->on("users");
         });
     }
 
@@ -30,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('debts');
+        Schema::dropIfExists('files');
     }
 };

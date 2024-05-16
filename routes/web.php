@@ -48,51 +48,6 @@ Route::controller(AuthController::class)
 
 // rotas protegidas
 Route::middleware("checkAuth")->group(function () {
-    Route::get("insert", function () {
-        $userId = auth()->id();
-        Identifier::factory(100)->create(["user_id" => $userId]);
-        QuickEntry::factory(100)->create(["user_id" => $userId]);
-        QuickLeave::factory(100)->create(["user_id" => $userId]);
-        Debt::factory(100)->create(["user_id" => $userId]);
-        Debtor::factory(100)->create(["user_id" => $userId]);
-        Expense::factory(100)->create(["user_id" => $userId]);
-        Investiment::factory(100)->create(["user_id" => $userId]);
-        Need::factory(100)->create(["user_id" => $userId]);
-    });
-
-    // dashboard
-    Route::controller(DashboardController::class)
-        ->as("dashboard.")
-        ->group(function () {
-            Route::get("/", "index")->name("index");
-        });
-
-    // entries
-    Route::resource("entradas-rapidas", QuickEntryController::class)
-        ->parameter("entradas-rapidas", "quickEntry")
-        ->names([
-            "index" => "quick-entries.index",
-            "create" => "quick-entries.create",
-            "store" => "quick-entries.store",
-            "show" => "quick-entries.show",
-            "edit" => "quick-entries.edit",
-            "update" => "quick-entries.update",
-            "destroy" => "quick-entries.destroy",
-        ]);
-
-    // leaves
-    Route::resource("saidas-rapidas", QuickLeaveController::class)
-        ->parameter("saidas-rapidas", "quickLeave")
-        ->names([
-            "index" => "quick-leaves.index",
-            "create" => "quick-leaves.create",
-            "store" => "quick-leaves.store",
-            "show" => "quick-leaves.show",
-            "edit" => "quick-leaves.edit",
-            "update" => "quick-leaves.update",
-            "destroy" => "quick-leaves.destroy",
-        ]);
-
     // expenses
     Route::resource("despesas", ExpenseController::class)
         ->parameter("despesas", "expense")

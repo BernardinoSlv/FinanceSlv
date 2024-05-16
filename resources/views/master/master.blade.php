@@ -523,6 +523,29 @@
                                 trending_up
                             </span>
                         </div>
+                        <div class="menu-title">Simples</div>
+                    </a>
+                    <ul>
+                        <li>
+                            <a>
+                                <span class="material-symbols-outlined">arrow_right</span>
+                                Criar
+                            </a>
+                        </li>
+                        <li>
+                            <a>
+                                <span class="material-symbols-outlined">arrow_right</span>
+                                Ver tudo
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                {{-- <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><span class="material-symbols-outlined ">
+                                trending_up
+                            </span>
+                        </div>
                         <div class="menu-title">Entradas rápidas</div>
                     </a>
                     <ul>
@@ -649,7 +672,7 @@
                                 Ver tudo</a>
                         </li>
                     </ul>
-                </li>
+                </li> --}}
                 <li class="menu-label">Contatos</li>
                 <li>
                     <a href="javascript:;" class="has-arrow">

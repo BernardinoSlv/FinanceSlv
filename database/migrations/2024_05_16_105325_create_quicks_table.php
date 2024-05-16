@@ -11,18 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('quick_entries', function (Blueprint $table) {
+        Schema::create('quicks', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger("user_id");
-            $table->unsignedBigInteger("identifier_id");
-            $table->string("title");
+            $table->foreignId("user_id")->references("id")->on("users");
+            $table->foreignId("identifier_id")->nullable()
+                ->references("id")->on("identifiers");
+            $table->string("title")->nullable();
             $table->text("description")->nullable();
-            $table->decimal("amount");
             $table->timestamps();
             $table->softDeletes();
-
-            $table->foreign("user_id")->references("id")->on("users");
-            $table->foreign("identifier_id")->references("id")->on("identifiers");
         });
     }
 
@@ -31,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('quick_entries');
+        Schema::dropIfExists('quicks');
     }
 };

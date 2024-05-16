@@ -11,7 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('movements', function (Blueprint $table) {
+        Schema::create('identifiers', function (Blueprint $table) {
+            $table->id();
+            $table->string("name");
+            $table->string("avatar")->nullable();
+            $table->text("description")->nullable();
+            $table->boolean("status")->nullable()->default(1);
+            $table->timestamps();
             $table->softDeletes();
         });
     }
@@ -21,8 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('movements', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        Schema::dropIfExists('quicks');
     }
 };
