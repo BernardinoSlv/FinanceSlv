@@ -47,4 +47,39 @@ class MovementTest extends TestCase
 
         $this->assertEquals($user->id, $movement->user->id);
     }
+
+    /**
+     * deve retornar o model Quick
+     */
+    public function test_movementable_method_using_quick(): void
+    {
+        Quick::factory(2)->create();
+
+        $quick = Quick::factory()->create();
+        $movement = Movement::factory()->create([
+            "movementable_type" => Quick::class,
+            "movementable_id" => $quick
+        ]);
+
+        $this->assertInstanceOf(Quick::class, $movement->movementable);
+        $this->assertEquals($quick->id, $movement->movementable->id);
+    }
+
+    /**
+     * deve retornar o model Quick mesmo deletado
+     */
+    public function test_movementable_method_using_trashed_quick(): void
+    {
+        Quick::factory(2)->create();
+        Quick::factory(2)->trashed()->create();
+
+        $quick = Quick::factory()->trashed()->create();
+        $movement = Movement::factory()->create([
+            "movementable_type" => Quick::class,
+            "movementable_id" => $quick
+        ]);
+
+        $this->assertInstanceOf(Quick::class, $movement->movementable);
+        $this->assertEquals($quick->id, $movement->movementable->id);
+    }
 }
