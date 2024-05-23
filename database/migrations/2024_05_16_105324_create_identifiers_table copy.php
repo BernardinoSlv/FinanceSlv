@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string("name");
             $table->string("avatar")->nullable();
             $table->text("description")->nullable();
-            $table->boolean("status")->nullable()->default(1);
+            $table->boolean("status")->default(1);
             $table->timestamps();
             $table->softDeletes();
         });
