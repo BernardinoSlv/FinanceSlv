@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Models;
 
+use App\Models\Identifier;
 use App\Models\Movement;
 use App\Models\Quick;
 use App\Models\User;
@@ -81,5 +82,44 @@ class MovementTest extends TestCase
 
         $this->assertInstanceOf(Quick::class, $movement->movementable);
         $this->assertEquals($quick->id, $movement->movementable->id);
+    }
+
+    /**
+     * deve retornar nenhum movement
+     */
+    public function test_scope_by_identifier_method_without_movements_to_identifier(): void
+    {
+        $identifier = Identifier::factory()->create();
+        Movement::factory(2)->create([
+            "movementable_type" => Quick::class,
+            "movementable_id" => Quick::factory()->create([])
+        ]);
+
+        $movements = Movement::byIdentifier($identifier->id)->get();
+
+        $this->assertCount(0, $movements);
+    }
+
+    /**
+     * deve retornar 2 Movement
+     */
+    public function test_scope_by_identifier_method(): void
+    {
+        Movement::factory(2)->create([
+            "movementable_type" => Quick::class,
+            "movementable_id" => Quick::factory()->create([])
+        ]);
+
+        $identifier = Identifier::factory()->create();
+        Movement::factory(2)->create([
+            "movementable_type" => Quick::class,
+            "movementable_id" => Quick::factory()->create([
+                "identifier_id" => $identifier
+            ])
+        ]);
+
+        $movements = Movement::byIdentifier($identifier->id)->get();
+
+        $this->assertCount(2, $movements);
     }
 }
