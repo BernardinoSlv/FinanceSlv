@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Entry;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -21,7 +20,9 @@ class MovementFactory extends Factory
         return [
             "user_id" => User::factory()->create(),
             // "movementable_type" => ,
-            // "movementable_id" =>
+            // "movementable_id" => ,
+            "type" => "I",
+            "amount" => 1000.00,
         ];
     }
 }
