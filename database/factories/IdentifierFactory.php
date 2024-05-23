@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,6 +18,7 @@ class IdentifierFactory extends Factory
     public function definition(): array
     {
         return [
+            "user_id" => User::factory()->create(),
             "name" => fake()->name() . rand(0, 100) . rand(0, 100) . time(),
             "avatar" => "test.jpg",
             "description" => fake()->text(100),

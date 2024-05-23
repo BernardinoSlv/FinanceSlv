@@ -19,6 +19,8 @@ class FileTest extends TestCase
      */
     public function test_user_method(): void
     {
+        User::factory(2)->create();
+
         $user = User::factory()->create();
         $file = File::factory()->create([
             "user_id" => $user,
@@ -34,6 +36,9 @@ class FileTest extends TestCase
      */
     public function test_user_method_trashed_user(): void
     {
+        User::factory(2)->create();
+        User::factory(2)->trashed()->create();
+
         $user = User::factory()->trashed()->create();
         $file = File::factory()->create([
             "user_id" => $user,
@@ -84,7 +89,7 @@ class FileTest extends TestCase
         $this->assertEquals($movement->id, $file->fileable->id);
     }
 
-     /**
+    /**
      * deve retornar o model mesmo deletado
      */
     public function test_fileable_method_using_trashed_quick(): void
