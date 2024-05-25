@@ -12,6 +12,13 @@ class Quick extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $fillable = [
+        "user_id",
+        "identifier_id",
+        "title",
+        "description"
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, "user_id", "id")->withTrashed();

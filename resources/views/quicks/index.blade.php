@@ -93,6 +93,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th>#</th>
+                                <th>Tipo</th>
                                 <th>Título</th>
                                 <th>Valor</th>
                                 <th>Identificador</th>
@@ -106,10 +107,13 @@
                                     <td>
                                         <strong>{{ $quick->id }}</strong>
                                     </td>
+                                    <td>
+                                        <x-movement-type :movement="$quick->movement" />
+                                    </td>
                                     <td>{{ $quick->title }}</td>
                                     <td>R$ {{ $quick->movement?->amount }}</td>
                                     <td>
-                                        <a href="javascript:;">{{ $quick->identifier->name }}</a>
+                                        <a href="javascript:;">{{ $quick->identifier?->name }}</a>
                                     </td>
                                     <td>
                                         {{ $quick->created_at }}

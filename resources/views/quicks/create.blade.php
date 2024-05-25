@@ -1,5 +1,5 @@
 @php
-    use App\Enums\QuickTypeEnum;
+    use App\Enums\MovementTypeEnum;
 @endphp
 
 @extends('master.master')
@@ -33,13 +33,13 @@
                                 <h5 class="mb-2">Tipo</h5>
                                 <div class="d-flex gap-3">
                                     <div class="form-check">
-                                        <input type="radio" name="type" id="in" class="form-check-input"
-                                            @checked(old('type') === QuickTypeEnum::IN->value || !old('type'))>
+                                        <input type="radio" name="type" value="{{ MovementTypeEnum::IN->value }}"
+                                            id="in" class="form-check-input" @checked(old('type') === MovementTypeEnum::IN->value || !old('type'))>
                                         <label for="in">Entrada</label>
                                     </div>
                                     <div class="form-check">
-                                        <input type="radio" name="type" id="out" class="form-check-input"
-                                            @checked(old('type') === QuickTypeEnum::OUT->value)>
+                                        <input type="radio" name="type" value="{{ MovementTypeEnum::OUT->value }}"
+                                            id="out" class="form-check-input" @checked(old('type') === MovementTypeEnum::OUT->value)>
                                         <label for="out">Saída</label>
                                     </div>
                                 </div>

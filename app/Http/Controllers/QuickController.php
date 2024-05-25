@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Alert;
 use App\Http\Requests\StoreQuickRequest;
 use App\Http\Requests\UpdateQuickRequest;
 use App\Models\Quick;
+use Src\Parsers\RealToFloatParser;
 
 class QuickController extends Controller
 {
@@ -17,9 +19,11 @@ class QuickController extends Controller
          * @var User
          */
         $user =  auth()->user();
-        $paginator = $user->quicks()->with(["movement", "identifier"])->paginate(
-            request("per_page", 10)
-        )
+        $paginator = $user->quicks()
+            ->orderBy("created_at", "desc")
+            ->with(["movement", "identifier"])->paginate(
+                request("per_page", 10)
+            )
             ->withQueryString();
 
         return view("quicks.index", compact("paginator"));
@@ -44,7 +48,19 @@ class QuickController extends Controller
      */
     public function store(StoreQuickRequest $request)
     {
-        //
+
+        $quick = Quick::query()->create([
+            ...$request->validated(),
+            "user_id" => auth()->id()
+        ]);
+        $quick->movement()->create([
+            ...$request->validated(),
+            "amount" => RealToFloatParser::parse($request->input("amount")),
+            "user_id" => auth()->id()
+        ]);
+
+        return redirect()->route("quicks.index")
+            ->with(Alert::success("Registro criado."));
     }
 
     /**

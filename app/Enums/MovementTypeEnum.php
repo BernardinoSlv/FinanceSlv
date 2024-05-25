@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum QuickTypeEnum: string
+enum MovementTypeEnum: string
 {
     case IN = "in";
 
