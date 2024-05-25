@@ -52,6 +52,7 @@ class User extends Authenticatable
 
     public function movements(): HasMany
     {
+        return $this->hasMany(Movement::class, "user_id", "id");
     }
 
     public function quicks(): HasMany
