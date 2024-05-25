@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Models;
 
+use App\Models\File;
 use App\Models\Identifier;
 use App\Models\Movement;
 use App\Models\Quick;
@@ -99,5 +100,49 @@ class UserTest extends TestCase
         Quick::factory(2)->create(["user_id" => $user]);
 
         $this->assertCount(2, $user->quicks);
+    }
+
+    /**
+     * deve retornar uma coleção vazia
+     */
+    public function test_files_method_without_file(): void
+    {
+        File::factory(2)->create([
+            "fileable_type" => Movement::class,
+            "fileable_id" => Movement::factory()->create([
+                "movementable_type" => Quick::class,
+                "movementable_id" => Quick::factory()->create()
+            ])
+        ]);
+
+        $user = User::factory()->create();
+
+        $this->assertCount(0, $user->files);
+    }
+
+    /**
+     * deve retornar 2 File
+     */
+    public function test_files_method(): void
+    {
+        File::factory(2)->create([
+            "fileable_type" => Movement::class,
+            "fileable_id" => Movement::factory()->create([
+                "movementable_type" => Quick::class,
+                "movementable_id" => Quick::factory()->create()
+            ])
+        ]);
+
+        $user = User::factory()->create();
+        File::factory(2)->create([
+            "user_id" => $user,
+            "fileable_type" => Movement::class,
+            "fileable_id" => Movement::factory()->create([
+                "movementable_type" => Quick::class,
+                "movementable_id" => Quick::factory()->create()
+            ])
+        ]);
+
+        $this->assertCount(2, $user->files);
     }
 }

@@ -62,5 +62,6 @@ class User extends Authenticatable
 
     public function files(): HasMany
     {
+        return $this->hasMany(File::class, "user_id", "id");
     }
 }
