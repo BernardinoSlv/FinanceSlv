@@ -75,4 +75,29 @@ class UserTest extends TestCase
 
         $this->assertCount(2, $user->movements);
     }
+
+    /**
+     * deve retornar uma colleção vazia
+     */
+    public function test_quicks_method_without_quick(): void
+    {
+        Quick::factory(2)->create();
+
+        $user = User::factory()->create();
+
+        $this->assertCount(0, $user->quicks);
+    }
+
+    /**
+     * deve retornar 2 Quick
+     */
+    public function test_quicks_method(): void
+    {
+        Quick::factory(2)->create();
+
+        $user = User::factory()->create();
+        Quick::factory(2)->create(["user_id" => $user]);
+
+        $this->assertCount(2, $user->quicks);
+    }
 }

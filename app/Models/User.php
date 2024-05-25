@@ -57,6 +57,7 @@ class User extends Authenticatable
 
     public function quicks(): HasMany
     {
+        return $this->hasMany(Quick::class, "user_id", "id");
     }
 
     public function files(): HasMany
