@@ -19,6 +19,7 @@ class Quick extends Model
 
     public function identifier(): BelongsTo
     {
+        return $this->belongsTo(Identifier::class, "identifier_id", "id")->withTrashed();
     }
 
     public function movement(): MorphOne

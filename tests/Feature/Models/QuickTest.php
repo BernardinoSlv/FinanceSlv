@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Models;
 
+use App\Models\Identifier;
 use App\Models\Quick;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -41,5 +42,32 @@ class QuickTest extends TestCase
 
         $this->assertSoftDeleted($quick->user);
         $this->assertEquals($user->id, $quick->user->id);
+    }
+
+    /**
+     * deve retornar o Identifier
+     */
+    public function test_identifier_method(): void
+    {
+        Identifier::factory(2)->create();
+
+        $identifier = Identifier::factory()->create();
+        $quick = Quick::factory()->create(["identifier_id" => $identifier]);
+
+        $this->assertEquals($identifier->id, $quick->identifier->id);
+    }
+
+    /**
+     * deve retornar o Identifier mesmo deletado
+     */
+    public function test_identifier_method_trashed_identifier(): void
+    {
+        Identifier::factory(2)->create();
+
+        $identifier = Identifier::factory()->trashed()->create();
+        $quick = Quick::factory()->create(["identifier_id" => $identifier]);
+
+        $this->assertSoftDeleted($quick->identifier);
+        $this->assertEquals($identifier->id, $quick->identifier->id);
     }
 }
