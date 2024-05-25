@@ -30,7 +30,13 @@ class QuickController extends Controller
      */
     public function create()
     {
-        //
+        /**
+         * @var User
+         */
+        $user = auth()->user();
+        $identifiers = $user->identifiers;
+
+        return view("quicks.create", compact("identifiers"));
     }
 
     /**

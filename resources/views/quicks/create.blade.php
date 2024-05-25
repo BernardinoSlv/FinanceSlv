@@ -1,3 +1,7 @@
+@php
+    use App\Enums\QuickTypeEnum;
+@endphp
+
 @extends('master.master')
 
 @section('content')
@@ -7,7 +11,7 @@
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 p-0">
-                    <li class="breadcrumb-item"><a href="{{ route('quick-entries.index') }}">Entradas rápidas</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('quicks.index') }}">Entradas rápidas</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Criar</li>
                 </ol>
             </nav>
@@ -19,12 +23,27 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form method="POST" action="{{ route('quick-entries.store') }}">
+                    <form method="POST" action="{{ route('quicks.store') }}">
                         @csrf
 
                         @include('includes.alerts')
-                        
+
                         <div class="row gy-4">
+                            <div class="col-sm-6">
+                                <h5 class="mb-2">Tipo</h5>
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input type="radio" name="type" id="in" class="form-check-input"
+                                            @checked(old('type') === QuickTypeEnum::IN->value || !old('type'))>
+                                        <label for="in">Entrada</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="radio" name="type" id="out" class="form-check-input"
+                                            @checked(old('type') === QuickTypeEnum::OUT->value)>
+                                        <label for="out">Saída</label>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="col-sm-6">
                                 <h5 class="mb-2">Identificador</h5>
                                 <x-inputs.selects.identifier :identifiers="$identifiers" />

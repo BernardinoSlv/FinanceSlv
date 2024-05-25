@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\Http\Controllers;
 
+use App\Models\Identifier;
 use App\Models\Quick;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -37,6 +39,32 @@ class QuickControllerTest extends TestCase
             ->assertViewIs("quicks.index")
             ->assertViewHas("paginator", function (LengthAwarePaginator $paginator): bool {
                 return $paginator->total() === 2;
+            });
+    }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_create_action_unauthenticated(): void
+    {
+        $this->get(route("quicks.create"))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 200 e view quicks.index
+     */
+    public function test_create_action(): void
+    {
+        Identifier::factory(2)->create();
+
+        $user = User::factory()->has(Identifier::factory(2))->create();
+
+        $this->actingAs($user)->get(route("quicks.create"))
+            ->assertOk()
+            ->assertViewIs("quicks.create")
+            ->assertViewHas("identifiers", function (Collection $identifiers): bool {
+                return $identifiers->count() === 2;
             });
     }
 }

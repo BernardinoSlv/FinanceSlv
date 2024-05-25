@@ -527,7 +527,7 @@
                     </a>
                     <ul>
                         <li>
-                            <a>
+                            <a href="{{ route('quicks.create') }}">
                                 <span class="material-symbols-outlined">arrow_right</span>
                                 Criar
                             </a>
