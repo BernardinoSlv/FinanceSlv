@@ -177,4 +177,65 @@ class QuickControllerTest extends TestCase
             "user_id" => $user->id,
         ]);
     }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_edit_action_unauthenticated(): void
+    {
+        $quick = Quick::factory()->create([]);
+
+        $this->get(route("quicks.edit", $quick))
+            ->assertRedirect(route("auth.index"));
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_nonexistent(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->get(route("quicks.edit", 0))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_trashed(): void
+    {
+        $user = User::factory()->create();
+        $quick = Quick::factory()->trashed()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->get(route("quicks.edit", $quick))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_edit_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $quick = Quick::factory()->create();
+
+        $this->actingAs($user)->get(route("quicks.edit", $quick))
+            ->assertForbidden();
+    }
+
+    /**
+     * deve ter status 200 e view quicks.edit
+     */
+    public function test_edit_action(): void
+    {
+        $user = User::factory()->create();
+        $quick = Quick::factory()->create(["user_id" => $user]);
+
+        $this->actingAs($user)->get(route("quicks.edit", $quick))
+            ->assertOk()
+            ->assertViewIs("quicks.edit")
+            ->assertViewHas("identifiers")
+            ->assertViewHas("quick", fn (Quick $actualQuick): bool => $quick->id === $actualQuick->id);
+    }
 }

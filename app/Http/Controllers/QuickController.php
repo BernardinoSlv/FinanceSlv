@@ -6,6 +6,8 @@ use App\Helpers\Alert;
 use App\Http\Requests\StoreQuickRequest;
 use App\Http\Requests\UpdateQuickRequest;
 use App\Models\Quick;
+use App\Models\User;
+use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
 class QuickController extends Controller
@@ -68,7 +70,6 @@ class QuickController extends Controller
      */
     public function show(Quick $quick)
     {
-        //
     }
 
     /**
@@ -76,7 +77,17 @@ class QuickController extends Controller
      */
     public function edit(Quick $quick)
     {
-        //
+        if (Gate::denies("quick-edit", $quick)) {
+            abort(403);
+        }
+
+        /**
+         * @var User
+         */
+        $user = auth()->user();
+        $identifiers = $user->identifiers;
+
+        return view("quicks.edit", compact("quick", "identifiers"));
     }
 
     /**
