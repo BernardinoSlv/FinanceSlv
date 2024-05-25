@@ -52,36 +52,4 @@ abstract class BaseRepository implements BaseRepositoryContract
         return true;
     }
 
-    public function deletePolymorph(string $polymorphType, int $polymorphId): int
-    {
-        if ($this instanceof EntryRepositoryContract) {
-            return $this->_model->query()->where([
-                "entryable_type" => $polymorphType,
-                "entryable_id" => $polymorphId
-            ])
-                ->delete();
-        } elseif ($this instanceof LeaveRepositoryContract) {
-            return $this->_model->query()->where([
-                "leaveable_type" => $polymorphType,
-                "leaveable_id" => $polymorphId
-            ])
-                ->delete();
-        } elseif ($this instanceof MovementRepositoryContract) {
-            return $this->_model->query()->where([
-                "movementable_type" => $polymorphType,
-                "movementable_id" => $polymorphId
-            ])
-                ->delete();
-        }
-        throw new Error("Method is not allowed");
-    }
-
-    public function forceDelete(int $id): bool
-    {
-        if (!($entity = $this->_model->query()->find($id))) {
-            return false;
-        }
-        $entity->forceDelete();
-        return true;
-    }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IdentifierController;
 use App\Http\Controllers\ExpenseController;
 use Illuminate\Support\Facades\Route;
@@ -29,18 +30,21 @@ Route::controller(AuthController::class)
 
 // rotas protegidas
 Route::middleware("checkAuth")->group(function () {
-    // expenses
-    Route::resource("despesas", ExpenseController::class)
-        ->parameter("despesas", "expense")
-        ->names([
-            "index" => "expenses.index",
-            "create" => "expenses.create",
-            "store" => "expenses.store",
-            "show" => "expenses.show",
-            "edit" => "expenses.edit",
-            "update" => "expenses.update",
-            "destroy" => "expenses.destroy",
-        ]);
+    Route::get("/", [DashboardController::class, "index"])
+        ->name("dashboard.index");
+
+    // // expenses
+    // Route::resource("despesas", ExpenseController::class)
+    //     ->parameter("despesas", "expense")
+    //     ->names([
+    //         "index" => "expenses.index",
+    //         "create" => "expenses.create",
+    //         "store" => "expenses.store",
+    //         "show" => "expenses.show",
+    //         "edit" => "expenses.edit",
+    //         "update" => "expenses.update",
+    //         "destroy" => "expenses.destroy",
+    //     ]);
 
     // identifiers
     Route::resource("identificadores", IdentifierController::class)
