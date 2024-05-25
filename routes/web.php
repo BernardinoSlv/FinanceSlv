@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IdentifierController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\QuickController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,6 +34,18 @@ Route::middleware("checkAuth")->group(function () {
     Route::get("/", [DashboardController::class, "index"])
         ->name("dashboard.index");
 
+    // quicks
+    Route::resource("simples", QuickController::class)
+        ->parameter("simples", "quick")
+        ->names([
+            "index" => "quicks.index",
+            "create" => "quicks.create",
+            "store" => "quicks.store",
+            "show" => "quicks.show",
+            "edit" => "quicks.edit",
+            "update" => "quicks.update",
+            "destroy" => "quicks.destroy",
+        ]);
     // // expenses
     // Route::resource("despesas", ExpenseController::class)
     //     ->parameter("despesas", "expense")

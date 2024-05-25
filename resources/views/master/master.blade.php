@@ -533,7 +533,7 @@
                             </a>
                         </li>
                         <li>
-                            <a>
+                            <a href="{{ route('quicks.index') }}">
                                 <span class="material-symbols-outlined">arrow_right</span>
                                 Ver tudo
                             </a>

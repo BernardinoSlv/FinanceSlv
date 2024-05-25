@@ -79,7 +79,7 @@
         <div class="col-auto">
             <div class="d-flex align-items-center gap-2 justify-content-lg-end">
                 <button class="btn btn-light px-4"><i class="bi bi-box-arrow-right me-2"></i>Export</button>
-                <a class="btn btn-primary px-4" href="{{ route('quick-entries.create') }}"><i
+                <a class="btn btn-primary px-4" href="{{ route('quicks.create') }}"><i
                         class="bi bi-plus-lg me-2"></i>Criar</a>
             </div>
         </div>
@@ -101,18 +101,18 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($quickEntries as $quickEntry)
+                            @foreach ($paginator as $quick)
                                 <tr>
                                     <td>
-                                        <strong>{{ $quickEntry->id }}</strong>
+                                        <strong>{{ $quick->id }}</strong>
                                     </td>
-                                    <td>{{ $quickEntry->title }}</td>
-                                    <td>R$ {{ $quickEntry->amount }}</td>
+                                    <td>{{ $quick->title }}</td>
+                                    <td>R$ {{ $quick->movement?->amount }}</td>
                                     <td>
-                                        <a href="javascript:;">{{ $quickEntry->identifier_id }}</a>
+                                        <a href="javascript:;">{{ $quick->identifier->name }}</a>
                                     </td>
                                     <td>
-                                        {{ $quickEntry->created_at }}
+                                        {{ $quick->created_at }}
                                     </td>
                                     <td>
                                         <div class="dropdown">
@@ -124,11 +124,10 @@
                                             <ul class="dropdown-menu">
                                                 <li>
                                                     <a class="dropdown-item"
-                                                        href="{{ route('quick-entries.edit', $quickEntry) }}">Editar</a>
+                                                        href="{{ route('quicks.edit', $quick) }}">Editar</a>
                                                 </li>
                                                 <li>
-                                                    <form action="{{ route('quick-entries.destroy', $quickEntry) }}"
-                                                        method="POST">
+                                                    <form action="{{ route('quicks.destroy', $quick) }}" method="POST">
                                                         @method('DELETE')
                                                         @csrf
 
@@ -149,8 +148,10 @@
         <div class="card-footer">
             <nav class="">
                 <ul class="pagination pagination-sm justify-content-end">
-                    <li class="page-item"><a href="" class="page-link">Anterior</a></li>
-                    <li class="page-item"><a href="" class="page-link">Próximo</a></li>
+                    <li class="page-item {{ $paginator->previousPageUrl() ?: 'disabled' }}"><a
+                            href="{{ $paginator->previousPageUrl() }}" class="page-link">Anterior</a></li>
+                    <li class="page-item {{ $paginator->nextPageUrl() ?: 'disabled' }}"><a
+                            href="{{ $paginator->nextPageUrl() }}" class="page-link">Próximo</a></li>
                 </ul>
             </nav>
         </div>
