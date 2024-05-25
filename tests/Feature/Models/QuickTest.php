@@ -3,6 +3,7 @@
 namespace Tests\Feature\Models;
 
 use App\Models\Identifier;
+use App\Models\Movement;
 use App\Models\Quick;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -69,5 +70,40 @@ class QuickTest extends TestCase
 
         $this->assertSoftDeleted($quick->identifier);
         $this->assertEquals($identifier->id, $quick->identifier->id);
+    }
+
+    /**
+     * deve retornar null
+     */
+    public function test_movement_method_without_movement(): void
+    {
+        Movement::factory(2)->create([
+            "movementable_type" => Quick::class,
+            "movementable_id" => Quick::factory()->create()
+        ]);
+
+        $quick = Quick::factory()->create();
+
+        $this->assertNull($quick->movement);
+    }
+
+    /**
+     * deve retornar o Movement
+     */
+    public function test_movement_method(): void
+    {
+        Movement::factory(2)->create([
+            "movementable_type" => Quick::class,
+            "movementable_id" => Quick::factory()->create()
+        ]);
+
+        $quick = Quick::factory()->create();
+        $movement = Movement::factory()->create([
+            "movementable_type" => Quick::class,
+            "movementable_id" => $quick
+        ]);
+
+        $this->assertInstanceOf(Movement::class, $quick->movement);
+        $this->assertEquals($movement->id, $quick->movement->id);
     }
 }

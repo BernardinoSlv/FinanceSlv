@@ -24,5 +24,6 @@ class Quick extends Model
 
     public function movement(): MorphOne
     {
+        return $this->morphOne(Movement::class, "movementable");
     }
 }
