@@ -11,7 +11,7 @@
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 p-0">
-                    <li class="breadcrumb-item"><a href="{{ route('quicks.index') }}">Entradas rápidas</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('debts.index') }}">Dívidas</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Criar</li>
                 </ol>
             </nav>
@@ -23,27 +23,12 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form method="POST" action="{{ route('quicks.store') }}">
+                    <form method="POST" action="{{ route('debts.store') }}">
                         @csrf
 
                         @include('includes.alerts')
 
                         <div class="row gy-4">
-                            <div class="col-sm-6">
-                                <h5 class="mb-2">Tipo</h5>
-                                <div class="d-flex gap-3">
-                                    <div class="form-check">
-                                        <input type="radio" name="type" value="{{ MovementTypeEnum::IN->value }}"
-                                            id="in" class="form-check-input" @checked(old('type') === MovementTypeEnum::IN->value || !old('type'))>
-                                        <label for="in">Entrada</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input type="radio" name="type" value="{{ MovementTypeEnum::OUT->value }}"
-                                            id="out" class="form-check-input" @checked(old('type') === MovementTypeEnum::OUT->value)>
-                                        <label for="out">Saída</label>
-                                    </div>
-                                </div>
-                            </div>
                             <div class="col-sm-6">
                                 <h5 class="mb-2">Identificador</h5>
                                 <x-inputs.selects.identifier :identifiers="$identifiers" />
@@ -57,6 +42,15 @@
                                 <h5 class="mb-2">Valor</h5>
                                 <input type="text" name="amount" value="{{ old('amount') }}" class="form-control">
                                 <div class="form-text"><strong>Ex</strong>: 1.599,00</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <h5 class="mb-2">Parcelas <small class="text-muted">(Opcional)</small></h5>
+                                <input type="number" name="installments" value="{{ old('installments') }}"
+                                    class="form-control">
+                            </div>
+                            <div class="col-sm-6">
+                                <h5 class="mb-2">Data de vencimento</h5>
+                                <input type="date" name="due_date" value="{{ old('due_date') }}" class="form-control">
                             </div>
                             <div class="col-12">
                                 <h5 class="mb-2">Descrição</h5>

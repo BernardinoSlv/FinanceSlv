@@ -12,6 +12,15 @@ class Debt extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $fillable = [
+        "identifier_id",
+        "title",
+        "description",
+        "amount",
+        "installments",
+        "due_date"
+    ];
+
     protected $casts = [
         "due_date" => "date"
     ];

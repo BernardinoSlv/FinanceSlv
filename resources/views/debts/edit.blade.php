@@ -11,7 +11,7 @@
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 p-0">
-                    <li class="breadcrumb-item"><a href="{{ route('quicks.index') }}">Entradas rápidas</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('debts.index') }}">Dívidas</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Editar</li>
                 </ol>
             </nav>

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Alert;
 use App\Http\Requests\StoreDebtRequest;
 use App\Http\Requests\UpdateDebtRequest;
 use App\Models\Debt;
+use Src\Parsers\RealToFloatParser;
 
 class DebtController extends Controller
 {
@@ -24,7 +26,9 @@ class DebtController extends Controller
      */
     public function create()
     {
-        //
+        $identifiers = auth()->user()->identifiers;
+
+        return view("debts.create", compact("identifiers"));
     }
 
     /**
@@ -32,7 +36,16 @@ class DebtController extends Controller
      */
     public function store(StoreDebtRequest $request)
     {
-        //
+        $debt = new Debt([
+            ...$request->validated(),
+            "amount" => RealToFloatParser::parse($request->input('amount'))
+        ]);
+        $debt->user_id = auth()->id();
+        $debt->save();
+
+        return redirect()->route("debts.index")->with(
+            Alert::success("Dívida criada com sucesso.")
+        );
     }
 
     /**
