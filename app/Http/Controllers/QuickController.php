@@ -98,15 +98,18 @@ class QuickController extends Controller
         if (Gate::denies("quick-edit", $quick)) {
             abort(403);
         }
-
         $quick->fill($request->validated());
         $quick->save();
 
-        $quick->movement->fill([
+        $movement = $quick->movement()->withTrashed()->first();
+        if ($movement->trashed()) {
+            $movement->restore();
+        }
+
+        $movement->fill([
             ...$request->validated(),
             'amount' => RealToFloatParser::parse($request->input('amount'))
-        ]);
-        $quick->movement->save();
+        ])->save();
 
 
         return redirect()->route("quicks.edit", $quick)

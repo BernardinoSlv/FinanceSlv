@@ -83,6 +83,11 @@ class MovementController extends Controller
      */
     public function destroy(Movement $movement)
     {
-        //
+        if (Gate::denies("movement-edit", $movement)) abort(403);
+
+        $movement->delete();
+
+        return redirect()->route("movements.index")
+            ->with(Alert::success("Movimentação deletada com sucesso."));
     }
 }

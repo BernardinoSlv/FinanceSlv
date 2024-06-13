@@ -182,4 +182,55 @@ class MovementControllerTest extends TestCase
             "amount" => 100.00
         ]);
     }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_destroy_action_unauthenticated(): void
+    {
+        $movement = Movement::factory()->for(Quick::factory(), "movementable")->create();
+
+        $this->delete(route("movements.destroy", $movement))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_nonexistent(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->delete(route("movements.destroy", 0))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_destroy_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $movement = Movement::factory()->for(Quick::factory(), "movementable")->create();
+
+        $this->actingAs($user)->delete(route("movements.destroy", $movement))
+            ->assertForbidden();
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_destroy_action(): void
+    {
+        $user = User::factory()->create();
+        $movement = Movement::factory()
+            ->for($user)
+            ->for(Quick::factory(), "movementable")
+            ->create();
+
+        $this->actingAs($user)->delete(route('movements.destroy', $movement))
+            ->assertRedirect(route("movements.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertSoftDeleted($movement);
+    }
 }
