@@ -12,6 +12,10 @@ class Debt extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $casts = [
+        "due_date" => "date"
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, "user_id", "id")->withTrashed();
