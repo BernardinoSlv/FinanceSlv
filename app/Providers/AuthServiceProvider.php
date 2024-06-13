@@ -47,5 +47,9 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define("movement-edit", function (User $user, Movement $movement): bool {
             return $user->id === $movement->user_id;
         });
+
+        Gate::define("debt-edit", function (User $user, Debt $debt): bool {
+            return $user->id === $debt->user_id;
+        });
     }
 }

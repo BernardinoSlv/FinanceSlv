@@ -6,6 +6,7 @@ use App\Helpers\Alert;
 use App\Http\Requests\StoreDebtRequest;
 use App\Http\Requests\UpdateDebtRequest;
 use App\Models\Debt;
+use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
 class DebtController extends Controller
@@ -16,6 +17,7 @@ class DebtController extends Controller
     public function index()
     {
         $debts = auth()->user()->debts()
+            ->orderBy("id", "desc")
             ->paginate();
 
         return view("debts.index", compact("debts"));
@@ -26,7 +28,7 @@ class DebtController extends Controller
      */
     public function create()
     {
-        $identifiers = auth()->user()->identifiers;
+        $identifiers = auth()->user()->identifiers()->orderBy('name')->orderBy("id")->get();
 
         return view("debts.create", compact("identifiers"));
     }
@@ -53,7 +55,6 @@ class DebtController extends Controller
      */
     public function show(Debt $debt)
     {
-        //
     }
 
     /**
@@ -61,7 +62,16 @@ class DebtController extends Controller
      */
     public function edit(Debt $debt)
     {
-        //
+        if (Gate::denies("debt-edit", $debt)) {
+            abort(403);
+        }
+
+        $identifiers = auth()->user()->identifiers()
+            ->orderBy("name")
+            ->orderBy("id")
+            ->get();
+
+        return view("debts.edit", compact("debt", "identifiers"));
     }
 
     /**
@@ -69,7 +79,17 @@ class DebtController extends Controller
      */
     public function update(UpdateDebtRequest $request, Debt $debt)
     {
-        //
+        if (Gate::denies("debt-edit", $debt)) {
+            abort(403);
+        }
+
+        $debt->fill([
+            ...$request->validated(),
+            "amount" => RealToFloatParser::parse($request->input("amount"))
+        ])->save();
+
+        return redirect()->route("debts.edit", $debt)
+            ->with(Alert::success("Dívida atualizada com sucesso."));
     }
 
     /**
@@ -77,6 +97,5 @@ class DebtController extends Controller
      */
     public function destroy(Debt $debt)
     {
-        //
     }
 }

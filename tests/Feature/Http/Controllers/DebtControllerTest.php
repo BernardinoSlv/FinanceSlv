@@ -114,4 +114,138 @@ class DebtControllerTest extends TestCase
             "user_id" => $user->id
         ]);
     }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_edit_action_unauthenticated(): void
+    {
+        $debt = Debt::factory()->create();
+
+        $this->get(route("debts.edit", $debt))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_nonexistent(): void
+    {
+        $user = User::factory()->create();
+
+        $this->get(route("debts.edit", 0))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_edit_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $debt = Debt::factory()->create();
+
+        $this->actingAs($user)->get(route("debts.edit", $debt))
+            ->assertForbidden();
+    }
+
+    /**
+     * deve ter status 200 e view debts.edit
+     */
+    public function test_edit_action(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $debt = $user->debts->first();
+
+        $this->actingAs($user)->get(route("debts.edit", $debt))
+            ->assertOk()
+            ->assertViewIs("debts.edit")
+            ->assertViewHas([
+                "debt",
+                "identifiers"
+            ]);
+    }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_update_action_unauthenticated(): void
+    {
+        $debt = Debt::factory()->create();
+
+        $this->put(route("debts.update", $debt))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_action_nonexistent(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->put(route('debts.update', 0))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve redirecionar com erros de validação
+     */
+    public function test_update_action_without_data(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $debt = $user->debts->first();
+
+        $this->actingAs($user)->put(route("debts.update", $debt))
+            ->assertFound()
+            ->assertSessionHasErrors([
+                "identifier_id",
+                "title",
+                "amount",
+                "due_date"
+            ]);
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_update_action_is_not_owner(): void
+    {
+        $user = User::factory()->has(Identifier::factory())->create();
+        $debt = Debt::factory()->create();
+        $data = Debt::factory()->make([
+            "identifier_id" => $user->identifiers->first(),
+            "amount" => "500,00",
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("debts.update", $debt), $data)
+            ->assertForbidden();
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_update_action(): void
+    {
+        $user = User::factory()
+            ->has(Identifier::factory())
+            ->has(Debt::factory())
+            ->create();
+        $debt = $user->debts->first();
+        $data = Debt::factory()->make([
+            "identifier_id" => $user->identifiers->first(),
+            "amount" => "500,00",
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("debts.update", $debt), $data)
+            ->assertRedirect(route("debts.edit", $debt))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("debts", [
+            ...$data,
+            "due_date" => date("Y-m-d", strtotime($data["due_date"])),
+            "amount" => 500,
+            "user_id" => $user->id,
+            "id" => $debt->id,
+        ]);
+    }
 }

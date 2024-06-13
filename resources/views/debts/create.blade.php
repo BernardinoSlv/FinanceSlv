@@ -36,7 +36,6 @@
                             <div class="col-sm-6">
                                 <h5 class="mb-2">Título</h5>
                                 <input type="text" name="title" value="{{ old('title') }}" class="form-control">
-                                <div class="form-text"><strong>Ex</strong>: hora extra</div>
                             </div>
                             <div class="col-sm-6">
                                 <h5 class="mb-2">Valor</h5>
