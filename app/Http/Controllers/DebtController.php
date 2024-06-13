@@ -6,41 +6,31 @@ use App\Helpers\Alert;
 use App\Http\Requests\StoreDebtRequest;
 use App\Http\Requests\UpdateDebtRequest;
 use App\Models\Debt;
-use App\Repositories\Contracts\DebtRepositoryContract;
-use App\Repositories\Contracts\IdentifierRepositoryContract;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
 class DebtController extends Controller
 {
-    public function __construct(
-        protected DebtRepositoryContract $_debtRepository
-    ) {
-    }
-
-
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $debts = $this->_debtRepository->allByUser(auth()->user()->id);
+        $debts = auth()->user()->debts()
+            ->orderBy("id", "desc")
+            ->paginate();
 
-        return view("debts.index", compact(
-            "debts"
-        ));
+        return view("debts.index", compact("debts"));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create(IdentifierRepositoryContract $identifierRepository)
+    public function create()
     {
-        $identifiers = $identifierRepository->allByUser(auth()->id());
+        $identifiers = auth()->user()->identifiers()->orderBy('name')->orderBy("id")->get();
 
-        return view("debts.create", compact(
-            "identifiers"
-        ));
+        return view("debts.create", compact("identifiers"));
     }
 
     /**
@@ -48,13 +38,15 @@ class DebtController extends Controller
      */
     public function store(StoreDebtRequest $request)
     {
-        $this->_debtRepository->create(auth()->user()->id, [
+        $debt = new Debt([
             ...$request->validated(),
-            "amount" => RealToFloatParser::parse($request->input("amount"))
+            "amount" => RealToFloatParser::parse($request->input('amount'))
         ]);
+        $debt->user_id = auth()->id();
+        $debt->save();
 
         return redirect()->route("debts.index")->with(
-            Alert::success("Registro criado com sucesso.")
+            Alert::success("Dívida criada com sucesso.")
         );
     }
 
@@ -63,23 +55,23 @@ class DebtController extends Controller
      */
     public function show(Debt $debt)
     {
-        //
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(IdentifierRepositoryContract $identifierRepository, Debt $debt)
+    public function edit(Debt $debt)
     {
         if (Gate::denies("debt-edit", $debt)) {
-            abort(404);
+            abort(403);
         }
-        $identifiers = $identifierRepository->allByUser(auth()->id());
 
-        return view("debts.edit", compact(
-            "debt",
-            "identifiers"
-        ));
+        $identifiers = auth()->user()->identifiers()
+            ->orderBy("name")
+            ->orderBy("id")
+            ->get();
+
+        return view("debts.edit", compact("debt", "identifiers"));
     }
 
     /**
@@ -87,17 +79,16 @@ class DebtController extends Controller
      */
     public function update(UpdateDebtRequest $request, Debt $debt)
     {
-        if (Gate::denies("debt-edit", $debt)) {
-            abort(404);
-        }
-        $this->_debtRepository->update($debt->id, [
+        if (Gate::denies("debt-edit", $debt))
+            abort(403);
+
+        $debt->fill([
             ...$request->validated(),
             "amount" => RealToFloatParser::parse($request->input("amount"))
-        ]);
+        ])->save();
 
-        return redirect()->route("debts.index")->with(
-            Alert::success("Registro atualizado com sucesso.")
-        );
+        return redirect()->route("debts.edit", $debt)
+            ->with(Alert::success("Dívida atualizada com sucesso."));
     }
 
     /**
@@ -105,14 +96,12 @@ class DebtController extends Controller
      */
     public function destroy(Debt $debt)
     {
-        if (Gate::denies("debt-edit", $debt)) {
-            abort(404);
-        }
+        if (Gate::denies("debt-edit", $debt))
+            abort(403);
 
-        $this->_debtRepository->delete($debt->id);
+        $debt->delete();
 
-        return redirect()->route("debts.index")->with(
-            Alert::success("Registro removido com sucesso.")
-        );
+        return redirect()->route("debts.index")
+            ->with(Alert::success("Dívida deletada com sucesso."));
     }
 }

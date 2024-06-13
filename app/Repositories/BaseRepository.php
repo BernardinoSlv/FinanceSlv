@@ -35,11 +35,11 @@ abstract class BaseRepository implements BaseRepositoryContract
 
     public function update(int $id, array $attributes): bool
     {
-        if (!($identifier = $this->_model->find($id))) {
+        if (!($entity = $this->_model->query()->find($id))) {
             return false;
         }
-        $identifier->fill($attributes);
-        $identifier->save();
+        $entity->fill($attributes);
+        $entity->save();
         return true;
     }
 
@@ -52,27 +52,4 @@ abstract class BaseRepository implements BaseRepositoryContract
         return true;
     }
 
-    public function deletePolymorph(string $polymorphType, int $polymorphId): int
-    {
-        if ($this instanceof EntryRepositoryContract) {
-            return $this->_model->query()->where([
-                "entryable_type" => $polymorphType,
-                "entryable_id" => $polymorphId
-            ])
-                ->delete();
-        } elseif ($this instanceof LeaveRepositoryContract) {
-            return $this->_model->query()->where([
-                "leaveable_type" => $polymorphType,
-                "leaveable_id" => $polymorphId
-            ])
-                ->delete();
-        } elseif ($this instanceof MovementRepositoryContract) {
-            return $this->_model->query()->where([
-                "movementable_type" => $polymorphType,
-                "movementable_id" => $polymorphId
-            ])
-                ->delete();
-        }
-        throw new Error("Method is not allowed");
-    }
 }

@@ -3,15 +3,10 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DebtController;
-use App\Http\Controllers\DebtorController;
-use App\Http\Controllers\DebtorPaymentController;
-use App\Http\Controllers\DebtPaymentController;
 use App\Http\Controllers\IdentifierController;
-use App\Http\Controllers\QuickEntryController;
 use App\Http\Controllers\ExpenseController;
-use App\Http\Controllers\InvestimentController;
-use App\Http\Controllers\QuickLeaveController;
-use App\Http\Controllers\NeedController;
+use App\Http\Controllers\MovementController;
+use App\Http\Controllers\QuickController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -38,82 +33,32 @@ Route::controller(AuthController::class)
 
 // rotas protegidas
 Route::middleware("checkAuth")->group(function () {
-    // dashboard
-    Route::controller(DashboardController::class)
-        ->as("dashboard.")
-        ->group(function () {
-            Route::get("/", "index")->name("index");
-        });
+    Route::get("/", [DashboardController::class, "index"])
+        ->name("dashboard.index");
 
-    // entries
-    Route::resource("entradas-rapidas", QuickEntryController::class)
-        ->parameter("entradas-rapidas", "quickEntry")
+    // quicks
+    Route::resource("simples", QuickController::class)
+        ->parameter("simples", "quick")
         ->names([
-            "index" => "quick-entries.index",
-            "create" => "quick-entries.create",
-            "store" => "quick-entries.store",
-            "show" => "quick-entries.show",
-            "edit" => "quick-entries.edit",
-            "update" => "quick-entries.update",
-            "destroy" => "quick-entries.destroy",
+            "index" => "quicks.index",
+            "create" => "quicks.create",
+            "store" => "quicks.store",
+            "show" => "quicks.show",
+            "edit" => "quicks.edit",
+            "update" => "quicks.update",
+            "destroy" => "quicks.destroy",
         ]);
-
-    // leaves
-    Route::resource("saidas-rapidas", QuickLeaveController::class)
-        ->parameter("saidas-rapidas", "quickLeave")
+    Route::resource("movimentações", MovementController::class)
+        ->parameter("movimentações", "movement")
         ->names([
-            "index" => "quick-leaves.index",
-            "create" => "quick-leaves.create",
-            "store" => "quick-leaves.store",
-            "show" => "quick-leaves.show",
-            "edit" => "quick-leaves.edit",
-            "update" => "quick-leaves.update",
-            "destroy" => "quick-leaves.destroy",
+            "index" => "movements.index",
+            "create" => "movements.create",
+            "store" => "movements.store",
+            "show" => "movements.show",
+            "edit" => "movements.edit",
+            "update" => "movements.update",
+            "destroy" => "movements.destroy",
         ]);
-
-    // expenses
-    Route::resource("despesas", ExpenseController::class)
-        ->parameter("despesas", "expense")
-        ->names([
-            "index" => "expenses.index",
-            "create" => "expenses.create",
-            "store" => "expenses.store",
-            "show" => "expenses.show",
-            "edit" => "expenses.edit",
-            "update" => "expenses.update",
-            "destroy" => "expenses.destroy",
-        ]);
-
-    // debtors
-    Route::resource("devedores", DebtorController::class)
-        ->parameter("devedores", "debtor")
-        ->names([
-            "index" => "debtors.index",
-            "create" => "debtors.create",
-            "store" => "debtors.store",
-            "show" => "debtors.show",
-            "edit" => "debtors.edit",
-            "update" => "debtors.update",
-            "destroy" => "debtors.destroy",
-        ]);
-    Route::resource("devedores.pagamentos", DebtorPaymentController::class)
-        ->parameters([
-            "devedores" => "debtor",
-            "pagamentos" => "entry"
-        ])
-        ->names([
-            "index" => "debtors.payments.index",
-            "create" => "debtors.payments.create",
-            "store" => "debtors.payments.store",
-            "show" => "debtors.payments.show",
-            "edit" => "debtors.payments.edit",
-            "update" => "debtors.payments.update",
-            "destroy" => "debtors.payments.destroy",
-        ])
-        ->scoped();
-
-
-    // debts
     Route::resource("dividas", DebtController::class)
         ->parameter("dividas", "debt")
         ->names([
@@ -125,46 +70,20 @@ Route::middleware("checkAuth")->group(function () {
             "update" => "debts.update",
             "destroy" => "debts.destroy",
         ]);
-    Route::resource("dividas.pagamentos", DebtPaymentController::class)
-        ->parameters([
-            "dividas" => "debt",
-            "pagamentos" => "leave"
-        ])
-        ->names([
-            "index" => "debts.payments.index",
-            "create" => "debts.payments.create",
-            "store" => "debts.payments.store",
-            "show" => "debts.payments.show",
-            "edit" => "debts.payments.edit",
-            "update" => "debts.payments.update",
-            "destroy" => "debts.payments.destroy",
-        ])->scoped();
+    // // expenses
+    // Route::resource("despesas", ExpenseController::class)
+    //     ->parameter("despesas", "expense")
+    //     ->names([
+    //         "index" => "expenses.index",
+    //         "create" => "expenses.create",
+    //         "store" => "expenses.store",
+    //         "show" => "expenses.show",
+    //         "edit" => "expenses.edit",
+    //         "update" => "expenses.update",
+    //         "destroy" => "expenses.destroy",
+    //     ]);
 
-    // investiments
-    Route::resource("investimentos", InvestimentController::class)
-        ->parameter("investimentos", "investiment")
-        ->names([
-            "index" => "investiments.index",
-            "create" => "investiments.create",
-            "store" => "investiments.store",
-            "show" => "investiments.show",
-            "edit" => "investiments.edit",
-            "update" => "investiments.update",
-            "destroy" => "investiments.destroy",
-        ]);
-
-    Route::resource("necessidades", NeedController::class)
-        ->parameter("necessidades", "need")
-        ->names([
-            "index" => "needs.index",
-            "create" => "needs.create",
-            "store" => "needs.store",
-            "show" => "needs.show",
-            "edit" => "needs.edit",
-            "update" => "needs.update",
-            "destroy" => "needs.destroy",
-        ]);
-
+    // identifiers
     Route::resource("identificadores", IdentifierController::class)
         ->parameter("identificadores", "identifier")
         ->names([

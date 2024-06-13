@@ -5,13 +5,14 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -22,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        "avatar"
     ];
 
     /**
@@ -47,5 +49,25 @@ class User extends Authenticatable
     public function identifiers(): HasMany
     {
         return $this->hasMany(Identifier::class, "user_id", "id");
+    }
+
+    public function movements(): HasMany
+    {
+        return $this->hasMany(Movement::class, "user_id", "id");
+    }
+
+    public function quicks(): HasMany
+    {
+        return $this->hasMany(Quick::class, "user_id", "id");
+    }
+
+    public function files(): HasMany
+    {
+        return $this->hasMany(File::class, "user_id", "id");
+    }
+
+    public function debts(): HasMany
+    {
+        return $this->hasMany(Debt::class, "user_id", "id");
     }
 }

@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Entity>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Identifier>
  */
 class IdentifierFactory extends Factory
 {
@@ -19,9 +19,10 @@ class IdentifierFactory extends Factory
     {
         return [
             "user_id" => User::factory()->create(),
-            "name" => fake()->name() . rand(0, 1000) . rand(0, 1000) . time(),
-            "phone" => fake("pt_BR")->phoneNumber(),
-            "description" => fake()->text()
+            "name" => fake()->name() . rand(0, 100) . rand(0, 100) . time(),
+            "avatar" => "test.jpg",
+            "description" => fake()->text(100),
+            // "status" => 1,
         ];
     }
 }

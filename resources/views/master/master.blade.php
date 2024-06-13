@@ -1,505 +1,924 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
 
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Roksyn - Bootstrap 5 Admin Template</title>
 
-    <meta charset="utf-8" />
-    <title>Dashboard | Finance Slv</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
-    <meta content="Coderthemes" name="author" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <!-- App favicon -->
-    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}">
+    <!--plugins-->
+    <link href="{{ asset('assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/plugins/metismenu/css/metisMenu.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/plugins/simplebar/css/simplebar.css') }}" rel="stylesheet">
+    <!-- loader-->
+    <link href="{{ asset('assets/css/pace.min.css') }}" rel="stylesheet">
+    <script src="{{ asset('assets/js/pace.min.js') }}"></script>
+    <!--Styles-->
+    <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ asset('assets/css/icons.css') }}">
 
-    <!-- App css -->
-    <link href="{{ asset('assets/css/config/default/bootstrap.min.css') }}" rel="stylesheet" type="text/css"
-        id="bs-default-stylesheet" />
-    <link href="{{ asset('assets/css/config/default/app.min.css') }}" rel="stylesheet" type="text/css"
-        id="app-default-stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="{{ asset('assets/css/main.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/dark-theme.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/semi-dark-theme.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/minimal-theme.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/shadow-theme.css') }}" rel="stylesheet">
 
-    <link href="{{ asset('assets/css/config/default/bootstrap-dark.min.css') }}" rel="stylesheet" type="text/css"
-        id="bs-dark-stylesheet" disabled="disabled" />
-    <link href="{{ asset('assets/css/config/default/app-dark.min.css') }}" rel="stylesheet" type="text/css"
-        id="app-dark-stylesheet" disabled="disabled" />
-
-    <!-- icons -->
-    <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
-        integrity="sha512-dPXYcDub/aeb08c63jRq/k6GaKccl256JQy/AnOq7CAnEZ9FzSL9wSbcZkMp4R26vBsMLFYH4kQ67/bbV8XaCQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
-<!-- body start -->
+<body>
 
-<body class="loading"
-    data-layout='{"mode": "dark", "width": "fluid", "menuPosition": "fixed", "sidebar": { "color": "dark", "size": "default", "showuser": true}, "topbar": {"color": "light"}, "showRightSidebarOnPageLoad": true}'>
-
-    <!-- Begin page -->
-    <div id="wrapper">
-
-
-        <!-- Topbar Start -->
-        <div class="navbar-custom">
-            <ul class="list-unstyled topnav-menu float-end mb-0">
-                <li class="dropdown d-inline-block d-lg-none">
-                    <a class="nav-link dropdown-toggle arrow-none waves-effect waves-light" data-bs-toggle="dropdown"
-                        href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                        <i class="fe-search noti-icon"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-lg dropdown-menu-end p-0">
-                        <form class="p-3">
-                            <input type="text" class="form-control" placeholder="Search ..."
-                                aria-label="Recipient's username">
-                        </form>
-                    </div>
+    <!--start header-->
+    <header class="top-header">
+        <nav class="navbar navbar-expand justify-content-between">
+            <div class="btn-toggle-menu">
+                <span class="material-symbols-outlined">menu</span>
+            </div>
+            <div class="d-lg-block d-none search-bar">
+                <button class="btn btn-sm w-100 d-flex align-items-center" data-bs-toggle="modal"
+                    data-bs-target="#exampleModal">
+                    <span class="material-symbols-outlined">search</span>Search
+                </button>
+            </div>
+            <ul class="navbar-nav top-right-menu gap-2">
+                <li class="nav-item d-lg-none d-block" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    <a class="nav-link" href="javascript:;"><span class="material-symbols-outlined">
+                            search
+                        </span></a>
                 </li>
-
-                <li class="dropdown notification-list topbar-dropdown">
-                    <a class="nav-link dropdown-toggle waves-effect waves-light" data-bs-toggle="dropdown"
-                        href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                        <i class="fe-bell noti-icon"></i>
-                        <span class="badge bg-danger rounded-circle noti-icon-badge">9</span>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-end dropdown-lg">
-
-                        <!-- item-->
-                        <div class="dropdown-item noti-title">
-                            <h5 class="m-0">
-                                <span class="float-end">
-                                    <a href="" class="text-dark">
-                                        <small>Clear All</small>
+                <li class="nav-item dark-mode">
+                    <a class="nav-link dark-mode-icon" href="javascript:;"><span
+                            class="material-symbols-outlined">dark_mode</span></a>
+                </li>
+                <li class="nav-item dropdown dropdown-app">
+                    <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" data-bs-toggle="dropdown"
+                        href="javascript:;"><span class="material-symbols-outlined">
+                            apps
+                        </span></a>
+                    <div class="dropdown-menu dropdown-menu-end mt-lg-2 p-0">
+                        <div class="app-container p-2 my-2">
+                            <div class="row gx-0 gy-2 row-cols-3 justify-content-center p-2">
+                                <div class="col">
+                                    <a href="javascript:;">
+                                        <div class="app-box text-center">
+                                            <div class="app-icon">
+                                                <img src="assets/images/icons/slack.png" width="30" alt="">
+                                            </div>
+                                            <div class="app-name">
+                                                <p class="mb-0 mt-1">Slack</p>
+                                            </div>
+                                        </div>
                                     </a>
-                                </span>Notification
-                            </h5>
+                                </div>
+                                <div class="col">
+                                    <a href="javascript:;">
+                                        <div class="app-box text-center">
+                                            <div class="app-icon">
+                                                <img src="assets/images/icons/behance.png" width="30"
+                                                    alt="">
+                                            </div>
+                                            <div class="app-name">
+                                                <p class="mb-0 mt-1">Behance</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a href="javascript:;">
+                                        <div class="app-box text-center">
+                                            <div class="app-icon">
+                                                <img src="assets/images/icons/google-drive.png" width="30"
+                                                    alt="">
+                                            </div>
+                                            <div class="app-name">
+                                                <p class="mb-0 mt-1">Dribble</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a href="javascript:;">
+                                        <div class="app-box text-center">
+                                            <div class="app-icon">
+                                                <img src="assets/images/icons/outlook.png" width="30"
+                                                    alt="">
+                                            </div>
+                                            <div class="app-name">
+                                                <p class="mb-0 mt-1">Outlook</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a href="javascript:;">
+                                        <div class="app-box text-center">
+                                            <div class="app-icon">
+                                                <img src="assets/images/icons/github.png" width="30"
+                                                    alt="">
+                                            </div>
+                                            <div class="app-name">
+                                                <p class="mb-0 mt-1">GitHub</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a href="javascript:;">
+                                        <div class="app-box text-center">
+                                            <div class="app-icon">
+                                                <img src="assets/images/icons/stack-overflow.png" width="30"
+                                                    alt="">
+                                            </div>
+                                            <div class="app-name">
+                                                <p class="mb-0 mt-1">Stack</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a href="javascript:;">
+                                        <div class="app-box text-center">
+                                            <div class="app-icon">
+                                                <img src="assets/images/icons/figma.png" width="30"
+                                                    alt="">
+                                            </div>
+                                            <div class="app-name">
+                                                <p class="mb-0 mt-1">Stack</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a href="javascript:;">
+                                        <div class="app-box text-center">
+                                            <div class="app-icon">
+                                                <img src="assets/images/icons/twitter.png" width="30"
+                                                    alt="">
+                                            </div>
+                                            <div class="app-name">
+                                                <p class="mb-0 mt-1">Twitter</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a href="javascript:;">
+                                        <div class="app-box text-center">
+                                            <div class="app-icon">
+                                                <img src="assets/images/icons/google-calendar.png" width="30"
+                                                    alt="">
+                                            </div>
+                                            <div class="app-name">
+                                                <p class="mb-0 mt-1">Calendar</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a href="javascript:;">
+                                        <div class="app-box text-center">
+                                            <div class="app-icon">
+                                                <img src="assets/images/icons/spotify.png" width="30"
+                                                    alt="">
+                                            </div>
+                                            <div class="app-name">
+                                                <p class="mb-0 mt-1">Spotify</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a href="javascript:;">
+                                        <div class="app-box text-center">
+                                            <div class="app-icon">
+                                                <img src="assets/images/icons/google-photos.png" width="30"
+                                                    alt="">
+                                            </div>
+                                            <div class="app-name">
+                                                <p class="mb-0 mt-1">Photos</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a href="javascript:;">
+                                        <div class="app-box text-center">
+                                            <div class="app-icon">
+                                                <img src="assets/images/icons/pinterest.png" width="30"
+                                                    alt="">
+                                            </div>
+                                            <div class="app-name">
+                                                <p class="mb-0 mt-1">Photos</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a href="javascript:;">
+                                        <div class="app-box text-center">
+                                            <div class="app-icon">
+                                                <img src="assets/images/icons/linkedin.png" width="30"
+                                                    alt="">
+                                            </div>
+                                            <div class="app-name">
+                                                <p class="mb-0 mt-1">linkedin</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a href="javascript:;">
+                                        <div class="app-box text-center">
+                                            <div class="app-icon">
+                                                <img src="assets/images/icons/dribble.png" width="30"
+                                                    alt="">
+                                            </div>
+                                            <div class="app-name">
+                                                <p class="mb-0 mt-1">Dribble</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a href="javascript:;">
+                                        <div class="app-box text-center">
+                                            <div class="app-icon">
+                                                <img src="assets/images/icons/youtube.png" width="30"
+                                                    alt="">
+                                            </div>
+                                            <div class="app-name">
+                                                <p class="mb-0 mt-1">YouTube</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a href="javascript:;">
+                                        <div class="app-box text-center">
+                                            <div class="app-icon">
+                                                <img src="assets/images/icons/google.png" width="30"
+                                                    alt="">
+                                            </div>
+                                            <div class="app-name">
+                                                <p class="mb-0 mt-1">News</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a href="javascript:;">
+                                        <div class="app-box text-center">
+                                            <div class="app-icon">
+                                                <img src="assets/images/icons/envato.png" width="30"
+                                                    alt="">
+                                            </div>
+                                            <div class="app-name">
+                                                <p class="mb-0 mt-1">Envato</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a href="javascript:;">
+                                        <div class="app-box text-center">
+                                            <div class="app-icon">
+                                                <img src="assets/images/icons/safari.png" width="30"
+                                                    alt="">
+                                            </div>
+                                            <div class="app-name">
+                                                <p class="mb-0 mt-1">Safari</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+
+                            </div><!--end row-->
+
                         </div>
-
-                        <div class="noti-scroll" data-simplebar>
-
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item notify-item active">
-                                <div class="notify-icon">
-                                    <img src="{{ asset('assets/images/users/user-1.jpg') }}"
-                                        class="img-fluid rounded-circle" alt="" />
-                                </div>
-                                <p class="notify-details">Cristina Pride</p>
-                                <p class="text-muted mb-0 user-msg">
-                                    <small>Hi, How are you? What about our next meeting</small>
-                                </p>
-                            </a>
-
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item notify-item">
-                                <div class="notify-icon bg-primary">
-                                    <i class="mdi mdi-comment-account-outline"></i>
-                                </div>
-                                <p class="notify-details">Caleb Flakelar commented on Admin
-                                    <small class="text-muted">1 min ago</small>
-                                </p>
-                            </a>
-
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item notify-item">
-                                <div class="notify-icon">
-                                    <img src="{{ asset('assets/images/users/user-4.jpg') }}"
-                                        class="img-fluid rounded-circle" alt="" />
-                                </div>
-                                <p class="notify-details">Karen Robinson</p>
-                                <p class="text-muted mb-0 user-msg">
-                                    <small>Wow ! this admin looks good and awesome design</small>
-                                </p>
-                            </a>
-
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item notify-item">
-                                <div class="notify-icon bg-warning">
-                                    <i class="mdi mdi-account-plus"></i>
-                                </div>
-                                <p class="notify-details">New user registered.
-                                    <small class="text-muted">5 hours ago</small>
-                                </p>
-                            </a>
-
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item notify-item">
-                                <div class="notify-icon bg-info">
-                                    <i class="mdi mdi-comment-account-outline"></i>
-                                </div>
-                                <p class="notify-details">Caleb Flakelar commented on Admin
-                                    <small class="text-muted">4 days ago</small>
-                                </p>
-                            </a>
-
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item notify-item">
-                                <div class="notify-icon bg-secondary">
-                                    <i class="mdi mdi-heart"></i>
-                                </div>
-                                <p class="notify-details">Carlos Crouch liked
-                                    <b>Admin</b>
-                                    <small class="text-muted">13 days ago</small>
-                                </p>
-                            </a>
-                        </div>
-
-                        <!-- All-->
-                        <a href="javascript:void(0);"
-                            class="dropdown-item text-center text-primary notify-item notify-all">
-                            View all
-                            <i class="fe-arrow-right"></i>
-                        </a>
-
                     </div>
                 </li>
-
-                <li class="dropdown notification-list topbar-dropdown">
-                    <a class="nav-link dropdown-toggle nav-user me-0 waves-effect waves-light"
-                        data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false"
-                        aria-expanded="false">
-                        <img src="{{ asset('assets/images/users/user-1.jpg') }}" alt="user-image"
-                            class="rounded-circle")}}">
-                        <span class="pro-user-name ms-1">
-                            Nowak <i class="mdi mdi-chevron-down"></i>
-                        </span>
+                <li class="nav-item dropdown dropdown-large">
+                    <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="javascript:;"
+                        data-bs-toggle="dropdown">
+                        <div class="position-relative">
+                            <span class="notify-badge">8</span>
+                            <span class="material-symbols-outlined">
+                                notifications_none
+                            </span>
+                        </div>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-end profile-dropdown ">
-                        <!-- item-->
-                        <div class="dropdown-header noti-title">
-                            <h6 class="text-overflow m-0">Welcome !</h6>
+                    <div class="dropdown-menu dropdown-menu-end mt-lg-2">
+                        <a href="javascript:;">
+                            <div class="msg-header">
+                                <p class="msg-header-title">Notifications</p>
+                                <p class="msg-header-clear ms-auto">Marks all as read</p>
+                            </div>
+                        </a>
+                        <div class="header-notifications-list">
+                            <a class="dropdown-item" href="javascript:;">
+                                <div class="d-flex align-items-center">
+                                    <div class="notify text-primary border">
+                                        <span class="material-symbols-outlined">
+                                            add_shopping_cart
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="msg-name">New Orders <span class="msg-time float-end">2 min
+                                                ago</span></h6>
+                                        <p class="msg-info">You have recived new orders</p>
+                                    </div>
+                                </div>
+                            </a>
+                            <a class="dropdown-item" href="javascript:;">
+                                <div class="d-flex align-items-center">
+                                    <div class="notify text-danger border">
+                                        <span class="material-symbols-outlined">
+                                            account_circle
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="msg-name">New Customers<span class="msg-time float-end">14 Sec
+                                                ago</span></h6>
+                                        <p class="msg-info">5 new user registered</p>
+                                    </div>
+                                </div>
+                            </a>
+                            <a class="dropdown-item" href="javascript:;">
+                                <div class="d-flex align-items-center">
+                                    <div class="notify text-success border">
+                                        <span class="material-symbols-outlined">
+                                            picture_as_pdf
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="msg-name">24 PDF File<span class="msg-time float-end">19 min
+                                                ago</span></h6>
+                                        <p class="msg-info">The pdf files generated</p>
+                                    </div>
+                                </div>
+                            </a>
+                            <a class="dropdown-item" href="javascript:;">
+                                <div class="d-flex align-items-center">
+                                    <div class="notify text-info border">
+                                        <span class="material-symbols-outlined">
+                                            store
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="msg-name">New Product Approved <span class="msg-time float-end">2
+                                                hrs ago</span></h6>
+                                        <p class="msg-info">Your new product has approved</p>
+                                    </div>
+                                </div>
+                            </a>
+                            <a class="dropdown-item" href="javascript:;">
+                                <div class="d-flex align-items-center">
+                                    <div class="notify text-warning border">
+                                        <span class="material-symbols-outlined">
+                                            event_available
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="msg-name">Time Response <span class="msg-time float-end">28 min
+                                                ago</span></h6>
+                                        <p class="msg-info">5.1 min avarage time response</p>
+                                    </div>
+                                </div>
+                            </a>
+                            <a class="dropdown-item" href="javascript:;">
+                                <div class="d-flex align-items-center">
+                                    <div class="notify text-danger border">
+                                        <span class="material-symbols-outlined">
+                                            forum
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="msg-name">New Comments <span class="msg-time float-end">4 hrs
+                                                ago</span></h6>
+                                        <p class="msg-info">New customer comments recived</p>
+                                    </div>
+                                </div>
+                            </a>
+                            <a class="dropdown-item" href="javascript:;">
+                                <div class="d-flex align-items-center">
+                                    <div class="notify text-primary border">
+                                        <span class="material-symbols-outlined">
+                                            local_florist
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="msg-name">New 24 authors<span class="msg-time float-end">1 day
+                                                ago</span></h6>
+                                        <p class="msg-info">24 new authors joined last week</p>
+                                    </div>
+                                </div>
+                            </a>
+                            <a class="dropdown-item" href="javascript:;">
+                                <div class="d-flex align-items-center">
+                                    <div class="notify text-success border">
+                                        <span class="material-symbols-outlined">
+                                            park
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="msg-name">Your item is shipped <span class="msg-time float-end">5
+                                                hrs
+                                                ago</span></h6>
+                                        <p class="msg-info">Successfully shipped your item</p>
+                                    </div>
+                                </div>
+                            </a>
+                            <a class="dropdown-item" href="javascript:;">
+                                <div class="d-flex align-items-center">
+                                    <div class="notify text-warning border">
+                                        <span class="material-symbols-outlined">
+                                            elevation
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="msg-name">Defense Alerts <span class="msg-time float-end">2 weeks
+                                                ago</span></h6>
+                                        <p class="msg-info">45% less alerts last 4 weeks</p>
+                                    </div>
+                                </div>
+                            </a>
                         </div>
-
-                        <!-- item-->
-                        <a href="contacts-profile.html" class="dropdown-item notify-item">
-                            <i class="fe-user"></i>
-                            <span>My Account</span>
+                        <a href="javascript:;">
+                            <div class="text-center msg-footer">View All</div>
                         </a>
-
-                        <!-- item-->
-                        <a href="auth-lock-screen.html" class="dropdown-item notify-item">
-                            <i class="fe-lock"></i>
-                            <span>Lock Screen</span>
-                        </a>
-
-                        <div class="dropdown-divider"></div>
-
-                        <!-- item-->
-                        <a href="{{ route('auth.logout') }}" class="dropdown-item notify-item">
-                            <i class="fe-log-out"></i>
-                            <span>Sair</span>
-                        </a>
-
                     </div>
                 </li>
-            </ul>
 
-            <!-- LOGO -->
-            <div class="logo-box">
-                <a href="index.html" class="logo logo-light text-center">
-                    <span class="logo-sm">
-                        <img src="{{ asset('assets/images/logo-sm.png') }}" alt="" height="22">
-                    </span>
-                    <span class="logo-lg">
-                        <img src="{{ asset('assets/images/logo-light.png') }}" alt="" height="16">
-                    </span>
-                </a>
-                <a href="index.html" class="logo logo-dark text-center">
-                    <span class="logo-sm">
-                        <img src="{{ asset('assets/images/logo-sm.png') }}" alt="" height="22">
-                    </span>
-                    <span class="logo-lg">
-                        <img src="{{ asset('assets/images/logo-dark.png') }}" alt="" height="16">
-                    </span>
-                </a>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="offcanvas" href="#ThemeCustomizer"><span
+                            class="material-symbols-outlined">
+                            settings
+                        </span></a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <!--end header-->
+
+
+    <!--start sidebar-->
+    <aside class="sidebar-wrapper">
+        <div class="sidebar-header">
+            <div class="logo-icon">
+                <img src="assets/images/logo-icon.png" class="logo-img" alt="">
             </div>
-
-            <ul class="list-unstyled topnav-menu topnav-menu-left mb-0">
-                <li>
-                    <button class="button-menu-mobile disable-btn waves-effect">
-                        <i class="fe-menu"></i>
-                    </button>
-                </li>
-
-                <li>
-                    <h4 class="page-title-main">Dashboard</h4>
-                </li>
-
-            </ul>
-
-            <div class="clearfix"></div>
-
+            <div class="logo-name flex-grow-1">
+                <h5 class="mb-0">Roksyn</h5>
+            </div>
+            <div class="sidebar-close ">
+                <span class="material-symbols-outlined">close</span>
+            </div>
         </div>
-        <!-- end Topbar -->
+        <div class="sidebar-nav" data-simplebar="true">
 
-        <!-- ========== Left Sidebar Start ========== -->
-        <div class="left-side-menu">
-
-            <div class="h-100" data-simplebar>
-
-                <!-- User box -->
-                <div class="user-box text-center">
-
-                    <img src="{{ asset('assets/images/users/user-1.jpg') }}" alt="user-img" title="Mat Helme"
-                        class="rounded-circle img-thumbnail avatar-md">
-                    <div class="dropdown">
-                        <a href="#" class="user-name dropdown-toggle h5 mt-2 mb-1 d-block"
-                            data-bs-toggle="dropdown" aria-expanded="false">{{ auth()->user()->name }}</a>
-                        <div class="dropdown-menu user-pro-dropdown">
-
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item notify-item">
-                                <i class="fe-user me-1"></i>
-                                <span>My Account</span>
-                            </a>
-
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item notify-item">
-                                <i class="fe-settings me-1"></i>
-                                <span>Settings</span>
-                            </a>
-
-                            <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item notify-item">
-                                <i class="fe-lock me-1"></i>
-                                <span>Lock Screen</span>
-                            </a>
-
-                            <!-- item-->
-                            <a href="{{ route('auth.logout') }}" class="dropdown-item notify-item">
-                                <i class="fe-log-out me-1"></i>
-                                <span>Sair</span>
-                            </a>
-
+            <!--navigation-->
+            <ul class="metismenu" id="menu">
+                <li>
+                    <a href="index.html">
+                        <div class="parent-icon"><span class="material-symbols-outlined">home</span>
                         </div>
-                    </div>
-
-                    {{-- <p class="text-muted left-user-info">Admin Head</p> --}}
-
-                    <ul class="list-inline">
-                        <li class="list-inline-item">
-                            <a href="#" class="text-muted left-user-info">
-                                <i class="mdi mdi-cog"></i>
+                        <div class="menu-title">Dashboard</div>
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><span class="material-symbols-outlined">apps</span>
+                        </div>
+                        <div class="menu-title">Application</div>
+                    </a>
+                    <ul>
+                        <li> <a href="app-emailbox.html"><span
+                                    class="material-symbols-outlined">arrow_right</span>Email</a>
+                        </li>
+                        <li> <a href="app-chat-box.html"><span
+                                    class="material-symbols-outlined">arrow_right</span>Chat Box</a>
+                        </li>
+                        <li> <a href="app-file-manager.html"><span
+                                    class="material-symbols-outlined">arrow_right</span>File Manager</a>
+                        </li>
+                        <li> <a href="app-contact-list.html"><span
+                                    class="material-symbols-outlined">arrow_right</span>Contatcs</a>
+                        </li>
+                        <li> <a href="app-to-do.html"><span class="material-symbols-outlined">arrow_right</span>Todo
+                                List</a>
+                        </li>
+                        <li> <a href="app-invoice.html"><span
+                                    class="material-symbols-outlined">arrow_right</span>Invoice</a>
+                        </li>
+                        <li> <a href="app-fullcalender.html"><span
+                                    class="material-symbols-outlined">arrow_right</span>Calendar</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="menu-label">Operações</li>
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><span class="material-symbols-outlined">
+                                account_balance
+                            </span>
+                        </div>
+                        <div class="menu-title">Simples</div>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="{{ route('quicks.create') }}">
+                                <span class="material-symbols-outlined">arrow_right</span>
+                                Criar
                             </a>
                         </li>
-
-                        <li class="list-inline-item">
-                            <a href="{{ route('auth.logout') }}">
-                                <i class="mdi mdi-power"></i>
+                        <li>
+                            <a href="{{ route('quicks.index') }}">
+                                <span class="material-symbols-outlined">arrow_right</span>
+                                Ver tudo
                             </a>
                         </li>
                     </ul>
-                </div>
-
-                <!--- Sidemenu -->
-                <div id="sidebar-menu">
-
-                    <ul id="side-menu">
-
-                        <li class="menu-title">Navigation</li>
-
+                </li>
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><span class="material-symbols-outlined">
+                                account_balance
+                            </span>
+                        </div>
+                        <div class="menu-title">Dívidas</div>
+                    </a>
+                    <ul>
                         <li>
-                            <a href="{{ route('dashboard.index') }}">
-                                <i class="mdi mdi-view-dashboard"></i>
-                                <span> Dashboard </span>
+                            <a href="{{ route('debts.create') }}">
+                                <span class="material-symbols-outlined">arrow_right</span>
+                                Criar
                             </a>
                         </li>
-
                         <li>
-                            <a href="#operations" data-bs-toggle="collapse">
-                                <i class="mdi mdi-database-arrow-left-outline"></i>
-                                <span> Operações </span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <div class="collapse" id="operations">
-                                <ul class="nav-second-level">
-                                    <li>
-                                        <a href="#quick-entries-collapse" data-bs-toggle="collapse">
-                                            <span>Entradas rápidas</span>
-                                            <span class="menu-arrow"></span>
-                                        </a>
-                                        <div class="collapse" id="quick-entries-collapse">
-                                            <ul class="nav-second-level">
-                                                <li>
-                                                    <a href="{{ route('quick-entries.index') }}">Todas</a>
-                                                </li>
-                                                <li>
-                                                    <a href="{{ route('quick-entries.create') }}">Criar</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <a href="#exits-collapse" data-bs-toggle="collapse">
-                                            <span>Saídas rápidas</span>
-                                            <span class="menu-arrow"></span>
-                                        </a>
-                                        <div class="collapse" id="exits-collapse">
-                                            <ul class="nav-second-level">
-                                                <li>
-                                                    <a href="{{ route('quick-leaves.index') }}">Todas</a>
-                                                </li>
-                                                <li>
-                                                    <a href="{{ route('quick-leaves.create') }}">Criar</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <a href="#expenses-collapse" data-bs-toggle="collapse">
-                                            <span>Despesas</span>
-                                            <span class="menu-arrow"></span>
-                                        </a>
-                                        <div class="collapse" id="expenses-collapse">
-                                            <ul class="nav-second-level">
-                                                <li>
-                                                    <a href="{{ route('expenses.index') }}">Todas</a>
-                                                </li>
-                                                <li>
-                                                    <a href="{{ route('expenses.create') }}">Criar</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <a href="#debts-collapse" data-bs-toggle="collapse">
-                                            <span>Dívidas</span>
-                                            <span class="menu-arrow"></span>
-                                        </a>
-                                        <div class="collapse" id="debts-collapse">
-                                            <ul class="nav-second-level">
-                                                <li>
-                                                    <a href="{{ route('debts.index') }}">Todas</a>
-                                                </li>
-                                                <li>
-                                                    <a href="{{ route('debts.create') }}">Criar</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <a href="#debtors-collapse" data-bs-toggle="collapse">
-                                            <span>Devedores</span>
-                                            <span class="menu-arrow"></span>
-                                        </a>
-                                        <div class="collapse" id="debtors-collapse">
-                                            <ul class="nav-second-level">
-                                                <li>
-                                                    <a href="{{ route('debtors.index') }}">Todos</a>
-                                                </li>
-                                                <li>
-                                                    <a href="{{ route('debtors.create') }}">Criar</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <a href="#investiments-collapse" data-bs-toggle="collapse">
-                                            <span>Investimentos</span>
-                                            <span class="menu-arrow"></span>
-                                        </a>
-                                        <div class="collapse" id="investiments-collapse">
-                                            <ul class="nav-second-level">
-                                                <li>
-                                                    <a href="{{ route('investiments.index') }}">Todos</a>
-                                                </li>
-                                                <li>
-                                                    <a href="{{ route('investiments.create') }}">Criar</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <a href="#needs-collapse" data-bs-toggle="collapse">
-                                            <span>Necessidades</span>
-                                            <span class="menu-arrow"></span>
-                                        </a>
-                                        <div class="collapse" id="needs-collapse">
-                                            <ul class="nav-second-level">
-                                                <li>
-                                                    <a href="{{ route('needs.index') }}">Todas</a>
-                                                </li>
-                                                <li>
-                                                    <a href="{{ route('needs.create') }}">Criar</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </li>
-                                </ul>
-                        </li>
-                        <li>
-                            <a href="{{ route('identifiers.index') }}">
-                                <i class="mdi mdi-account-group"></i>
-                                <span> Identificadores </span>
+                            <a href="{{ route('debts.index') }}">
+                                <span class="material-symbols-outlined">arrow_right</span>
+                                Ver tudo
                             </a>
                         </li>
                     </ul>
+                </li>
+                <li>
+                    <a href="{{ route('movements.index') }}" class="">
+                        <div class="parent-icon"><span class="material-symbols-outlined">
+                                account_balance
+                            </span>
+                        </div>
+                        <div class="menu-title">Movimentações</div>
+                    </a>
+                </li>
+                {{-- <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><span class="material-symbols-outlined ">
+                                trending_up
+                            </span>
+                        </div>
+                        <div class="menu-title">Entradas rápidas</div>
+                    </a>
+                    <ul>
+                        <li> <a href="{{ route('quick-entries.create') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
+                                Criar</a>
+                        </li>
+                        <li> <a href="{{ route('quick-entries.index') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
+                                Ver tudo</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><span class="material-symbols-outlined ">
+                                trending_down
+                            </span>
+                        </div>
+                        <div class="menu-title">Saídas rápidas</div>
+                    </a>
+                    <ul>
+                        <li> <a href="{{ route('quick-leaves.create') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
+                                Criar</a>
+                        </li>
+                        <li> <a href="{{ route('quick-leaves.index') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
+                                Ver tudo</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><span class="material-symbols-outlined ">
+                                menu_book
+                            </span>
+                        </div>
+                        <div class="menu-title">Despesas</div>
+                    </a>
+                    <ul>
+                        <li> <a href="{{ route('expenses.create') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
+                                Criar</a>
+                        </li>
+                        <li> <a href="{{ route('expenses.index') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
+                                Ver tudo</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><span class="material-symbols-outlined  ">
+                                credit_card_off
+                            </span>
+                        </div>
+                        <div class="menu-title">Dívidas</div>
+                    </a>
+                    <ul>
+                        <li> <a href="{{ route('debts.create') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
+                                Criar</a>
+                        </li>
+                        <li> <a href="{{ route('debts.index') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
+                                Ver tudo</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><span class="material-symbols-outlined ">
+                                credit_score
+                            </span>
+                        </div>
+                        <div class="menu-title">Devedores</div>
+                    </a>
+                    <ul>
+                        <li> <a href="{{ route('debtors.create') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
+                                Criar</a>
+                        </li>
+                        <li> <a href="{{ route('debtors.index') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
+                                Ver tudo</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><span class="material-symbols-outlined ">
+                                monitoring
+                            </span>
+                        </div>
+                        <div class="menu-title">Investimentos</div>
+                    </a>
+                    <ul>
+                        <li> <a href="{{ route('investiments.create') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
+                                Criar</a>
+                        </li>
+                        <li> <a href="{{ route('investiments.index') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
+                                Ver tudo</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><span class="material-symbols-outlined">
+                                receipt_long
+                            </span>
+                        </div>
+                        <div class="menu-title">Necessidades</div>
+                    </a>
+                    <ul>
+                        <li> <a href="{{ route('needs.create') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
+                                Criar</a>
+                        </li>
+                        <li> <a href="{{ route('needs.index') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
+                                Ver tudo</a>
+                        </li>
+                    </ul>
+                </li> --}}
+                <li class="menu-label">Contatos</li>
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><span class="material-symbols-outlined">
+                                contact_page
+                            </span>
+                        </div>
+                        <div class="menu-title">Identificadores</div>
+                    </a>
+                    <ul>
+                        <li> <a href="{{ route('identifiers.create') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
+                                Criar</a>
+                        </li>
+                        <li> <a href="{{ route('identifiers.index') }}"><span
+                                    class="material-symbols-outlined">arrow_right</span>
+                                Ver tudo</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <!--end navigation-->
 
-                </div>
-                <!-- End Sidebar -->
-
-                <div class="clearfix"></div>
-
-            </div>
-            <!-- Sidebar -left -->
 
         </div>
-        <!-- Left Sidebar End -->
+        <div class="sidebar-bottom dropdown dropup-center dropup">
+            <div class="dropdown-toggle d-flex align-items-center px-3 gap-3 w-100 h-100" data-bs-toggle="dropdown">
+                <div class="user-img">
+                    <img src="assets/images/avatars/01.png" alt="">
+                </div>
+                <div class="user-info">
+                    <h5 class="mb-0 user-name">Jhon Maxwell</h5>
+                    <p class="mb-0 user-designation">UI Engineer</p>
+                </div>
+            </div>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="javascript:;"><span class="material-symbols-outlined me-2">
+                            account_circle
+                        </span><span>Profile</span></a>
+                </li>
+                <li><a class="dropdown-item" href="javascript:;"><span class="material-symbols-outlined me-2">
+                            tune
+                        </span><span>Settings</span></a>
+                </li>
+                <li><a class="dropdown-item" href="javascript:;"><span class="material-symbols-outlined me-2">
+                            dashboard
+                        </span><span>Dashboard</span></a>
+                </li>
+                <li><a class="dropdown-item" href="javascript:;"><span class="material-symbols-outlined me-2">
+                            account_balance
+                        </span><span>Earnings</span></a>
+                </li>
+                <li><a class="dropdown-item" href="javascript:;"><span class="material-symbols-outlined me-2">
+                            cloud_download
+                        </span><span>Downloads</span></a>
+                </li>
+                <li>
+                    <div class="dropdown-divider mb-0"></div>
+                </li>
+                <li><a class="dropdown-item" href="javascript:;"><span class="material-symbols-outlined me-2">
+                            logout
+                        </span><span>Logout</span></a>
+                </li>
+            </ul>
+        </div>
+    </aside>
+    <!--end sidebar-->
 
-        <!-- ============================================================== -->
-        <!-- Start Page Content here -->
-        <!-- ============================================================== -->
 
-        <div class="content-page">
-            <div class="content">
+    <!--start main content-->
+    <main class="page-content">
+        @yield('content')
+    </main>
+    <!--end main content-->
 
-                <!-- Start Content-->
-                <div class="container-fluid">
 
-                    @yield('content')
+    <!--start overlay-->
+    <div class="overlay btn-toggle-menu"></div>
+    <!--end overlay-->
 
-                </div> <!-- container-fluid -->
-
-            </div> <!-- content -->
-
-            <!-- Footer Start -->
-            <footer class="footer">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <a href="#">Finance Slv</a>
+    <!-- Search Modal -->
+    <div class="modal" id="exampleModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header gap-2">
+                    <div class="position-relative popup-search w-100">
+                        <input class="form-control form-control-lg ps-5 border border-3 border-primary" type="search"
+                            placeholder="Search">
+                        <span
+                            class="material-symbols-outlined position-absolute ms-3 translate-middle-y start-0 top-50">search</span>
+                    </div>
+                    <button type="button" class="btn-close d-xl-none" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="search-list">
+                        <p class="mb-1">Html Templates</p>
+                        <div class="list-group">
+                            <a href="javascript:;"
+                                class="list-group-item list-group-item-action active align-items-center d-flex gap-2"><i
+                                    class="bi bi-filetype-html fs-5"></i>Best Html Templates</a>
+                            <a href="javascript:;"
+                                class="list-group-item list-group-item-action align-items-center d-flex gap-2"><i
+                                    class="bi bi-award fs-5"></i>Html5 Templates</a>
+                            <a href="javascript:;"
+                                class="list-group-item list-group-item-action align-items-center d-flex gap-2"><i
+                                    class="bi bi-box2-heart fs-5"></i>Responsive Html5 Templates</a>
+                            <a href="javascript:;"
+                                class="list-group-item list-group-item-action align-items-center d-flex gap-2"><i
+                                    class="bi bi-camera-video fs-5"></i>eCommerce Html Templates</a>
+                        </div>
+                        <p class="mb-1 mt-3">Web Designe Company</p>
+                        <div class="list-group">
+                            <a href="javascript:;"
+                                class="list-group-item list-group-item-action align-items-center d-flex gap-2"><i
+                                    class="bi bi-chat-right-text fs-5"></i>Best Html Templates</a>
+                            <a href="javascript:;"
+                                class="list-group-item list-group-item-action align-items-center d-flex gap-2"><i
+                                    class="bi bi-cloud-arrow-down fs-5"></i>Html5 Templates</a>
+                            <a href="javascript:;"
+                                class="list-group-item list-group-item-action align-items-center d-flex gap-2"><i
+                                    class="bi bi-columns-gap fs-5"></i>Responsive Html5 Templates</a>
+                            <a href="javascript:;"
+                                class="list-group-item list-group-item-action align-items-center d-flex gap-2"><i
+                                    class="bi bi-collection-play fs-5"></i>eCommerce Html Templates</a>
+                        </div>
+                        <p class="mb-1 mt-3">Software Development</p>
+                        <div class="list-group">
+                            <a href="javascript:;"
+                                class="list-group-item list-group-item-action align-items-center d-flex gap-2"><i
+                                    class="bi bi-cup-hot fs-5"></i>Best Html Templates</a>
+                            <a href="javascript:;"
+                                class="list-group-item list-group-item-action align-items-center d-flex gap-2"><i
+                                    class="bi bi-droplet fs-5"></i>Html5 Templates</a>
+                            <a href="javascript:;"
+                                class="list-group-item list-group-item-action align-items-center d-flex gap-2"><i
+                                    class="bi bi-exclamation-triangle fs-5"></i>Responsive Html5 Templates</a>
+                            <a href="javascript:;"
+                                class="list-group-item list-group-item-action align-items-center d-flex gap-2"><i
+                                    class="bi bi-eye fs-5"></i>eCommerce Html Templates</a>
+                        </div>
+                        <p class="mb-1 mt-3">Online Shoping Portals</p>
+                        <div class="list-group">
+                            <a href="javascript:;"
+                                class="list-group-item list-group-item-action align-items-center d-flex gap-2"><i
+                                    class="bi bi-facebook fs-5"></i>Best Html Templates</a>
+                            <a href="javascript:;"
+                                class="list-group-item list-group-item-action align-items-center d-flex gap-2"><i
+                                    class="bi bi-flower2 fs-5"></i>Html5 Templates</a>
+                            <a href="javascript:;"
+                                class="list-group-item list-group-item-action align-items-center d-flex gap-2"><i
+                                    class="bi bi-geo-alt fs-5"></i>Responsive Html5 Templates</a>
+                            <a href="javascript:;"
+                                class="list-group-item list-group-item-action align-items-center d-flex gap-2"><i
+                                    class="bi bi-github fs-5"></i>eCommerce Html Templates</a>
                         </div>
                     </div>
                 </div>
-            </footer>
-            <!-- end Footer -->
-
+            </div>
         </div>
-        <!-- ============================================================== -->
-        <!-- End Page content -->
-        <!-- ============================================================== -->
-
-
     </div>
-    <!-- END wrapper -->
 
-    <!-- Vendor js -->
-    <script src="{{ asset('assets/js/vendor.min.js') }}"></script>
 
-    <!-- knob plugin -->
-    <script src="{{ asset('assets/libs/jquery-knob/jquery.knob.min.js') }}"></script>
+    <!--start theme customization-->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="ThemeCustomizer" aria-labelledby="ThemeCustomizerLable">
+        <div class="offcanvas-header border-bottom">
+            <h5 class="offcanvas-title" id="ThemeCustomizerLable">Theme Customizer</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <h6 class="mb-0">Theme Variation</h6>
+            <hr>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="LightTheme"
+                    value="option1">
+                <label class="form-check-label" for="LightTheme">Light</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="DarkTheme"
+                    value="option2" checked="">
+                <label class="form-check-label" for="DarkTheme">Dark</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="SemiDarkTheme"
+                    value="option3">
+                <label class="form-check-label" for="SemiDarkTheme">Semi Dark</label>
+            </div>
+            <hr>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="MinimalTheme"
+                    value="option3">
+                <label class="form-check-label" for="MinimalTheme">Minimal Theme</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="ShadowTheme"
+                    value="option4">
+                <label class="form-check-label" for="ShadowTheme">Shadow Theme</label>
+            </div>
 
-    <!--Morris Chart-->
-    <script src="{{ asset('assets/libs/morris.js06/morris.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/raphael/raphael.min.js') }}"></script>
+        </div>
+    </div>
+    <!--end theme customization-->
 
-    @yield('js')
 
-    <!-- App js-->
-    <script src="{{ asset('assets/js/app.min.js') }}"></script>
-
+    <!--plugins-->
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js') }}"></script>
+    <script src="{{ asset('assets/plugins/metismenu/js/metisMenu.min.js') }}"></script>
+    <script src="{{ asset('assets/plugins/simplebar/js/simplebar.min.js') }}"></script>
+    <script src="{{ asset('assets/plugins/apex/apexcharts.min.js') }}"></script>
+    <script src="{{ asset('assets/js/index.js') }}"></script>
+    <!--BS Scripts-->
+    <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/js/main.js') }}"></script>
 </body>
 
 </html>
