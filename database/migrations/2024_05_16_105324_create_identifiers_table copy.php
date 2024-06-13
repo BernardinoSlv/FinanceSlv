@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId("user_id")->references("id")->on("users");
             $table->string("name");
+            $table->string("phone")->nullable();
             $table->string("avatar")->nullable();
             $table->text("description")->nullable();
             $table->boolean("status")->default(1);

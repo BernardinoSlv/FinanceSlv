@@ -95,7 +95,22 @@ class QuickController extends Controller
      */
     public function update(UpdateQuickRequest $request, Quick $quick)
     {
-        //
+        if (Gate::denies("quick-edit", $quick)) {
+            abort(403);
+        }
+
+        $quick->fill($request->validated());
+        $quick->save();
+
+        $quick->movement->fill([
+            ...$request->validated(),
+            'amount' => RealToFloatParser::parse($request->input('amount'))
+        ]);
+        $quick->movement->save();
+
+
+        return redirect()->route("quicks.edit", $quick)
+            ->with(Alert::success("Registro atualizado com sucesso"));
     }
 
     /**

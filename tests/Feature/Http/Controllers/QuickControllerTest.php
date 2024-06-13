@@ -4,6 +4,7 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Enums\MovementTypeEnum;
 use App\Models\Identifier;
+use App\Models\Movement;
 use App\Models\Quick;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -237,5 +238,92 @@ class QuickControllerTest extends TestCase
             ->assertViewIs("quicks.edit")
             ->assertViewHas("identifiers")
             ->assertViewHas("quick", fn (Quick $actualQuick): bool => $quick->id === $actualQuick->id);
+    }
+
+    /**deve redirecionar para login */
+    public function test_update_action_unauthenticated(): void
+    {
+        $quick = Quick::factory()->create();
+
+        $this->put(route('quicks.update', $quick))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_action_nonexistente(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->put(route("quicks.update", 0))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve redirecionar com errors de validação
+     */
+    public function test_update_action_without_data(): void
+    {
+        $user = User::factory()->has(Quick::factory())->create();
+        $quick = $user->quicks->first();
+
+        $this->actingAs($user)->put(route("quicks.update", $quick))
+            ->assertFound()
+            ->assertSessionHasErrors([
+                "title",
+                "type",
+                "amount"
+            ]);
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_update_action_is_not_owner(): void
+    {
+        $user = User::factory()->has(Identifier::factory())->create();
+        $quick = Quick::factory()->create();
+        $data = Quick::factory()->make([
+            'identifier_id' => $user->identifiers->first(),
+            "amount" => "500,00",
+            "type" => MovementTypeEnum::IN->value
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("quicks.update", $quick), $data)
+            ->assertForbidden();
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_update_action(): void
+    {
+        $user = User::factory()
+            ->has(Quick::factory()
+                ->has(Movement::factory()))
+            ->has(Identifier::factory())
+            ->create();
+        $quick = $user->quicks->first();
+        $data = Quick::factory()->make([
+            'identifier_id' => $user->identifiers->first(),
+            "amount" => "500,00",
+            "type" => MovementTypeEnum::IN->value
+        ])->toArray();
+
+        $this->actingAs($user)->put(route('quicks.update', $quick), $data)
+            ->assertRedirectToRoute("quicks.edit", $quick)
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("quicks", [
+            "id" => $quick->id,
+            ...Arr::only($data, ['identifier_id', 'title', "description"])
+        ]);
+        $this->assertDatabaseHas('movements', [
+            "id" => $quick->movement->id,
+            ...Arr::only($data, [
+                "type"
+            ]),
+            "amount" => 500.00
+        ]);
     }
 }
