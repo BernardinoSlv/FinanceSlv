@@ -118,6 +118,14 @@ class QuickController extends Controller
      */
     public function destroy(Quick $quick)
     {
-        //
+        if (Gate::denies("quick-edit", $quick)) {
+            abort(403);
+        }
+
+        $quick->movement->delete();
+        $quick->delete();
+
+        return redirect()->route('quicks.index')
+            ->with(Alert::success("Registro deletado com suceso."));
     }
 }

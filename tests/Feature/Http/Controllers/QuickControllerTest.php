@@ -326,4 +326,59 @@ class QuickControllerTest extends TestCase
             "amount" => 500.00
         ]);
     }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_destroy_action_unauthenticated(): void
+    {
+        $quick = Quick::factory()->create();
+
+        $this->delete(route("quicks.destroy", $quick))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_nonexistent(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->delete(route("quicks.destroy", 0))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_destroy_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $quick = Quick::factory()->create();
+
+        $this->actingAs($user)->delete(route("quicks.destroy", $quick))
+            ->assertForbidden();
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_destroy_action(): void
+    {
+        $user = User::factory()
+            ->has(
+                Quick::factory()
+                    ->has(Movement::factory())
+            )
+            ->create();
+        $quick = $user->quicks->first();
+        $movement = $quick->movement;
+
+        $this->actingAs($user)->delete(route("quicks.destroy", $quick))
+            ->assertRedirect(route("quicks.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertSoftDeleted($quick);
+        $this->assertSoftDeleted($movement);
+    }
 }

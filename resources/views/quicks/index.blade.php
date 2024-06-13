@@ -131,12 +131,12 @@
                                                         href="{{ route('quicks.edit', $quick) }}">Editar</a>
                                                 </li>
                                                 <li>
-                                                    <form action="{{ route('quicks.destroy', $quick) }}" method="POST">
+                                                    <form action="{{ route('quicks.destroy', $quick) }}" method="POST"
+                                                        onsubmit="return confirm('O registro será deletado permanentemente!')">
                                                         @method('DELETE')
                                                         @csrf
 
-                                                        <button type="submit" class="dropdown-item"
-                                                            onclick="return confirm('Deseja excluir? ')">Remover</button>
+                                                        <button type="submit" class="dropdown-item">Remover</button>
                                                     </form>
                                                 </li>
                                             </ul>
