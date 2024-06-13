@@ -248,4 +248,52 @@ class DebtControllerTest extends TestCase
             "id" => $debt->id,
         ]);
     }
+
+    /**
+     * deve redirecionar para login
+     */
+    public function test_destroy_action_unauthenticated(): void
+    {
+        $debt = Debt::factory()->create();
+
+        $this->delete(route("debts.destroy", $debt))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_nonexistent(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->delete(route("debts.destroy", 0))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_destroy_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $debt = Debt::factory()->create();
+
+        $this->actingAs($user)->delete(route("debts.destroy", $debt))
+            ->assertForbidden();
+    }
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_destroy_action(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $debt = $user->debts->first();
+
+        $this->actingAs($user)->delete(route('debts.destroy', $debt))
+            ->assertRedirect(route("debts.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertSoftDeleted($debt);
+    }
 }

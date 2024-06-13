@@ -79,9 +79,8 @@ class DebtController extends Controller
      */
     public function update(UpdateDebtRequest $request, Debt $debt)
     {
-        if (Gate::denies("debt-edit", $debt)) {
+        if (Gate::denies("debt-edit", $debt))
             abort(403);
-        }
 
         $debt->fill([
             ...$request->validated(),
@@ -97,5 +96,12 @@ class DebtController extends Controller
      */
     public function destroy(Debt $debt)
     {
+        if (Gate::denies("debt-edit", $debt))
+            abort(403);
+
+        $debt->delete();
+
+        return redirect()->route("debts.index")
+            ->with(Alert::success("Dívida deletada com sucesso."));
     }
 }
