@@ -48,7 +48,7 @@ Route::middleware("checkAuth")->group(function () {
             "destroy" => "quicks.destroy",
         ]);
     Route::resource("movimentações", MovementController::class)
-        ->parameter("movimentações", "quick")
+        ->parameter("movimentações", "movement")
         ->names([
             "index" => "movements.index",
             "create" => "movements.create",

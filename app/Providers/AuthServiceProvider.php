@@ -11,6 +11,7 @@ use App\Models\Entry;
 use App\Models\Expense;
 use App\Models\Investiment;
 use App\Models\Leave;
+use App\Models\Movement;
 use App\Models\Need;
 use App\Models\Quick;
 use App\Models\QuickEntry;
@@ -39,11 +40,12 @@ class AuthServiceProvider extends ServiceProvider
             return $user->id === $quick->user_id;
         });
 
-
-
-
         Gate::define("identifier-edit", function (User $user, Identifier $identifier): bool {
             return $user->id === $identifier->user_id;
+        });
+
+        Gate::define("movement-edit", function (User $user, Movement $movement): bool {
+            return $user->id === $movement->user_id;
         });
     }
 }

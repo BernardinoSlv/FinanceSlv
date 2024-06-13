@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Alert;
 use App\Http\Requests\StoreMovementRequest;
 use App\Http\Requests\UpdateMovementRequest;
 use App\Models\Movement;
+use Illuminate\Support\Facades\Gate;
+use Src\Parsers\RealToFloatParser;
 
 class MovementController extends Controller
 {
@@ -52,7 +55,11 @@ class MovementController extends Controller
      */
     public function edit(Movement $movement)
     {
-        //
+        if (Gate::denies("movement-edit", $movement)) {
+            abort(403);
+        }
+
+        return view("movements.edit", compact('movement'));
     }
 
     /**
@@ -60,7 +67,15 @@ class MovementController extends Controller
      */
     public function update(UpdateMovementRequest $request, Movement $movement)
     {
-        //
+        if (Gate::denies("movement-edit", $movement)) abort(403);
+
+        $movement->fill([
+            ...$request->validated(),
+            "amount" => RealToFloatParser::parse($request->input("amount"))
+        ])->save();
+
+        return redirect()->route("movements.edit", $movement)
+            ->with(Alert::success("Movimentação editada com sucesso."));
     }
 
     /**

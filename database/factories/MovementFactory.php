@@ -23,7 +23,7 @@ class MovementFactory extends Factory
             // "movementable_type" => ,
             // "movementable_id" => ,
             "type" => MovementTypeEnum::IN->value,
-            "amount" => 1000.00,
+            "amount" => rand(1, 1000),
         ];
     }
 }

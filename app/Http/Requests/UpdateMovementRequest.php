@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\MovementTypeEnum;
+use App\Rules\Amount;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateMovementRequest extends FormRequest
 {
@@ -11,7 +14,7 @@ class UpdateMovementRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +25,14 @@ class UpdateMovementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "type" => [
+                "required", Rule::in([
+                    MovementTypeEnum::IN->value,
+                    MovementTypeEnum::OUT->value,
+                ])
+            ],
+            "amount" => ["required", new Amount],
+
         ];
     }
 }
