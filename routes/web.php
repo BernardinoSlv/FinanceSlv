@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IdentifierController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\MovementController;
 use App\Http\Controllers\QuickController;
 use Illuminate\Support\Facades\Route;
 
@@ -45,6 +46,17 @@ Route::middleware("checkAuth")->group(function () {
             "edit" => "quicks.edit",
             "update" => "quicks.update",
             "destroy" => "quicks.destroy",
+        ]);
+    Route::resource("movimentações", MovementController::class)
+        ->parameter("movimentações", "quick")
+        ->names([
+            "index" => "movements.index",
+            "create" => "movements.create",
+            "store" => "movements.store",
+            "show" => "movements.show",
+            "edit" => "movements.edit",
+            "update" => "movements.update",
+            "destroy" => "movements.destroy",
         ]);
     // // expenses
     // Route::resource("despesas", ExpenseController::class)
