@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Models;
 
+use App\Models\Debt;
 use App\Models\File;
 use App\Models\Identifier;
 use App\Models\Movement;
@@ -144,5 +145,31 @@ class UserTest extends TestCase
         ]);
 
         $this->assertCount(2, $user->files);
+    }
+
+    /**
+     * deve retornar uma coleção vazia
+     */
+    public function test_debts_method_without_debts(): void
+    {
+        Debt::factory(2)->create();
+
+        $user = User::factory()->create();
+
+        $this->assertCount(0, $user->debts);
+    }
+
+    /**
+     * deve retornar 2 Debt
+     */
+    public function test_debts_method(): void
+    {
+        Debt::factory(2)->create();
+
+        $user = User::factory()->create();
+        Debt::factory(2)->create(["user_id" => $user]);
+        Debt::factory(2)->trashed()->create(["user_id" => $user]);
+
+        $this->assertCount(2, $user->debts);
     }
 }

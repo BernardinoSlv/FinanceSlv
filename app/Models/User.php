@@ -65,4 +65,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(File::class, "user_id", "id");
     }
+
+    public function debts(): HasMany
+    {
+        return $this->hasMany(Debt::class, "user_id", "id");
+    }
 }
