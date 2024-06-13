@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\RegexEnum;
-use Illuminate\Database\Query\Builder;
+use App\Rules\Amount;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class UpdateDebtRequest extends FormRequest
@@ -15,7 +13,7 @@ class UpdateDebtRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::check();
+        return true;
     }
 
     /**
@@ -31,9 +29,11 @@ class UpdateDebtRequest extends FormRequest
                 Rule::exists("identifiers", "id")
                     ->where("user_id", auth()->id())
             ],
-            "title" => ["required", "min:1", "max:256",],
+            "title" => ["required", "string", "between:2,256"],
             "description" => ["nullable"],
-            "amount" => ["required", "regex:" . RegexEnum::AMOUNT->value],
+            "amount" => ["required", new Amount],
+            "installments" => ["nullable", "integer", "min:1"],
+            "due_date" => ["required", "date"],
         ];
     }
 }

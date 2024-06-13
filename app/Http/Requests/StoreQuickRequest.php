@@ -2,18 +2,20 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\MovementTypeEnum;
 use App\Rules\Amount;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Src\Parsers\RealToFloatParser;
 
-class StoreDebtRequest extends FormRequest
+class StoreQuickRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return auth()->check();
     }
 
     /**
@@ -25,15 +27,19 @@ class StoreDebtRequest extends FormRequest
     {
         return [
             "identifier_id" => [
-                "required",
+                "nullable",
                 Rule::exists("identifiers", "id")
                     ->where("user_id", auth()->id())
             ],
             "title" => ["required", "string", "between:2,256"],
             "description" => ["nullable"],
-            "amount" => ["required", new Amount],
-            "installments" => ["nullable", "integer", "min:1"],
-            "due_date" => ["required", "date"],
+            "type" => [
+                "required", Rule::in([
+                    MovementTypeEnum::IN->value,
+                    MovementTypeEnum::OUT->value,
+                ])
+            ],
+            "amount" => ["required", new Amount]
         ];
     }
 }

@@ -6,7 +6,7 @@
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 p-0">
-                    <li class="breadcrumb-item active" aria-current="page">Dívidas</li>
+                    <li class="breadcrumb-item active" aria-current="page">Entradas rápidas</li>
                 </ol>
             </nav>
         </div>
@@ -79,7 +79,7 @@
         <div class="col-auto">
             <div class="d-flex align-items-center gap-2 justify-content-lg-end">
                 <button class="btn btn-light px-4"><i class="bi bi-box-arrow-right me-2"></i>Export</button>
-                <a class="btn btn-primary px-4" href="{{ route('debts.create') }}"><i
+                <a class="btn btn-primary px-4" href="{{ route('quicks.create') }}"><i
                         class="bi bi-plus-lg me-2"></i>Criar</a>
             </div>
         </div>
@@ -93,32 +93,30 @@
                         <thead class="table-light">
                             <tr>
                                 <th>#</th>
-                                <th>Identificador</th>
+                                <th>Tipo</th>
                                 <th>Título</th>
                                 <th>Valor</th>
-                                <th>Parcelas</th>
-                                <th>Vencimento</th>
+                                <th>Identificador</th>
                                 <th>Data</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($debts as $debt)
+                            @foreach ($paginator as $quick)
                                 <tr>
                                     <td>
-                                        <strong>{{ $debt->id }}</strong>
+                                        <strong>{{ $quick->id }}</strong>
                                     </td>
                                     <td>
-                                        <a href="javascript:;">{{ $debt->identifier?->name }}</a>
+                                        <x-movement-type :movement="$quick->movement" />
                                     </td>
-                                    <td>{{ $debt->title }}</td>
-                                    <td>R$ {{ $debt->amount }}</td>
-                                    <td>{{ $debt->installments }}</td>
+                                    <td>{{ $quick->title }}</td>
+                                    <td>R$ {{ $quick->movement?->amount }}</td>
                                     <td>
-                                        {{ $debt->due_date->format('d/m/Y') }}
+                                        <a href="javascript:;">{{ $quick->identifier?->name }}</a>
                                     </td>
                                     <td>
-                                        {{ $debt->created_at->format('d/m/Y H:i') }}
+                                        {{ $quick->created_at }}
                                     </td>
                                     <td>
                                         <div class="dropdown">
@@ -130,10 +128,10 @@
                                             <ul class="dropdown-menu">
                                                 <li>
                                                     <a class="dropdown-item"
-                                                        href="{{ route('debts.edit', $debt) }}">Editar</a>
+                                                        href="{{ route('quicks.edit', $quick) }}">Editar</a>
                                                 </li>
                                                 <li>
-                                                    <form action="{{ route('debts.destroy', $debt) }}" method="POST"
+                                                    <form action="{{ route('quicks.destroy', $quick) }}" method="POST"
                                                         onsubmit="return confirm('O registro será deletado permanentemente!')">
                                                         @method('DELETE')
                                                         @csrf
@@ -154,10 +152,10 @@
         <div class="card-footer">
             <nav class="">
                 <ul class="pagination pagination-sm justify-content-end">
-                    <li class="page-item {{ $debts->previousPageUrl() ?: 'disabled' }}"><a
-                            href="{{ $debts->previousPageUrl() }}" class="page-link">Anterior</a></li>
-                    <li class="page-item {{ $debts->nextPageUrl() ?: 'disabled' }}"><a
-                            href="{{ $debts->nextPageUrl() }}" class="page-link">Próximo</a></li>
+                    <li class="page-item {{ $paginator->previousPageUrl() ?: 'disabled' }}"><a
+                            href="{{ $paginator->previousPageUrl() }}" class="page-link">Anterior</a></li>
+                    <li class="page-item {{ $paginator->nextPageUrl() ?: 'disabled' }}"><a
+                            href="{{ $paginator->nextPageUrl() }}" class="page-link">Próximo</a></li>
                 </ul>
             </nav>
         </div>

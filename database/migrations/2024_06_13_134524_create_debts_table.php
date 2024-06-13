@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('identifiers', function (Blueprint $table) {
+        Schema::create('debts', function (Blueprint $table) {
             $table->id();
             $table->foreignId("user_id")->references("id")->on("users");
-            $table->string("name");
-            $table->string("phone")->nullable();
-            $table->string("avatar")->nullable();
+            $table->foreignId("identifier_id")->references("id")->on("identifiers");
+            $table->decimal("amount");
+            $table->string("title")->nullable();
             $table->text("description")->nullable();
-            $table->boolean("status")->default(1);
+            $table->integer("installments", unsigned: true)->nullable();
+            $table->date("due_date")->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -29,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('quicks');
+        Schema::dropIfExists('debts');
     }
 };

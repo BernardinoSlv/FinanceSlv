@@ -16,8 +16,11 @@ class Movement extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        "user_id",
         "movementable_type",
         "movementable_id",
+        "type",
+        "amount"
     ];
 
     public function user(): BelongsTo

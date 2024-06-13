@@ -6,7 +6,7 @@
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 p-0">
-                    <li class="breadcrumb-item active" aria-current="page">Dívidas</li>
+                    <li class="breadcrumb-item active" aria-current="page">Movimentações</li>
                 </ol>
             </nav>
         </div>
@@ -79,7 +79,7 @@
         <div class="col-auto">
             <div class="d-flex align-items-center gap-2 justify-content-lg-end">
                 <button class="btn btn-light px-4"><i class="bi bi-box-arrow-right me-2"></i>Export</button>
-                <a class="btn btn-primary px-4" href="{{ route('debts.create') }}"><i
+                <a class="btn btn-primary px-4" href="{{ route('movements.create') }}"><i
                         class="bi bi-plus-lg me-2"></i>Criar</a>
             </div>
         </div>
@@ -93,32 +93,34 @@
                         <thead class="table-light">
                             <tr>
                                 <th>#</th>
-                                <th>Identificador</th>
+                                <th>Operação</th>
+                                <th>Tipo</th>
                                 <th>Título</th>
                                 <th>Valor</th>
-                                <th>Parcelas</th>
-                                <th>Vencimento</th>
+                                <th>Identificador</th>
                                 <th>Data</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($debts as $debt)
+                            @foreach ($movements as $movement)
                                 <tr>
                                     <td>
-                                        <strong>{{ $debt->id }}</strong>
+                                        <strong>{{ $movement->id }}</strong>
                                     </td>
                                     <td>
-                                        <a href="javascript:;">{{ $debt->identifier?->name }}</a>
-                                    </td>
-                                    <td>{{ $debt->title }}</td>
-                                    <td>R$ {{ $debt->amount }}</td>
-                                    <td>{{ $debt->installments }}</td>
-                                    <td>
-                                        {{ $debt->due_date->format('d/m/Y') }}
+                                        {{ $movement->movementable::class }}
                                     </td>
                                     <td>
-                                        {{ $debt->created_at->format('d/m/Y H:i') }}
+                                        <x-movement-type :movement="$movement" />
+                                    </td>
+                                    <td>{{ $movement->movementable->title }}</td>
+                                    <td>R$ {{ $movement->amount }}</td>
+                                    <td>
+                                        <a href="javascript:;">{{ $movement->movementable->identifier?->name }}</a>
+                                    </td>
+                                    <td>
+                                        {{ $movement->created_at }}
                                     </td>
                                     <td>
                                         <div class="dropdown">
@@ -130,10 +132,11 @@
                                             <ul class="dropdown-menu">
                                                 <li>
                                                     <a class="dropdown-item"
-                                                        href="{{ route('debts.edit', $debt) }}">Editar</a>
+                                                        href="{{ route('movements.edit', $movement) }}">Editar</a>
                                                 </li>
                                                 <li>
-                                                    <form action="{{ route('debts.destroy', $debt) }}" method="POST"
+                                                    <form action="{{ route('movements.destroy', $movement) }}"
+                                                        method="POST"
                                                         onsubmit="return confirm('O registro será deletado permanentemente!')">
                                                         @method('DELETE')
                                                         @csrf
@@ -154,10 +157,10 @@
         <div class="card-footer">
             <nav class="">
                 <ul class="pagination pagination-sm justify-content-end">
-                    <li class="page-item {{ $debts->previousPageUrl() ?: 'disabled' }}"><a
-                            href="{{ $debts->previousPageUrl() }}" class="page-link">Anterior</a></li>
-                    <li class="page-item {{ $debts->nextPageUrl() ?: 'disabled' }}"><a
-                            href="{{ $debts->nextPageUrl() }}" class="page-link">Próximo</a></li>
+                    <li class="page-item {{ $movements->previousPageUrl() ?: 'disabled' }}"><a
+                            href="{{ $movements->previousPageUrl() }}" class="page-link">Anterior</a></li>
+                    <li class="page-item {{ $movements->nextPageUrl() ?: 'disabled' }}"><a
+                            href="{{ $movements->nextPageUrl() }}" class="page-link">Próximo</a></li>
                 </ul>
             </nav>
         </div>
