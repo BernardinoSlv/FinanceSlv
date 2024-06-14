@@ -42,7 +42,7 @@
                             <div class="col-sm-6">
                                 <h5 class="mb-2">Valor</h5>
                                 <input type="text" name="amount" value="{{ old('amount', $debt->amount) }}"
-                                    class="form-control">
+                                    class="form-control" data-js-mask="money1">
                                 <div class="form-text"><strong>Ex</strong>: 1.599,00</div>
                             </div>
                             <div class="col-sm-6">
