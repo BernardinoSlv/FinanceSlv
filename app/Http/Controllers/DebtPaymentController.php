@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Enums\MovementTypeEnum;
-use App\Http\Requests\StoreDebtRequest;
+use App\Helpers\Alert;
+use App\Http\Requests\StoreDebtPaymentRequest;
 use App\Http\Requests\UpdateDebtRequest;
 use App\Models\Debt;
 use Illuminate\Support\Facades\Gate;
+use Src\Parsers\RealToFloatParser;
 
 class DebtPaymentController extends Controller
 {
@@ -29,17 +31,33 @@ class DebtPaymentController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Debt $debt)
     {
-        //
+        if (Gate::denies("debt-edit", $debt)) {
+            abort(403);
+        }
+
+        return view("debts.payments.create", compact("debt"));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreDebtRequest $request)
+    public function store(StoreDebtPaymentRequest $request, Debt $debt)
     {
-        //
+        if (Gate::denies("debt-edit", $debt)) {
+            abort(403);
+        }
+
+        $debt->movements()->create([
+            ...$request->validated(),
+            "amount" => RealToFloatParser::parse($request->input("amount")),
+            "user_id" => auth()->id(),
+            "type" => MovementTypeEnum::OUT->value
+        ]);
+
+        return redirect()->route("debts.payments.create", $debt)
+            ->with(Alert::success("Pagamento adicionado com sucesso."));
     }
 
     /**
@@ -61,7 +79,7 @@ class DebtPaymentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateDebtRequest $request, Debt $debt)
+    public function update(UpdateDebtPaymentRequest $request, Debt $debt)
     {
         //
     }
