@@ -485,4 +485,130 @@ class DebtPaymentControllerTest extends TestCase
             "amount" => 800.00
         ]);
     }
+
+    /**
+     * deve redirecionar para auth.index
+     */
+    public function test_destroy_action_unauthenticated(): void
+    {
+        $debt = Debt::factory()->has(
+            Movement::factory()->state(["type" => MovementTypeEnum::OUT->value])
+        )->create();
+        $movement = $debt->movements->first();
+
+        $this->delete(route("debts.payments.destroy", [
+            "debt" => $debt,
+            "movement" => $movement
+        ]))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_nonexistent(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $debt = $user->debts->first();
+
+        $this->actingAs($user)->delete(route("debts.payments.destroy", [
+            "debt" => $debt,
+            "movement" => 0
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_nonexistent_debt(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $movement = $user->debts->first()
+            ->factory()->has(Movement::factory()->for($user)->state([
+                "type" => MovementTypeEnum::OUT->value
+            ]))
+            ->create();
+
+        $this->actingAs($user)->delete(route("debts.payments.destroy", [
+            "debt" => 0,
+            "movement" => $movement
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_destroy_action_movement_is_not_from_debt(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $debt = $user->debts->first();
+        $movement = Movement::factory()->for(Debt::factory()->create(), "movementable")->create([
+            "type" => MovementTypeEnum::OUT->value
+        ]);
+
+        $this->actingAs($user)->delete(route("debts.payments.destroy", [
+            "debt" => $debt,
+            'movement' => $movement
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_destroy_action_is_not_owner(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $debt = $user->debts->first();
+        $movement = Movement::factory()->for($debt, "movementable")->create([
+            "type" => MovementTypeEnum::OUT->value
+        ]);
+
+        $this->actingAs($user)->delete(route("debts.payments.destroy", [
+            "debt" => $debt,
+            "movement" => $movement
+        ]))
+            ->assertForbidden();
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_destroy_action_is_not_owner_from_debt(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $debt = Debt::factory()->create();
+        $movement = Movement::factory()->for($debt, "movementable")->for($user)->create([
+            "type" => MovementTypeEnum::OUT->value
+        ]);
+
+        $this->actingAs($user)->delete(route("debts.payments.destroy", [
+            "debt" => $debt,
+            "movement" => $movement
+        ]))
+            ->assertForbidden();
+    }
+
+
+    /**
+     * deve ter status 200 e view debts.payments.destroy
+     */
+    public function test_destroy_action(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $debt = $user->debts->first();
+        $movement = Movement::factory()->for($debt, "movementable")->for($user)->create([
+            "type" => MovementTypeEnum::OUT->value
+        ]);
+
+        $this->actingAs($user)->delete(route("debts.payments.destroy", [
+            "debt" => $debt,
+            "movement" => $movement
+        ]))
+            ->assertRedirect(route('debts.payments.index', $debt))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertSoftDeleted($movement);
+    }
 }

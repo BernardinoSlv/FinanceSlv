@@ -24,6 +24,7 @@ class DebtPaymentController extends Controller
 
         $movements = $debt->movements()
             ->where("type", MovementTypeEnum::OUT->value)
+            ->orderBy('id', "DESC")
             ->paginate();
 
         return view("debts.payments.index", compact("debt", "movements"));
@@ -103,8 +104,16 @@ class DebtPaymentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Debt $debt)
+    public function destroy(Debt $debt, Movement $movement)
     {
-        //
+        if (Gate::denies("debt-edit", $debt) || Gate::denies("movement-edit", $movement)) {
+            abort(403);
+        }
+
+        $movement->delete();
+
+        return redirect()->route("debts.payments.index", $debt)->with(
+            Alert::success("Pagamento deletado com sucesso.")
+        );
     }
 }
