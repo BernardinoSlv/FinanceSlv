@@ -109,13 +109,13 @@
                                         <strong>{{ $movement->id }}</strong>
                                     </td>
                                     <td>
-                                        {{ $movement->movementable::class }}
+                                        {{ get_class($movement->movementable) }}
                                     </td>
                                     <td>
                                         <x-movement-type :movement="$movement" />
                                     </td>
                                     <td>{{ $movement->movementable->title }}</td>
-                                    <td>R$ {{ $movement->amount }}</td>
+                                    <td>R$ {{ number_format($movement->amount, '2', ',', '.') }}</td>
                                     <td>
                                         <a href="javascript:;">{{ $movement->movementable->identifier?->name }}</a>
                                     </td>
@@ -131,8 +131,20 @@
                                             </button>
                                             <ul class="dropdown-menu">
                                                 <li>
-                                                    <a class="dropdown-item"
-                                                        href="{{ route('movements.edit', $movement) }}">Editar</a>
+                                                    @switch(get_class($movement->movementable))
+                                                        @case('App\\Models\\Debt')
+                                                            <a class="dropdown-item"
+                                                                href="{{ route('debts.edit', $movement->movementable) }}">Editar</a>
+                                                        @break
+
+                                                        @case('App\\Models\\Quick')
+                                                            <a class="dropdown-item"
+                                                                href="{{ route('quicks.edit', $movement->movementable) }}">Editar</a>
+                                                        @break
+
+                                                        @default
+                                                    @endswitch
+
                                                 </li>
                                                 <li>
                                                     <form action="{{ route('movements.destroy', $movement) }}"

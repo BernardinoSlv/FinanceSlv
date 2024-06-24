@@ -111,7 +111,7 @@
                                         <x-movement-type :movement="$quick->movement" />
                                     </td>
                                     <td>{{ $quick->title }}</td>
-                                    <td>R$ {{ $quick->movement?->amount }}</td>
+                                    <td>R$ {{ number_format($quick->movement?->amount, '2', ',', '.') }}</td>
                                     <td>
                                         <a href="javascript:;">{{ $quick->identifier?->name }}</a>
                                     </td>

@@ -59,7 +59,8 @@ Route::middleware("checkAuth")->group(function () {
             "edit" => "movements.edit",
             "update" => "movements.update",
             "destroy" => "movements.destroy",
-        ]);
+        ])
+        ->only(["index", "destroy"]);
     Route::resource("dividas", DebtController::class)
         ->parameter("dividas", "debt")
         ->names([
