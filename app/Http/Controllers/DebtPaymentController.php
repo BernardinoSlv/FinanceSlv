@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Enums\MovementTypeEnum;
 use App\Helpers\Alert;
 use App\Http\Requests\StoreDebtPaymentRequest;
-use App\Http\Requests\UpdateDebtRequest;
+use App\Http\Requests\UpdateDebtPaymentRequest;
 use App\Models\Debt;
+use App\Models\Movement;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
@@ -71,17 +72,32 @@ class DebtPaymentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Debt $debt)
+    public function edit(Debt $debt, Movement $movement)
     {
-        //
+        if (Gate::denies("debt-edit", $debt) || Gate::denies("movement-edit", $movement)) {
+            abort(403);
+        }
+
+        return view("debts.payments.edit", compact("debt", "movement"));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateDebtPaymentRequest $request, Debt $debt)
+    public function update(UpdateDebtPaymentRequest $request, Debt $debt, Movement $movement)
     {
-        //
+        if (Gate::denies("debt-edit", $debt) || Gate::denies("movement-edit", $movement)) {
+            abort(403);
+        }
+
+        $movement->fill($request->validated());
+        $movement->amount = RealToFloatParser::parse($request->input("amount"));
+        $movement->save();
+
+        return redirect()->route("debts.payments.edit", [
+            "debt" => $debt,
+            "movement" => $movement
+        ])->with(Alert::success("Pagamento atualizado com sucesso."));
     }
 
     /**

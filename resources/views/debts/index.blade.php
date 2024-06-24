@@ -96,6 +96,7 @@
                                 <th>Identificador</th>
                                 <th>Título</th>
                                 <th>Valor</th>
+                                <th>Pago</th>
                                 <th>Parcelas</th>
                                 <th>Vencimento</th>
                                 <th>Data</th>
@@ -112,10 +113,13 @@
                                         <a href="javascript:;">{{ $debt->identifier?->name }}</a>
                                     </td>
                                     <td>{{ $debt->title }}</td>
-                                    <td>R$ {{ $debt->amount }}</td>
+                                    <td>R$ {{ number_format($debt->amount, 2, ',', '.') }}</td>
+                                    <td>R$ {{ number_format($debt->movements_sum_amount, 2, ',', '.') }}
+
+                                    </td>
                                     <td>{{ $debt->installments }}</td>
                                     <td>
-                                        {{ $debt->due_date->format('d/m/Y') }}
+                                        {{ $debt->due_date?->format('d/m/Y') }}
                                     </td>
                                     <td>
                                         {{ $debt->created_at->format('d/m/Y H:i') }}

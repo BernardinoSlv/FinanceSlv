@@ -17,6 +17,8 @@ class DebtController extends Controller
     public function index()
     {
         $debts = auth()->user()->debts()
+            ->with("identifier")
+            ->withSum("movements", "amount")
             ->orderBy("id", "desc")
             ->paginate();
 

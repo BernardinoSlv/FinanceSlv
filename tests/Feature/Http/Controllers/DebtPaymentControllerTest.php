@@ -192,4 +192,297 @@ class DebtPaymentControllerTest extends TestCase
             "user_id" => $user->id
         ]);
     }
+
+    /**
+     * deve redirecionar para auth.index
+     */
+    public function test_edit_action_unauthenticated(): void
+    {
+        $debt = Debt::factory()->has(
+            Movement::factory()->state(["type" => MovementTypeEnum::OUT->value])
+        )->create();
+        $movement = $debt->movements->first();
+
+        $this->get(route("debts.payments.edit", [
+            "debt" => $debt,
+            "movement" => $movement
+        ]))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_nonexistent(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $debt = $user->debts->first();
+
+        $this->actingAs($user)->get(route("debts.payments.edit", [
+            "debt" => $debt,
+            "movement" => 0
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_nonexistent_debt(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $movement = $user->debts->first()
+            ->factory()->has(Movement::factory()->for($user)->state([
+                "type" => MovementTypeEnum::OUT->value
+            ]))
+            ->create();
+
+        $this->actingAs($user)->get(route("debts.payments.edit", [
+            "debt" => 0,
+            "movement" => $movement
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_edit_action_movement_is_not_from_debt(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $debt = $user->debts->first();
+        $movement = Movement::factory()->for(Debt::factory()->create(), "movementable")->create([
+            "type" => MovementTypeEnum::OUT->value
+        ]);
+
+        $this->actingAs($user)->get(route("debts.payments.edit", [
+            "debt" => $debt,
+            'movement' => $movement
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_edit_action_is_not_owner(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $debt = $user->debts->first();
+        $movement = Movement::factory()->for($debt, "movementable")->create([
+            "type" => MovementTypeEnum::OUT->value
+        ]);
+
+        $this->actingAs($user)->get(route("debts.payments.edit", [
+            "debt" => $debt,
+            "movement" => $movement
+        ]))
+            ->assertForbidden();
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_edit_action_is_not_owner_from_debt(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $debt = Debt::factory()->create();
+        $movement = Movement::factory()->for($debt, "movementable")->for($user)->create([
+            "type" => MovementTypeEnum::OUT->value
+        ]);
+
+        $this->actingAs($user)->get(route("debts.payments.edit", [
+            "debt" => $debt,
+            "movement" => $movement
+        ]))
+            ->assertForbidden();
+    }
+
+
+    /**
+     * deve ter status 200 e view debts.payments.edit
+     */
+    public function test_edit_action(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $debt = $user->debts->first();
+        $movement = Movement::factory()->for($debt, "movementable")->for($user)->create([
+            "type" => MovementTypeEnum::OUT->value
+        ]);
+
+        $this->actingAs($user)->get(route("debts.payments.edit", [
+            "debt" => $debt,
+            "movement" => $movement
+        ]))
+            ->assertOk()
+            ->assertViewIs("debts.payments.edit")
+            ->assertViewHasAll([
+                "debt",
+                "movement",
+            ]);
+    }
+
+    /**
+     * deve redirecionar para auth.index
+     */
+    public function test_update_action_unauthenticated(): void
+    {
+        $debt = Debt::factory()->has(
+            Movement::factory()->state(["type" => MovementTypeEnum::OUT->value])
+        )->create();
+        $movement = $debt->movements->first();
+
+        $this->put(route("debts.payments.update", [
+            "debt" => $debt,
+            "movement" => $movement
+        ]))
+            ->assertRedirectToRoute("auth.index");
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_action_nonexistent(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $debt = $user->debts->first();
+
+        $this->actingAs($user)->put(route("debts.payments.update", [
+            "debt" => $debt,
+            "movement" => 0
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_action_nonexistent_debt(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $movement = $user->debts->first()
+            ->factory()->has(Movement::factory()->for($user)->state([
+                "type" => MovementTypeEnum::OUT->value
+            ]))
+            ->create();
+
+        $this->actingAs($user)->put(route("debts.payments.update", [
+            "debt" => 0,
+            "movement" => $movement
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve redirecionar com erro de validação
+     */
+    public function test_update_action_without_data(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $debt = Debt::factory()->create();
+        $movement = Movement::factory()->for($debt, "movementable")->for($user)->create([
+            "type" => MovementTypeEnum::OUT->value
+        ]);
+
+        $this->actingAs($user)->put(route("debts.payments.update", [
+            "debt" => $debt,
+            "movement" => $movement
+        ]))
+            ->assertFound()
+            ->assertSessionHasErrors([
+                "amount"
+            ]);
+    }
+
+    /**
+     * deve ter status 404
+     */
+    public function test_update_action_movement_is_not_from_debt(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $debt = $user->debts->first();
+        $movement = Movement::factory()->for(Debt::factory()->create(), "movementable")->create([
+            "type" => MovementTypeEnum::OUT->value
+        ]);
+
+        $this->actingAs($user)->put(route("debts.payments.update", [
+            "debt" => $debt,
+            'movement' => $movement
+        ]))
+            ->assertNotFound();
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_update_action_is_not_owner(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $debt = $user->debts->first();
+        $movement = Movement::factory()->for($debt, "movementable")->create([
+            "type" => MovementTypeEnum::OUT->value
+        ]);
+        $data = [
+            "amount" => "800,00"
+        ];
+
+        $this->actingAs($user)->put(route("debts.payments.update", [
+            "debt" => $debt,
+            "movement" => $movement
+        ]), $data)
+            ->assertForbidden();
+    }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_update_action_is_not_owner_from_debt(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $debt = Debt::factory()->create();
+        $movement = Movement::factory()->for($debt, "movementable")->for($user)->create([
+            "type" => MovementTypeEnum::OUT->value
+        ]);
+        $data = [
+            "amount" => "800,00"
+        ];
+
+        $this->actingAs($user)->put(route("debts.payments.update", [
+            "debt" => $debt,
+            "movement" => $movement
+        ]), $data)
+            ->assertForbidden();
+    }
+
+
+    /**
+     * deve ter status 200 e view debts.payments.update
+     */
+    public function test_update_action(): void
+    {
+        $user = User::factory()->has(Debt::factory())->create();
+        $debt = $user->debts->first();
+        $movement = Movement::factory()->for($debt, "movementable")->for($user)->create([
+            "type" => MovementTypeEnum::OUT->value
+        ]);
+        $data = [
+            "amount" => "800,00"
+        ];
+
+        $this->actingAs($user)->put(route("debts.payments.update", [
+            "debt" => $debt,
+            "movement" => $movement
+        ]), $data)
+            ->assertRedirect(route('debts.payments.edit', [
+                "debt" => $debt,
+                "movement" => $movement
+            ]))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("movements", [
+            "id" => $movement->id,
+            "movementable_type" => Debt::class,
+            "movementable_id" => $debt->id,
+            "amount" => 800.00
+        ]);
+    }
 }

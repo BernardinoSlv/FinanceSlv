@@ -108,9 +108,6 @@
                                     <td>
                                         <strong>{{ $movement->id }}</strong>
                                     </td>
-                                    <td>
-                                        <a href="javascript:;">{{ $movement->identifier?->name }}</a>
-                                    </td>
                                     <td>R$ {{ $movement->amount }}</td>
                                     <td>
                                         {{ $movement->created_at->format('d/m/Y H:i') }}

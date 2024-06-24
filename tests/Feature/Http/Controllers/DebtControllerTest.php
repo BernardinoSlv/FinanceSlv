@@ -89,7 +89,6 @@ class DebtControllerTest extends TestCase
                 "identifier_id",
                 "amount",
                 "title",
-                "due_date"
             ]);
     }
 
@@ -202,7 +201,6 @@ class DebtControllerTest extends TestCase
                 "identifier_id",
                 "title",
                 "amount",
-                "due_date"
             ]);
     }
 
