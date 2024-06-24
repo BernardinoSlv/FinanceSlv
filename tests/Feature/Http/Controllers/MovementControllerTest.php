@@ -44,7 +44,7 @@ class MovementControllerTest extends TestCase
             ->assertViewHas("movements", function (LengthAwarePaginator $movements) {
                 if (!$movements->first()->relationLoaded("movementable")) {
                     return false;
-                } elseif (!$movements->first()->movementable->relationLoaded("identifier")) {
+                } elseif (!$movements->first()->relationLoaded("identifier")) {
                     return false;
                 }
                 return $movements->total() === 2;

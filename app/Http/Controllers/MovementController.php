@@ -19,7 +19,7 @@ class MovementController extends Controller
         /** @var User $user */
         $user = auth()->user();
         $movements = $user->movements()
-            ->with(["movementable", "movementable.identifier"])
+            ->with(["identifier", "movementable"])
             ->orderBy('id', "DESC")
             ->paginate();
 

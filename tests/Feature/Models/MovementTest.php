@@ -85,41 +85,32 @@ class MovementTest extends TestCase
     }
 
     /**
-     * deve retornar nenhum movement
+     * deve retornar o Identifier
      */
-    public function test_scope_by_identifier_method_without_movements_to_identifier(): void
+    public function test_identifier_method(): void
     {
+        Identifier::factory(2)->create();
+
         $identifier = Identifier::factory()->create();
-        Movement::factory(2)->create([
-            "movementable_type" => Quick::class,
-            "movementable_id" => Quick::factory()->create([])
-        ]);
+        $movement = Movement::factory()
+            ->for(Quick::factory(), "movementable")
+            ->create(["identifier_id" => $identifier]);
 
-        $movements = Movement::byIdentifier($identifier->id)->get();
-
-        $this->assertCount(0, $movements);
+        $this->assertEquals($identifier->id, $movement->identifier->id);
     }
 
     /**
-     * deve retornar 2 Movement
+     * deve retornar o Identifier mesmo deletado
      */
-    public function test_scope_by_identifier_method(): void
+    public function test_identifier_method_trashed_identifier(): void
     {
-        Movement::factory(2)->create([
-            "movementable_type" => Quick::class,
-            "movementable_id" => Quick::factory()->create([])
-        ]);
+        Identifier::factory(2)->create();
 
         $identifier = Identifier::factory()->create();
-        Movement::factory(2)->create([
-            "movementable_type" => Quick::class,
-            "movementable_id" => Quick::factory()->create([
-                "identifier_id" => $identifier
-            ])
-        ]);
+        $movement = Movement::factory()
+            ->for(Quick::factory()->trashed(), "movementable")
+            ->create(["identifier_id" => $identifier]);
 
-        $movements = Movement::byIdentifier($identifier->id)->get();
-
-        $this->assertCount(2, $movements);
+        $this->assertEquals($identifier->id, $movement->identifier->id);
     }
 }

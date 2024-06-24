@@ -117,7 +117,7 @@
                                     <td>{{ $movement->movementable->title }}</td>
                                     <td>R$ {{ number_format($movement->amount, '2', ',', '.') }}</td>
                                     <td>
-                                        <a href="javascript:;">{{ $movement->movementable->identifier?->name }}</a>
+                                        <a href="javascript:;">{{ $movement->identifier?->name }}</a>
                                     </td>
                                     <td>
                                         {{ $movement->created_at }}

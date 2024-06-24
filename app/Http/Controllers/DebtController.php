@@ -6,6 +6,9 @@ use App\Helpers\Alert;
 use App\Http\Requests\StoreDebtRequest;
 use App\Http\Requests\UpdateDebtRequest;
 use App\Models\Debt;
+use App\Models\Movement;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
@@ -84,10 +87,15 @@ class DebtController extends Controller
         if (Gate::denies("debt-edit", $debt))
             abort(403);
 
+        DB::beginTransaction();
         $debt->fill([
             ...$request->validated(),
             "amount" => RealToFloatParser::parse($request->input("amount"))
         ])->save();
+        $debt->movements()->update([
+            "identifier_id" => $request->input('identifier_id')
+        ]);
+        DB::commit();
 
         return redirect()->route("debts.edit", $debt)
             ->with(Alert::success("Dívida atualizada com sucesso."));

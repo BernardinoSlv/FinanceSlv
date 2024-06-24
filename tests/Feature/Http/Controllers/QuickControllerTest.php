@@ -172,7 +172,7 @@ class QuickControllerTest extends TestCase
             "user_id" => $user->id,
         ])->first();
         $this->assertDatabaseHas("movements", [
-            ...Arr::except($data, ["identifier_id", "description", "title"]),
+            ...Arr::except($data, ["description", "title"]),
             "movementable_type" => Quick::class,
             "movementable_id" => $quick->id,
             "user_id" => $user->id,
@@ -321,7 +321,7 @@ class QuickControllerTest extends TestCase
         $this->assertDatabaseHas('movements', [
             "id" => $quick->movement->id,
             ...Arr::only($data, [
-                "type"
+                "type", "identifier_id"
             ]),
             "amount" => 500.00
         ]);

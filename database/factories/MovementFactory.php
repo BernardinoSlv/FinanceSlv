@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\MovementTypeEnum;
+use App\Models\Identifier;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -20,6 +21,7 @@ class MovementFactory extends Factory
     {
         return [
             "user_id" => User::factory()->create(),
+            "identifier_id" => Identifier::factory()->create(),
             // "movementable_type" => ,
             // "movementable_id" => ,
             "type" => MovementTypeEnum::IN->value,
