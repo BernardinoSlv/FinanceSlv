@@ -40,8 +40,8 @@ class QuickControllerTest extends TestCase
         $this->actingAs($user)->get(route("quicks.index"))
             ->assertOk()
             ->assertViewIs("quicks.index")
-            ->assertViewHas("paginator", function (LengthAwarePaginator $paginator): bool {
-                return $paginator->total() === 2;
+            ->assertViewHas("quicks", function (LengthAwarePaginator $quicks): bool {
+                return $quicks->total() === 2;
             });
     }
 

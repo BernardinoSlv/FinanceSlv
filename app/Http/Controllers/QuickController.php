@@ -2,11 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\MovementTypeEnum;
 use App\Helpers\Alert;
 use App\Http\Requests\StoreQuickRequest;
 use App\Http\Requests\UpdateQuickRequest;
+use App\Models\Movement;
 use App\Models\Quick;
 use App\Models\User;
+use App\Pipes\Quick\FilterByTextPipe;
+use App\Pipes\Quick\OrderByPipe;
+use App\Pipes\Quick\TypePipe;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
@@ -16,20 +23,41 @@ class QuickController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Pipeline $pipeline)
     {
+        // Movement::factory(20)
+        //     ->for(
+        //         auth()->user()
+        //     )
+        //     ->sequence(...Quick::factory(20)->for(auth()->user())->create()->map(
+        //         fn (Quick $quick) => ["movementable_id" => $quick->id]
+        //     )->toArray())
+        //     ->create(["movementable_type" => Quick::class]);
+        // Quick::query()->orderBy("id")->with("movement")->chunk(100, function (Collection $quicks) {
+        //     $quicks->each(function (Quick $quick) {
+        //         $quick->created_at = now()->subDays(rand(0, 100))->subHours(rand(0, 240));
+        //         $quick->movement->type = rand(0, 1) ? MovementTypeEnum::IN->value : MovementTypeEnum::OUT->value;
+        //         $quick->movement->save();
+        //         $quick->save();
+        //     });
+        // });
+
         /**
          * @var User
          */
         $user =  auth()->user();
-        $paginator = $user->quicks()
-            ->orderBy("created_at", "desc")
-            ->with(["movement", "identifier"])->paginate(
-                request("per_page", 10)
-            )
+        $quicks = $pipeline->send($user->quicks())
+            ->through([
+                FilterByTextPipe::class,
+                OrderByPipe::class,
+                TypePipe::class
+            ])
+            ->thenReturn()
+            ->with(["movement", "identifier"])
+            ->select("quicks.*")
+            ->paginate()
             ->withQueryString();
-
-        return view("quicks.index", compact("paginator"));
+        return view("quicks.index", compact("quicks"));
     }
 
     /**

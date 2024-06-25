@@ -55,7 +55,8 @@ class DebtPaymentController extends Controller
             ...$request->validated(),
             "amount" => RealToFloatParser::parse($request->input("amount")),
             "user_id" => auth()->id(),
-            "type" => MovementTypeEnum::OUT->value
+            "type" => MovementTypeEnum::OUT->value,
+            "identifier_id" => $debt->identifier_id
         ]);
 
         return redirect()->route("debts.payments.create", $debt)
@@ -92,6 +93,7 @@ class DebtPaymentController extends Controller
         }
 
         $movement->fill($request->validated());
+        $movement->identifier_id = $debt->identifier_id;
         $movement->amount = RealToFloatParser::parse($request->input("amount"));
         $movement->save();
 

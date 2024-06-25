@@ -189,7 +189,8 @@ class DebtPaymentControllerTest extends TestCase
             "movementable_id" => $debt->id,
             'amount' => 39.90,
             "type" => MovementTypeEnum::OUT->value,
-            "user_id" => $user->id
+            "user_id" => $user->id,
+            "identifier_id" => $debt->identifier_id
         ]);
     }
 
@@ -482,7 +483,8 @@ class DebtPaymentControllerTest extends TestCase
             "id" => $movement->id,
             "movementable_type" => Debt::class,
             "movementable_id" => $debt->id,
-            "amount" => 800.00
+            "amount" => 800.00,
+            "identifier_id" => $debt->identifier_id
         ]);
     }
 
