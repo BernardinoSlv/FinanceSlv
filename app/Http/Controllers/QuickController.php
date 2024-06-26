@@ -25,23 +25,6 @@ class QuickController extends Controller
      */
     public function index(Pipeline $pipeline)
     {
-        // Movement::factory(20)
-        //     ->for(
-        //         auth()->user()
-        //     )
-        //     ->sequence(...Quick::factory(20)->for(auth()->user())->create()->map(
-        //         fn (Quick $quick) => ["movementable_id" => $quick->id]
-        //     )->toArray())
-        //     ->create(["movementable_type" => Quick::class]);
-        // Quick::query()->orderBy("id")->with("movement")->chunk(100, function (Collection $quicks) {
-        //     $quicks->each(function (Quick $quick) {
-        //         $quick->created_at = now()->subDays(rand(0, 100))->subHours(rand(0, 240));
-        //         $quick->movement->type = rand(0, 1) ? MovementTypeEnum::IN->value : MovementTypeEnum::OUT->value;
-        //         $quick->movement->save();
-        //         $quick->save();
-        //     });
-        // });
-
         /**
          * @var User
          */

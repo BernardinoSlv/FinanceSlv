@@ -6,8 +6,13 @@ use App\Helpers\Alert;
 use App\Http\Requests\StoreDebtRequest;
 use App\Http\Requests\UpdateDebtRequest;
 use App\Models\Debt;
+use App\Models\Identifier;
 use App\Models\Movement;
+use App\Pipes\Debt\FilterByTextPipe;
+use App\Pipes\Debt\OrderByPipe;
+use App\Pipes\Debt\StatusPipe;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
@@ -17,13 +22,20 @@ class DebtController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Pipeline $pipeline)
     {
-        $debts = auth()->user()->debts()
+        $debts = $pipeline->send(auth()->user()->debts())
+            ->through([
+                FilterByTextPipe::class,
+                OrderByPipe::class,
+                StatusPipe::class
+            ])
+            ->thenReturn()
+            ->select("debts.*")
             ->with("identifier")
             ->withSum("movements", "amount")
-            ->orderBy("id", "desc")
-            ->paginate();
+            ->paginate()
+            ->withQueryString();
 
         return view("debts.index", compact("debts"));
     }
