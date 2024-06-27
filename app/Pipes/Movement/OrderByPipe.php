@@ -50,7 +50,15 @@ class OrderByPipe implements PipeContract
                 )->orderBy("identifiers.name", $orderType);
                 break;
             default:
-                $query->orderBy("movements.created_at", $orderType);
+                $query->orderBy(
+                    DB::raw("(
+                        CASE
+                            WHEN movements.effetive_at is not null THEN movements.effetive_at
+                            ELSE movements.created_at
+                        END
+                    )"),
+                    $orderType
+                );
         }
         $query->orderBy('movements.id', "DESC");
 

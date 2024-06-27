@@ -18,6 +18,7 @@ return new class extends Migration
             $table->morphs("movementable");
             $table->string("type");
             $table->decimal("amount");
+            $table->date("effetive_at")->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

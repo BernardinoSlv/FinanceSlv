@@ -198,7 +198,13 @@
                                         <strong>{{ $movement->id }}</strong>
                                     </td>
                                     <td>
-                                        {{ get_class($movement->movementable) }}
+                                        <span class=" border-bottom">
+                                            @if (get_class($movement->movementable) === 'App\\Models\\Quick')
+                                                Simples
+                                            @else
+                                                Dívida
+                                            @endif
+                                        </span>
                                     </td>
                                     <td>
                                         <x-movement-type :movement="$movement" />
@@ -209,7 +215,17 @@
                                         <a href="javascript:;">{{ $movement->identifier?->name }}</a>
                                     </td>
                                     <td>
-                                        {{ $movement->created_at->format('d/m/Y') }}
+                                        @if ($movement->effetive_at)
+                                            @if ($movement->effetive_at->gt($movement->created_at))
+                                                <span class="text-warning fw-bold">
+                                                    {{ $movement->effetive_at->format('d/m/Y') }}
+                                                </span>
+                                            @else
+                                                {{ $movement->effetive_at->format('d/m/Y') }}
+                                            @endif
+                                        @else
+                                            {{ $movement->created_at->format('d/m/Y') }}
+                                        @endif
                                     </td>
                                     <td>
                                         <div class="dropdown">

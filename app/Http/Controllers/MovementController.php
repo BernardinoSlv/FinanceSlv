@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\Alert;
 use App\Http\Requests\StoreMovementRequest;
 use App\Http\Requests\UpdateMovementRequest;
+use App\Models\Debt;
 use App\Models\Movement;
 use App\Pipes\Movement\FilterByTextPipe;
 use App\Pipes\Movement\OperationTypePipe;
@@ -21,6 +22,13 @@ class MovementController extends Controller
      */
     public function index(Pipeline $pipeline)
     {
+        // Movement::query()->where("movementable_type", Debt::class)
+        //     ->each(function (Movement $movement) {
+        //         $movement->effetive_at = now()->addDays(rand(0, 30));
+        //         $movement->save();
+        //     });
+
+
         /** @var User $user */
         $user = auth()->user();
         $movements = $pipeline->send($user->movements())

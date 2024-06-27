@@ -24,6 +24,10 @@ class Movement extends Model
         "amount"
     ];
 
+    public $casts = [
+        "effetive_at" => "date"
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, "user_id", "id")->withTrashed();
@@ -42,6 +46,4 @@ class Movement extends Model
             "id"
         )->withTrashed();
     }
-
-
 }
