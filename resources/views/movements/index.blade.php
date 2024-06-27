@@ -22,10 +22,11 @@
         <a href="javascript:;"><span class="me-1">On Discount</span><span class="text-secondary">(88754)</span></a>
     </div>
 
-    <div class="row g-3">
+    <form action="{{ route('movements.index') }}" method="GET" class="row g-3">
         <div class="col-auto">
             <div class="position-relative">
-                <input class="form-control px-5" type="search" placeholder="Search Products">
+                <input class="form-control px-5" type="search" name="text" value="{{ request('text') }}"
+                    placeholder="Buscar">
                 <span
                     class="material-symbols-outlined position-absolute ms-3 translate-middle-y start-0 top-50 fs-5">search</span>
             </div>
@@ -34,56 +35,144 @@
             <div class="btn-group position-static">
                 <div class="btn-group position-static">
                     <button type="button" class="btn border btn-light dropdown-toggle px-4" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        Category
+                        data-bs-auto-close="outside" aria-expanded="false">
+                        Buscar por
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="javascript:;">Action</a></li>
-                        <li><a class="dropdown-item" href="javascript:;">Another action</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
+                        <li class="">
+                            <h6 class="dropdown-header">Campos</h6>
                         </li>
-                        <li><a class="dropdown-item" href="javascript:;">Something else here</a></li>
+                        <li class="">
+                            <label for="radio-search-by-empty" class="form-check-label dropdown-item">
+                                <input type="radio" name="search_by" id="radio-search-by-empty" value=""
+                                    class="form-check-input" @checked(!request('search_by'))>
+                                Todos</label>
+                        </li>
+                        <li class="">
+                            <label for="radio-search-by-title" class="form-check-label dropdown-item">
+                                <input type="radio" name="search_by" id="radio-search-by-title" value="title"
+                                    class="form-check-input" @checked(request('search_by') === 'title')>
+                                Título</label>
+                        </li>
+                        <li class="">
+                            <label for="radio-search-by-identifier" class="form-check-label dropdown-item">
+                                <input type="radio" name="search_by" id="radio-search-by-identifier" value="identifier"
+                                    class="form-check-input" @checked(request('search_by') === 'identifier')>
+                                Identificador</label>
+                        </li>
                     </ul>
                 </div>
                 <div class="btn-group position-static">
                     <button type="button" class="btn border btn-light dropdown-toggle px-4" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        Vendor
+                        data-bs-auto-close="outside" aria-expanded="false">
+                        Ordernar por
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="javascript:;">Action</a></li>
-                        <li><a class="dropdown-item" href="javascript:;">Another action</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
+                        <li class="">
+                            <h6 class="dropdown-header">Campos</h6>
                         </li>
-                        <li><a class="dropdown-item" href="javascript:;">Something else here</a></li>
+                        <li class="">
+                            <label for="radio-order-by-date" class="form-check-label dropdown-item">
+                                <input type="radio" name="order_by" id="radio-order-by-date" value=""
+                                    class="form-check-input" @checked(!request('order_by'))>
+                                Data</label>
+                        </li>
+                        <li class="">
+                            <label for="radio-order-by-title" class="form-check-label dropdown-item">
+                                <input type="radio" name="order_by" id="radio-order-by-title" value="title"
+                                    class="form-check-input" @checked(request('order_by') === 'title')>
+                                Título</label>
+                        </li>
+                        <li class="">
+                            <label for="radio-order-by-amount" class="form-check-label dropdown-item">
+                                <input type="radio" name="order_by" id="radio-order-by-amount" value="amount"
+                                    class="form-check-input" @checked(request('order_by') === 'amount')>
+                                Valor</label>
+                        </li>
+                        <li class="">
+                            <label for="radio-order-by-identifier" class="form-check-label dropdown-item">
+                                <input type="radio" name="order_by" id="radio-order-by-identifier" value="identifier"
+                                    class="form-check-input" @checked(request('order_by') === 'identifier')>
+                                Identificador</label>
+                        </li>
+                        <li class="dropdown-divider"></li>
+                        <li>
+                            <h6 class="dropdown-header">Ordem</h6>
+                        </li>
+                        <li class="">
+                            <label for="radio-order-type-asc" class="form-check-label dropdown-item">
+                                <input type="radio" name="order_type" id="radio-order-type-asc" value="a"
+                                    class="form-check-input" @checked(request('order_type') === 'a')>
+                                Crescenter</label>
+                        </li>
+                        <li class="">
+                            <label for="radio-order-type-desc" class="form-check-label dropdown-item">
+                                <input type="radio" name="order_type" id="radio-order-type-desc" value=""
+                                    class="form-check-input" @checked(!request('order_type'))>
+                                Decrescente</label>
+                        </li>
                     </ul>
                 </div>
                 <div class="btn-group position-static">
                     <button type="button" class="btn border btn-light dropdown-toggle px-4" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        Collection
+                        data-bs-auto-close="outside" aria-expanded="false">
+                        Tipo
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="javascript:;">Action</a></li>
-                        <li><a class="dropdown-item" href="javascript:;">Another action</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
+                        <li class="">
+                            <label for="radio-type-all" class="form-check-label dropdown-item">
+                                <input type="radio" name="type" id="radio-type-all" value=""
+                                    class="form-check-input" @checked(!request('type'))>
+                                Todos</label>
                         </li>
-                        <li><a class="dropdown-item" href="javascript:;">Something else here</a></li>
+                        <li class="">
+                            <label for="radio-type-in" class="form-check-label dropdown-item">
+                                <input type="radio" name="type" id="radio-type-in" value="in"
+                                    class="form-check-input" @checked(request('type') === 'in')>
+                                Entrada</label>
+                        </li>
+                        <li class="">
+                            <label for="radio-type-out" class="form-check-label dropdown-item">
+                                <input type="radio" name="type" id="radio-type-out" value="out"
+                                    class="form-check-input" @checked(request('type') === 'out')>
+                                Saída</label>
+                        </li>
+                        <li class="dropdown-divider"></li>
+                        <li>
+                            <h4 class="dropdown-header">Operação</h4>
+                        </li>
+                        <li class="">
+                            <label for="radio-operation-type-all" class="form-check-label dropdown-item">
+                                <input type="radio" name="operation_type" id="radio-operation-type-all" value=""
+                                    class="form-check-input" @checked(!request('operation_type'))>
+                                Todas</label>
+                        </li>
+                        <li class="">
+                            <label for="radio-operation-type-quick" class="form-check-label dropdown-item">
+                                <input type="radio" name="operation_type" id="radio-operation-type-quick"
+                                    value="quick" class="form-check-input" @checked(request('operation_type') === 'quick')>
+                                Simples</label>
+                        </li>
+                        <li class="">
+                            <label for="radio-operation-type-debt" class="form-check-label dropdown-item">
+                                <input type="radio" name="operation_type" id="radio-operation-type-debt"
+                                    value="debt" class="form-check-input" @checked(request('operation_type') === 'debt')>
+                                Dívidas</label>
+                        </li>
                     </ul>
                 </div>
+                <button class="btn btn-primary flex-shrink-0">
+                    <i class="bi bi-search"></i> Filtrar
+                </button>
             </div>
         </div>
         <div class="col-auto">
             <div class="d-flex align-items-center gap-2 justify-content-lg-end">
-                <button class="btn btn-light px-4"><i class="bi bi-box-arrow-right me-2"></i>Export</button>
-                {{-- <a class="btn btn-primary px-4" href="{{ route('movements.create') }}"><i
-                        class="bi bi-plus-lg me-2"></i>Criar</a> --}}
+                <button class="btn btn-light px-4" type="button"><i
+                        class="bi bi-box-arrow-right me-2"></i>Export</button>
             </div>
         </div>
-    </div><!--end row-->
+    </form><!--end row-->
 
     <div class="card mt-4">
         <div class="card-body">
@@ -120,7 +209,7 @@
                                         <a href="javascript:;">{{ $movement->identifier?->name }}</a>
                                     </td>
                                     <td>
-                                        {{ $movement->created_at }}
+                                        {{ $movement->created_at->format('d/m/Y') }}
                                     </td>
                                     <td>
                                         <div class="dropdown">

@@ -6,6 +6,11 @@ use App\Helpers\Alert;
 use App\Http\Requests\StoreMovementRequest;
 use App\Http\Requests\UpdateMovementRequest;
 use App\Models\Movement;
+use App\Pipes\Movement\FilterByTextPipe;
+use App\Pipes\Movement\OperationTypePipe;
+use App\Pipes\Movement\OrderByPipe;
+use App\Pipes\Movement\TypePipe;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
@@ -14,14 +19,24 @@ class MovementController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Pipeline $pipeline)
     {
         /** @var User $user */
         $user = auth()->user();
-        $movements = $user->movements()
+        $movements = $pipeline->send($user->movements())
+            ->through([
+                FilterByTextPipe::class,
+                OrderByPipe::class,
+                OperationTypePipe::class,
+                TypePipe::class
+            ])
+            ->thenReturn()
+            ->addSelect('movements.*')
             ->with(["identifier", "movementable"])
-            ->orderBy('id', "DESC")
-            ->paginate();
+            ->paginate()
+            ->withQueryString();
+
+        // dd($movements->first());
 
         return view("movements.index", compact("movements"));
     }
