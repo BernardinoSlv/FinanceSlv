@@ -37,7 +37,7 @@
                     <label for="remember" class="form-check-label">Lembrar de mim</label>
                 </div>
                 <div class="text-end">
-                    <button class="btn btn-primary">Cadastrar</button>
+                    <button class="btn btn-primary">Entrar</button>
                 </div>
             </form>
             <p>Ainda não tem conta? <a href="{{ route('auth.create') }}">clique aqui</a></p>

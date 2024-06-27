@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DebtController;
+use App\Http\Controllers\DebtPaymentController;
 use App\Http\Controllers\IdentifierController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\MovementController;
@@ -58,7 +59,8 @@ Route::middleware("checkAuth")->group(function () {
             "edit" => "movements.edit",
             "update" => "movements.update",
             "destroy" => "movements.destroy",
-        ]);
+        ])
+        ->only(["index", "destroy"]);
     Route::resource("dividas", DebtController::class)
         ->parameter("dividas", "debt")
         ->names([
@@ -70,6 +72,18 @@ Route::middleware("checkAuth")->group(function () {
             "update" => "debts.update",
             "destroy" => "debts.destroy",
         ]);
+    Route::resource("dividas.pagamentos", DebtPaymentController::class)
+        ->parameter("dividas", "debt")
+        ->parameter("pagamentos", "movement")
+        ->names([
+            "index" => "debts.payments.index",
+            "create" => "debts.payments.create",
+            "store" => "debts.payments.store",
+            "show" => "debts.payments.show",
+            "edit" => "debts.payments.edit",
+            "update" => "debts.payments.update",
+            "destroy" => "debts.payments.destroy",
+        ])->scoped();
     // // expenses
     // Route::resource("despesas", ExpenseController::class)
     //     ->parameter("despesas", "expense")

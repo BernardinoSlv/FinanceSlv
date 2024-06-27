@@ -33,7 +33,7 @@ class UpdateDebtRequest extends FormRequest
             "description" => ["nullable"],
             "amount" => ["required", new Amount],
             "installments" => ["nullable", "integer", "min:1"],
-            "due_date" => ["required", "date"],
+            "due_date" => ["nullable", "date"],
         ];
     }
 }

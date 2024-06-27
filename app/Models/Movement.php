@@ -17,10 +17,15 @@ class Movement extends Model
 
     protected $fillable = [
         "user_id",
+        "identifier_id",
         "movementable_type",
         "movementable_id",
         "type",
         "amount"
+    ];
+
+    public $casts = [
+        "effetive_at" => "date"
     ];
 
     public function user(): BelongsTo
@@ -33,19 +38,12 @@ class Movement extends Model
         return $this->morphTo("movementable")->withTrashed();
     }
 
-    /**
-     * obtém as movimentação de um identifier
-     */
-    public function scopeByIdentifier(Builder $query, int $identifierId)
+    public function identifier(): BelongsTo
     {
-        $query
-            // join with quicks
-            ->leftJoin(
-                "quicks",
-                fn (JoinClause $join) => $join
-                    ->on("movements.movementable_id", "=", "quicks.id")
-                    ->where("movementable_type", Quick::class)
-            )
-            ->where("quicks.identifier_id", $identifierId);
+        return $this->belongsTo(
+            Identifier::class,
+            "identifier_id",
+            "id"
+        )->withTrashed();
     }
 }

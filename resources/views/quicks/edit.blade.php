@@ -58,7 +58,7 @@
                             <div class="col-sm-6">
                                 <h5 class="mb-2">Valor</h5>
                                 <input type="text" name="amount" value="{{ old('amount', $quick->movement?->amount) }}"
-                                    class="form-control">
+                                    class="form-control" data-js-mask="money">
                                 <div class="form-text"><strong>Ex</strong>: 1.599,00</div>
                             </div>
                             <div class="col-12">

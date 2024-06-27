@@ -51,7 +51,7 @@ $(function() {
 
 
 
-// email 
+// email
 
 $(".email-toggle-btn").on("click", function() {
 	$(".email-wrapper").toggleClass("email-toggled")
@@ -64,7 +64,7 @@ $(".email-toggle-btn").on("click", function() {
 })
 
 
-// chat 
+// chat
 
 $(".chat-toggle-btn").on("click", function() {
 	$(".chat-wrapper").toggleClass("chat-toggled")
@@ -75,7 +75,7 @@ $(".chat-toggle-btn").on("click", function() {
 
 
 
-// switcher 
+// switcher
 
 $("#LightTheme").on("click", function() {
 	$("html").attr("data-bs-theme", "light")
@@ -104,6 +104,16 @@ $(".dark-mode").click(function () {
 	})
 })
 
+// masks
+  document.querySelectorAll('[data-js-mask]').forEach(elem => {
+    const maskType = elem.getAttribute("data-js-mask");
+    const elemJquery = $(elem);
 
+    switch(maskType) {
+      case "money":
+        elemJquery.mask('000.000.000.000.000,00', {reverse: true});
+        break
+    }
+  });
 
 });

@@ -22,7 +22,7 @@ class QuickFactory extends Factory
         return [
             "user_id" => $user,
             "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
-            "title" => fake()->title(),
+            "title" => fake()->word(),
             "description" => fake()->text(100),
         ];
     }

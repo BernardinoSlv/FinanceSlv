@@ -2,11 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\MovementTypeEnum;
 use App\Helpers\Alert;
 use App\Http\Requests\StoreQuickRequest;
 use App\Http\Requests\UpdateQuickRequest;
+use App\Models\Movement;
 use App\Models\Quick;
 use App\Models\User;
+use App\Pipes\Quick\FilterByTextPipe;
+use App\Pipes\Quick\OrderByPipe;
+use App\Pipes\Quick\TypePipe;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
@@ -15,20 +23,24 @@ class QuickController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Pipeline $pipeline)
     {
         /**
          * @var User
          */
         $user =  auth()->user();
-        $paginator = $user->quicks()
-            ->orderBy("created_at", "desc")
-            ->with(["movement", "identifier"])->paginate(
-                request("per_page", 10)
-            )
+        $quicks = $pipeline->send($user->quicks())
+            ->through([
+                FilterByTextPipe::class,
+                OrderByPipe::class,
+                TypePipe::class
+            ])
+            ->thenReturn()
+            ->with(["movement", "identifier"])
+            ->select("quicks.*")
+            ->paginate()
             ->withQueryString();
-
-        return view("quicks.index", compact("paginator"));
+        return view("quicks.index", compact("quicks"));
     }
 
     /**
@@ -50,7 +62,7 @@ class QuickController extends Controller
      */
     public function store(StoreQuickRequest $request)
     {
-
+        DB::beginTransaction();
         $quick = Quick::query()->create([
             ...$request->validated(),
             "user_id" => auth()->id()
@@ -60,6 +72,7 @@ class QuickController extends Controller
             "amount" => RealToFloatParser::parse($request->input("amount")),
             "user_id" => auth()->id()
         ]);
+        DB::commit();
 
         return redirect()->route("quicks.index")
             ->with(Alert::success("Registro criado."));
@@ -98,6 +111,7 @@ class QuickController extends Controller
         if (Gate::denies("quick-edit", $quick)) {
             abort(403);
         }
+        DB::beginTransaction();
         $quick->fill($request->validated());
         $quick->save();
 
@@ -110,6 +124,7 @@ class QuickController extends Controller
             ...$request->validated(),
             'amount' => RealToFloatParser::parse($request->input('amount'))
         ])->save();
+        DB::commit();
 
 
         return redirect()->route("quicks.edit", $quick)
@@ -125,8 +140,10 @@ class QuickController extends Controller
             abort(403);
         }
 
+        DB::beginTransaction();
         $quick->movement->delete();
         $quick->delete();
+        DB::commit();
 
         return redirect()->route('quicks.index')
             ->with(Alert::success("Registro deletado com suceso."));

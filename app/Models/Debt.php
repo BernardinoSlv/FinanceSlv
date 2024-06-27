@@ -34,4 +34,9 @@ class Debt extends Model
     {
         return $this->morphMany(Movement::class, "movementable");
     }
+
+    public function identifier(): BelongsTo
+    {
+        return $this->belongsTo(Identifier::class, "identifier_id", "id")->withTrashed();
+    }
 }
