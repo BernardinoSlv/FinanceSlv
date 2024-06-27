@@ -6,6 +6,14 @@ use App\Helpers\Alert;
 use App\Http\Requests\StoreDebtRequest;
 use App\Http\Requests\UpdateDebtRequest;
 use App\Models\Debt;
+use App\Models\Identifier;
+use App\Models\Movement;
+use App\Pipes\Debt\FilterByTextPipe;
+use App\Pipes\Debt\OrderByPipe;
+use App\Pipes\Debt\StatusPipe;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
@@ -14,11 +22,20 @@ class DebtController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Pipeline $pipeline)
     {
-        $debts = auth()->user()->debts()
-            ->orderBy("id", "desc")
-            ->paginate();
+        $debts = $pipeline->send(auth()->user()->debts())
+            ->through([
+                FilterByTextPipe::class,
+                OrderByPipe::class,
+                StatusPipe::class
+            ])
+            ->thenReturn()
+            ->select("debts.*")
+            ->with("identifier")
+            ->withSum("movements", "amount")
+            ->paginate()
+            ->withQueryString();
 
         return view("debts.index", compact("debts"));
     }
@@ -82,10 +99,15 @@ class DebtController extends Controller
         if (Gate::denies("debt-edit", $debt))
             abort(403);
 
+        DB::beginTransaction();
         $debt->fill([
             ...$request->validated(),
             "amount" => RealToFloatParser::parse($request->input("amount"))
         ])->save();
+        $debt->movements()->update([
+            "identifier_id" => $request->input('identifier_id')
+        ]);
+        DB::commit();
 
         return redirect()->route("debts.edit", $debt)
             ->with(Alert::success("Dívida atualizada com sucesso."));

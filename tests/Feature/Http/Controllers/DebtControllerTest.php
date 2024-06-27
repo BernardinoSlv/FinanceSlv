@@ -4,6 +4,7 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Debt;
 use App\Models\Identifier;
+use App\Models\Movement;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -89,7 +90,6 @@ class DebtControllerTest extends TestCase
                 "identifier_id",
                 "amount",
                 "title",
-                "due_date"
             ]);
     }
 
@@ -202,7 +202,6 @@ class DebtControllerTest extends TestCase
                 "identifier_id",
                 "title",
                 "amount",
-                "due_date"
             ]);
     }
 
@@ -246,6 +245,42 @@ class DebtControllerTest extends TestCase
             "amount" => 500,
             "user_id" => $user->id,
             "id" => $debt->id,
+        ]);
+    }
+
+    /**
+     * deve atualizar o identifier_id
+     */
+    public function test_update_action_with_movements(): void
+    {
+        $user = User::factory()
+            ->has(Identifier::factory())
+            ->has(Debt::factory())
+            ->create();
+        $debt = $user->debts->first();
+        $movements = Movement::factory(2)
+            ->for($debt, "movementable")
+            ->for($user)
+            ->create();
+        $data = Debt::factory()->make([
+            "identifier_id" => $user->identifiers->first(),
+            "amount" => "500,00",
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("debts.update", $debt), $data)
+            ->assertRedirect(route("debts.edit", $debt))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertDatabaseHas("movements", [
+            "id" => $movements->first()->id,
+            "movementable_type" => Debt::class,
+            "movementable_id" => $debt->id,
+            "identifier_id" => $user->identifiers->first()->id,
+        ]);
+        $this->assertDatabaseHas("movements", [
+            "id" => $movements->last()->id,
+            "movementable_type" => Debt::class,
+            "movementable_id" => $debt->id,
+            "identifier_id" => $user->identifiers->first()->id,
         ]);
     }
 

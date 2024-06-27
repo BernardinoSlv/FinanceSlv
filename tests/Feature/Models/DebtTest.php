@@ -3,6 +3,7 @@
 namespace Tests\Feature\Models;
 
 use App\Models\Debt;
+use App\Models\Identifier;
 use App\Models\Movement;
 use App\Models\Quick;
 use App\Models\User;
@@ -70,5 +71,31 @@ class DebtTest extends TestCase
         ]);
 
         $this->assertCount(2, $debt->movements);
+    }
+
+    /**
+     * deve retornar o Identifier
+     */
+    public function test_indentifier_method(): void
+    {
+        Identifier::factory(2)->create();
+
+        $identifier = Identifier::factory()->create();
+        $debt = Debt::factory()->for($identifier)->create();
+
+        $this->assertEquals($identifier->id, $debt->identifier->id);
+    }
+
+    /**
+     * deve retornar o Identifier mesmo deletado
+     */
+    public function test_indentifier_method_trashed_identifier(): void
+    {
+        Identifier::factory(2)->create();
+
+        $identifier = Identifier::factory()->trashed()->create();
+        $debt = Debt::factory()->for($identifier)->create();
+
+        $this->assertEquals($identifier->id, $debt->identifier->id);
     }
 }

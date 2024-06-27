@@ -5,7 +5,13 @@ namespace App\Http\Controllers;
 use App\Helpers\Alert;
 use App\Http\Requests\StoreMovementRequest;
 use App\Http\Requests\UpdateMovementRequest;
+use App\Models\Debt;
 use App\Models\Movement;
+use App\Pipes\Movement\FilterByTextPipe;
+use App\Pipes\Movement\OperationTypePipe;
+use App\Pipes\Movement\OrderByPipe;
+use App\Pipes\Movement\TypePipe;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
@@ -14,14 +20,31 @@ class MovementController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Pipeline $pipeline)
     {
+        // Movement::query()->where("movementable_type", Debt::class)
+        //     ->each(function (Movement $movement) {
+        //         $movement->effetive_at = now()->addDays(rand(0, 30));
+        //         $movement->save();
+        //     });
+
+
         /** @var User $user */
         $user = auth()->user();
-        $movements = $user->movements()
-            ->with(["movementable", "movementable.identifier"])
-            ->orderBy('id', "DESC")
-            ->paginate();
+        $movements = $pipeline->send($user->movements())
+            ->through([
+                FilterByTextPipe::class,
+                OrderByPipe::class,
+                OperationTypePipe::class,
+                TypePipe::class
+            ])
+            ->thenReturn()
+            ->addSelect('movements.*')
+            ->with(["identifier", "movementable"])
+            ->paginate()
+            ->withQueryString();
+
+        // dd($movements->first());
 
         return view("movements.index", compact("movements"));
     }
