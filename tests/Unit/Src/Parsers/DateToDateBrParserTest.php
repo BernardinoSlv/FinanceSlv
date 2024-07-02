@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\src\Parsers;
+namespace Tests\Unit\Src\Parsers;
 
 use PHPUnit\Framework\TestCase;
 use Src\Parsers\DateToDateBrParser;
