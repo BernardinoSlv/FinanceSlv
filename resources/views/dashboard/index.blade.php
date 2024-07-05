@@ -1,7 +1,22 @@
 @extends('master.master')
 
 @section('content')
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-xl-3 row-cols-xxl-3">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-xl-4 row-cols-xxl-4">
+        <div class="col">
+            <div class="card radius-10 border-0 border-start border-primary border-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="">
+                            <p class="mb-1 fw-bold">Balanço</p>
+                            <h4 class="mb-0 text-primary">@amount($totalEntry - $totalExit)</h4>
+                        </div>
+                        <div class="ms-auto widget-icon bg-primary text-white">
+                            <i class="bi bi-calculator"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="col">
             <div class="card radius-10 border-0 border-start border-success border-4">
                 <div class="card-body">
@@ -121,17 +136,17 @@
 
                     <li class="list-group-item border-top d-flex justify-content-between align-items-center bg-transparent">
                         Entradas<span class="badge bg-success rounded-pill">
-                            {{ number_format((100 / $tempTotalAll) * $totalEntry, 1) }}%
+                            {{ number_format(!$tempTotalAll ? 0 : (100 / $tempTotalAll) * $totalEntry, 1) }}%
                         </span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
                         Saídas<span class="badge bg-danger rounded-pill">
-                            {{ number_format((100 / $tempTotalAll) * $totalExit, 1) }}%
+                            {{ number_format(!$tempTotalAll ? 0 : (100 / $tempTotalAll) * $totalExit, 1) }}%
                         </span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
                         Dívidas<span class="badge bg-warning rounded-pill">
-                            {{ number_format((100 / $tempTotalAll) * $totalDebts, 1) }}%
+                            {{ number_format(!$tempTotalAll ? 0 : (100 / $tempTotalAll) * $totalDebts, 1) }}%
                         </span>
                     </li>
                 </ul>
@@ -267,70 +282,27 @@
                 </div>
                 <div class="card-body">
                     <div class="team-list">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="widget-icon bg-transparent border rounded-3">
-                                <img src="assets/images/icons/apple.png" alt="" width="30">
-                            </div>
-                            <div class="flex-grow-1">
-                                <p class="mb-2 fw-bold">Angular 12 Dashboard</p>
-                                <div class="progress" style="height: 5px;">
-                                    <div class="progress-bar" role="progressbar" style="width: 75%;" aria-valuenow="75"
-                                        aria-valuemin="0" aria-valuemax="100"></div>
+                        @foreach ($topDebts as $debt)
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="flex-grow-1">
+                                    <p class="mb-1 fw-bold text-truncate">{{ $debt->title }}</p>
+                                    <p class="mb-1 fw-bold text-truncate text-muted">{{ $debt->identifier?->name }}</p>
+                                    <div class="mb-2">
+                                        <span class="badge text-bg-danger">@amount($debt->amount)</span>
+                                        <span class="badge text-bg-success">@amount($debt->movements_sum_amount)</span>
+                                    </div>
+                                    <div class="text-end fw-bold">
+                                        {{ intval((100 / $debt->amount) * intval($debt->movements_sum_amount)) }}%
+                                    </div>
+                                    <div class="progress" style="height: 5px;">
+                                        <div class="progress-bar" role="progressbar"
+                                            style="width: {{ intval((100 / $debt->amount) * intval($debt->movements_sum_amount)) }}%;"
+                                            aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <hr>
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="widget-icon bg-transparent border rounded-3">
-                                <img src="assets/images/icons/bootstrap.png" alt="" width="30">
-                            </div>
-                            <div class="flex-grow-1">
-                                <p class="mb-2 fw-bold">Angular 12 Dashboard</p>
-                                <div class="progress" style="height: 5px;">
-                                    <div class="progress-bar" role="progressbar" style="width: 70%;" aria-valuenow="75"
-                                        aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="widget-icon bg-transparent border rounded-3">
-                                <img src="assets/images/icons/google-2.png" alt="" width="30">
-                            </div>
-                            <div class="flex-grow-1">
-                                <p class="mb-2 fw-bold">Angular 12 Dashboard</p>
-                                <div class="progress" style="height: 5px;">
-                                    <div class="progress-bar" role="progressbar" style="width: 65%;" aria-valuenow="75"
-                                        aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="widget-icon bg-transparent border rounded-3">
-                                <img src="assets/images/icons/spotify.png" alt="" width="30">
-                            </div>
-                            <div class="flex-grow-1">
-                                <p class="mb-2 fw-bold">Angular 12 Dashboard</p>
-                                <div class="progress" style="height: 5px;">
-                                    <div class="progress-bar" role="progressbar" style="width: 55%;" aria-valuenow="75"
-                                        aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="widget-icon bg-transparent border rounded-3">
-                                <img src="assets/images/icons/outlook.png" alt="" width="30">
-                            </div>
-                            <div class="flex-grow-1">
-                                <p class="mb-2 fw-bold">Angular 12 Dashboard</p>
-                                <div class="progress" style="height: 5px;">
-                                    <div class="progress-bar" role="progressbar" style="width: 45%;" aria-valuenow="75"
-                                        aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
-                            </div>
-                        </div>
+                            <hr>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -338,7 +310,7 @@
     </div><!--end row-->
 
 
-    <div class="row">
+    {{-- <div class="row">
         <div class="col-12 col-lg-12 col-xl-6">
             <div class="card">
                 <div class="card-header bg-transparent">
@@ -401,10 +373,10 @@
                 </div>
             </div>
         </div>
-    </div><!--end row-->
+    </div><!--end row--> --}}
 
 
-    <div class="card">
+    {{-- <div class="card">
         <div class="card-body">
             <div class="customer-table">
                 <div class="table-responsive white-space-nowrap">
@@ -611,7 +583,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 @endsection
 
 

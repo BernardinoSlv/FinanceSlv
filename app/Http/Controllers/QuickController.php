@@ -141,7 +141,7 @@ class QuickController extends Controller
         }
 
         DB::beginTransaction();
-        $quick->movement->delete();
+        $quick->movement?->delete();
         $quick->delete();
         DB::commit();
 

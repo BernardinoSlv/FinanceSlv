@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Enums\MovementTypeEnum;
 use App\Models\Debt;
+use App\Models\Identifier;
+use App\Models\Movement;
+use App\Models\Quick;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -61,12 +64,15 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
         $topDebts = $user->debts()
-        ->select("debts.*")
-                ->withSum(["movements" => function(Builder $query) {
-                    $query->where("movements.type", MovementTypeEnum::OUT->value)
-                }], )
-            ->
-
+            ->select("debts.*")
+            ->withSum(["movements" => function (Builder $query) {
+                $query->where("movements.type", MovementTypeEnum::OUT->value);
+            }], "amount")
+            ->orderBy("debts.amount", "DESC")
+            ->orderBy("debts.id", "ASC")
+            ->with("identifier")
+            ->limit(5)
+            ->get();
 
         return view("dashboard.index", compact(
             "totalEntry",
@@ -75,6 +81,7 @@ class DashboardController extends Controller
             "dataChart1",
             "topIdendifiersEntry",
             "topIdendifiersExit",
+            "topDebts"
         ));
     }
 }
