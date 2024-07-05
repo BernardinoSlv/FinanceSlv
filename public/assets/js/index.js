@@ -3,10 +3,14 @@ $(function () {
 
 
 	// chart 1
+  const chart1Elem = document.querySelector("#chart1");
+  const chart1Config = JSON.parse(chart1Elem.getAttribute("data-config"));
+  console.log(chart1Config);
+
 	var options = {
 		series: [{
-			name: 'Sales Overview',
-			data: [10, 25, 42, 12, 55, 30, 63, 27, 20]
+			name: 'Entradas',
+			data: chart1Config.map((data) => data.amount)
 		}],
 		chart: {
 			foreColor: '#9ba7b2',
@@ -57,19 +61,21 @@ $(function () {
 			enabledOnSeries: [1]
 		},
 		xaxis: {
-			categories: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+			categories: chart1Config.map((data) => data.period),
 		},
 	};
-	var chart = new ApexCharts(document.querySelector("#chart1"), options);
+	var chart = new ApexCharts(chart1Elem, options);
 	chart.render();
-	
+
 
 
 
 // chart 2
+const chart2Elem = document.querySelector("#chart2");
+const chart2Config = JSON.parse(chart2Elem.getAttribute("data-config"));
 
 var options = {
-	series: [10, 25, 10],
+	series: [chart2Config.totalEntry, chart2Config.totalExit, chart2Config.totalDebts],
 	chart: {
 		height: 255,
 		type: 'donut',
@@ -86,11 +92,11 @@ var options = {
 			}
 		}
 	},
-	colors: [ "#198754", "#0d6efd", "#dc3545"],
+	colors: [ "#198754", "#dc3545", "#ffc107"],
 	dataLabels: {
 		enabled: false
 	},
-	labels: ['Mobile', 'Desktop', 'Tablet'],
+	labels: ['Entradas', 'saídas', 'Dívidas'],
 	responsive: [{
 		breakpoint: 480,
 		options: {
@@ -103,7 +109,7 @@ var options = {
 		}
 	}]
 };
-var chart = new ApexCharts(document.querySelector("#chart2"), options);
+var chart = new ApexCharts(chart2Elem, options);
 chart.render();
 
 
@@ -169,7 +175,7 @@ chart.render();
 	};
 	var chart = new ApexCharts(document.querySelector("#chart3"), options);
 	chart.render();
-	
+
 
 
 
@@ -244,5 +250,5 @@ chart.render();
 
 
 
-    	
+
 });
