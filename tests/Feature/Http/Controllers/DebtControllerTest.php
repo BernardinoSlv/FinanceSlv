@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class DebtControllerTest extends TestCase
@@ -32,6 +33,7 @@ class DebtControllerTest extends TestCase
     public function test_index_action(): void
     {
         Debt::factory(2)->create();
+        Debt::factory(1)->create(["due_date" => null]);
 
         $user = User::factory()->has(Debt::factory(2))->create();
 
