@@ -91,7 +91,6 @@ class DebtControllerTest extends TestCase
             ->assertSessionHasErrors([
                 "identifier_id",
                 "amount",
-                "title",
             ]);
     }
 
@@ -202,7 +201,6 @@ class DebtControllerTest extends TestCase
             ->assertFound()
             ->assertSessionHasErrors([
                 "identifier_id",
-                "title",
                 "amount",
             ]);
     }

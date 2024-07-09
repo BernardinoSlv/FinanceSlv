@@ -31,7 +31,7 @@ class StoreQuickRequest extends FormRequest
                 Rule::exists("identifiers", "id")
                     ->where("user_id", auth()->id())
             ],
-            "title" => ["required", "string", "between:2,256"],
+            "title" => ["nullable", "string", "between:2,256"],
             "description" => ["nullable"],
             "type" => [
                 "required", Rule::in([
