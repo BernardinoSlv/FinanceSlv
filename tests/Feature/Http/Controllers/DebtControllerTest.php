@@ -11,7 +11,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class DebtControllerTest extends TestCase
@@ -91,6 +90,7 @@ class DebtControllerTest extends TestCase
             ->assertSessionHasErrors([
                 "identifier_id",
                 "amount",
+                "title",
             ]);
     }
 
@@ -201,6 +201,7 @@ class DebtControllerTest extends TestCase
             ->assertFound()
             ->assertSessionHasErrors([
                 "identifier_id",
+                "title",
                 "amount",
             ]);
     }

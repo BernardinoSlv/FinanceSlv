@@ -90,6 +90,7 @@ class QuickControllerTest extends TestCase
         $this->actingAs($user)->post(route("quicks.store"))
             ->assertFound()
             ->assertSessionHasErrors([
+                "title",
                 "type",
                 "amount"
             ])
@@ -270,6 +271,7 @@ class QuickControllerTest extends TestCase
         $this->actingAs($user)->put(route("quicks.update", $quick))
             ->assertFound()
             ->assertSessionHasErrors([
+                "title",
                 "type",
                 "amount"
             ]);

@@ -29,7 +29,7 @@ class UpdateDebtRequest extends FormRequest
                 Rule::exists("identifiers", "id")
                     ->where("user_id", auth()->id())
             ],
-            "title" => ["nullable", "string", "between:2,256"],
+            "title" => ["required_without:identifier_id", "nullable", "string", "between:2,256"],
             "description" => ["nullable"],
             "amount" => ["required", new Amount],
             "installments" => ["nullable", "integer", "min:1"],
