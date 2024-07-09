@@ -68,7 +68,10 @@ class DashboardController extends Controller
             ->withSum(["movements" => function (Builder $query) {
                 $query->where("movements.type", MovementTypeEnum::OUT->value);
             }], "amount")
-            ->orderBy("debts.amount", "DESC")
+            ->orderBy(DB::raw("debts.amount - (case
+                when movements_sum_amount is null then 0
+                else movements_sum_amount
+                    end)"), "DESC")
             ->orderBy("debts.id", "ASC")
             ->with("identifier")
             ->limit(5)

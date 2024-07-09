@@ -295,7 +295,7 @@
                                         {{ intval((100 / $debt->amount) * intval($debt->movements_sum_amount)) }}%
                                     </div>
                                     <div class="progress" style="height: 5px;">
-                                        <div class="progress-bar" role="progressbar"
+                                        <div class="progress-bar progress-bar-animated" role="progressbar"
                                             style="width: {{ intval((100 / $debt->amount) * intval($debt->movements_sum_amount)) }}%;"
                                             aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>

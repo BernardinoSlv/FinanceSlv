@@ -32,6 +32,7 @@ class DebtControllerTest extends TestCase
     public function test_index_action(): void
     {
         Debt::factory(2)->create();
+        Debt::factory(1)->create(["due_date" => null]);
 
         $user = User::factory()->has(Debt::factory(2))->create();
 
