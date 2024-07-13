@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Parsers;
+namespace Tests\Unit\Src\Parsers;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;

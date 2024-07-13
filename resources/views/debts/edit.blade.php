@@ -42,7 +42,7 @@
                             <div class="col-sm-6">
                                 <h5 class="mb-2">Valor</h5>
                                 <input type="text" name="amount" value="{{ old('amount', $debt->amount) }}"
-                                    class="form-control" data-js-mask="money1">
+                                    class="form-control" data-js-mask="money">
                                 <div class="form-text"><strong>Ex</strong>: 1.599,00</div>
                             </div>
                             <div class="col-sm-6">
@@ -53,7 +53,7 @@
                             <div class="col-sm-6">
                                 <h5 class="mb-2">Data de vencimento</h5>
                                 <input type="date" name="due_date"
-                                    value="{{ old('due_date', $debt->due_date->format('Y-m-d')) }}" class="form-control">
+                                    value="{{ old('due_date', $debt->due_date?->format("Y-m-d")) }}" class="form-control">
                             </div>
                             <div class="col-12">
                                 <h5 class="mb-2">Descrição</h5>
