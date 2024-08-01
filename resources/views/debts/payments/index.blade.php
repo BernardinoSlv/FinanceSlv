@@ -22,15 +22,8 @@
 
     @include('includes.alerts')
 
-    <div class="product-count d-flex align-items-center gap-3 gap-lg-4 mb-4 fw-bold flex-wrap font-text1">
-        <a href="javascript:;"><span class="me-1">All</span><span class="text-secondary">(88754)</span></a>
-        <a href="javascript:;"><span class="me-1">Published</span><span class="text-secondary">(56242)</span></a>
-        <a href="javascript:;"><span class="me-1">Drafts</span><span class="text-secondary">(17)</span></a>
-        <a href="javascript:;"><span class="me-1">On Discount</span><span class="text-secondary">(88754)</span></a>
-    </div>
-
-    <div class="row g-3">
-        <div class="col-auto">
+    <div class="row g-3 justify-content-end mb-4">
+        {{-- <div class="col-auto">
             <div class="position-relative">
                 <input class="form-control px-5" type="search" placeholder="Search Products">
                 <span
@@ -82,80 +75,132 @@
                     </ul>
                 </div>
             </div>
-        </div>
+        </div> --}}
         <div class="col-auto">
             <div class="d-flex align-items-center gap-2 justify-content-lg-end">
                 <button class="btn btn-light px-4"><i class="bi bi-box-arrow-right me-2"></i>Export</button>
-                <a class="btn btn-primary px-4" href="{{ route('debts.payments.create', $debt) }}"><i
-                        class="bi bi-plus-lg me-2"></i>Criar</a>
+                <button type="button" class="btn btn-primary px-4" data-config="" data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvas-create">
+                    <i class="bi bi-plus-lg me-2"></i>Criar
+                </button>
             </div>
         </div>
     </div><!--end row-->
 
-    <div class="card mt-4">
-        <div class="card-body">
-            <div class="product-table">
-                <div class="table-responsive white-space-nowrap">
-                    <table class="table align-middle table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>#</th>
-                                <th>Valor</th>
-                                <th>Data</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($movements->items() as $movement)
-                                <tr>
-                                    <td>
-                                        <strong>{{ $movement->id }}</strong>
-                                    </td>
-                                    <td>R$ {{ $movement->amount }}</td>
-                                    <td>
-                                        {{ $movement->created_at->format('d/m/Y H:i') }}
-                                    </td>
-                                    <td>
-                                        <div class="dropdown">
-                                            <button
-                                                class="btn btn-sm btn-light border dropdown-toggle dropdown-toggle-nocaret"
-                                                type="button" data-bs-toggle="dropdown">
-                                                <i class="bi bi-three-dots"></i>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li>
-                                                    <a class="dropdown-item"
-                                                        href="{{ route('debts.payments.edit', [
-                                                            'debt' => $debt,
-                                                            'movement' => $movement,
-                                                        ]) }}">Editar</a>
-                                                </li>
-                                                <li>
-                                                    <form
-                                                        action="{{ route('debts.payments.destroy', [
-                                                            'debt' => $debt,
-                                                            'movement' => $movement,
-                                                        ]) }}"
-                                                        method="POST"
-                                                        onsubmit="return confirm('O registro será deletado permanentemente!')">
-                                                        @method('DELETE')
-                                                        @csrf
+    <div class="row align-item-start">
+        <div class="col-md-4">
+            <div class="card" style="max-width: 400px">
+                <div class="card-body">
+                    @php
+                        $remainingAmount = floatval($debt->amount) - floatval($debt->movements_sum_amount);
+                    @endphp
+                    <h3>{{ $debt->identifier->name }}</h3>
+                    <h5>{{ $debt->title }}</h5>
+                    <p class="mb-1">Total: @amount($debt->amount)</p>
+                    <p class="mb-1 text-success">Total pago: @amount($debt->movements_sum_amount) </p>
+                    <hr>
+                    <p @class([
+                        'text-danger',
+                        'text-decoration-line-through' => !$remainingAmount,
+                    ])>Restante: @amount($remainingAmount)</p>
+                </div>
 
-                                                        <button type="submit" class="dropdown-item">Remover</button>
-                                                    </form>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card ">
+                <div class="card-body">
+                    <div class="product-table">
+                        <div class="table-responsive white-space-nowrap">
+                            <table class="table align-middle table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Valor</th>
+                                        <th>Data</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($movements->items() as $movement)
+                                        <tr>
+                                            <td>
+                                                <strong>{{ $movement->id }}</strong>
+                                            </td>
+                                            <td>R$ {{ $movement->amount }}</td>
+                                            <td>
+                                                {{ $movement->created_at->format('d/m/Y H:i') }}
+                                            </td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button
+                                                        class="btn btn-sm btn-light border dropdown-toggle dropdown-toggle-nocaret"
+                                                        type="button" data-bs-toggle="dropdown">
+                                                        <i class="bi bi-three-dots"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li>
+                                                            <a class="dropdown-item">Editar</a>
+                                                        </li>
+                                                        <li>
+                                                            <form
+                                                                action="{{ route('debts.payments.destroy', [
+                                                                    'debt' => $debt,
+                                                                    'movement' => $movement,
+                                                                ]) }}"
+                                                                method="POST"
+                                                                onsubmit="return confirm('O registro será deletado permanentemente!')">
+                                                                @method('DELETE')
+                                                                @csrf
+
+                                                                <button type="submit"
+                                                                    class="dropdown-item">Remover</button>
+                                                            </form>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <x-pagination :paginator="$movements" />
                 </div>
             </div>
         </div>
-        <div class="card-footer">
-            <x-pagination :paginator="$movements" />
+    </div>
+
+    <div class="offcanvas offcanvas-end" id="offcanvas-create">
+        <div class="offcanvas-header">
+            <h5>Criar pagamento</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+            <form action="{{ route('debts.payments.store', $debt) }}" method="POST" enctype="multipart/form-data"
+                data-js-component="form-ajax">
+                @csrf
+
+                <div class="mb-3">
+                    <label for="input-amount" class="form-label fw-bold">Valor</label>
+                    <input type="text" name="amount" class="form-control" id="input-amount" data-js-mask="money">
+                    <div class="form-text">ex: 800,00</div>
+                </div>
+                <div class="mb-3">
+                    <label for="input-files" class="form-label fw-bold">Arquivos</label>
+                    <input type="file" class="form-control" name="files[]" multiple id="input-files">
+                    <div class="form-text">Comprovantes, assinaturas e etc...</div>
+                </div>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </div>
+            </form>
         </div>
     </div>
+@endsection
+
+@section('scripts')
 @endsection

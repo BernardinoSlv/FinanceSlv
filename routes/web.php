@@ -74,6 +74,7 @@ Route::middleware("checkAuth")->group(function () {
         ]);
     Route::resource("dividas.pagamentos", DebtPaymentController::class)
         ->parameter("dividas", "debt")
+        ->only(["index", "store", "update", "destroy"])
         ->parameter("pagamentos", "movement")
         ->names([
             "index" => "debts.payments.index",
