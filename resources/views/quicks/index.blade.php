@@ -220,14 +220,7 @@
             </div>
         </div>
         <div class="card-footer">
-            <nav class="">
-                <ul class="pagination pagination-sm justify-content-end">
-                    <li class="page-item {{ $quicks->previousPageUrl() ?: 'disabled' }}"><a
-                            href="{{ $quicks->previousPageUrl() }}" class="page-link">Anterior</a></li>
-                    <li class="page-item {{ $quicks->nextPageUrl() ?: 'disabled' }}"><a
-                            href="{{ $quicks->nextPageUrl() }}" class="page-link">Próximo</a></li>
-                </ul>
-            </nav>
+           <x-pagination :paginator="$quicks" />
         </div>
     </div>
 @endsection
