@@ -486,7 +486,7 @@
                         <div class="menu-title">Dashboard</div>
                     </a>
                 </li>
-                <li>
+                {{-- <li>
                     <a href="javascript:;" class="has-arrow">
                         <div class="parent-icon"><span class="material-symbols-outlined">apps</span>
                         </div>
@@ -515,7 +515,7 @@
                                     class="material-symbols-outlined">arrow_right</span>Calendar</a>
                         </li>
                     </ul>
-                </li>
+                </li> --}}
                 <li class="menu-label">Operações</li>
                 <li>
                     <a href="javascript:;" class="has-arrow">

@@ -18,6 +18,9 @@
         </div>
     </div>
     <!--end breadcrumb-->
+    <a href="{{ route('quicks.index') }}" class="btn btn-sm btn-outline-secondary mb-3 d-sm-none">
+        <i class="bi bi-caret-left-fill"></i>
+    </a>
 
     <div class="row">
         <div class="col-12">

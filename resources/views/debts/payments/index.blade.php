@@ -16,6 +16,9 @@
         </div>
     </div>
     <!--end breadcrumb-->
+    <a href="{{ route('debts.index') }}" class="btn btn-sm btn-outline-secondary mb-3 d-sm-none">
+        <i class="bi bi-caret-left-fill"></i>
+    </a>
 
     @include('includes.alerts')
 
