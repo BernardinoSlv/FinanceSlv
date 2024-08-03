@@ -272,14 +272,7 @@
             </div>
         </div>
         <div class="card-footer">
-            <nav class="">
-                <ul class="pagination pagination-sm justify-content-end">
-                    <li class="page-item {{ $movements->previousPageUrl() ?: 'disabled' }}"><a
-                            href="{{ $movements->previousPageUrl() }}" class="page-link">Anterior</a></li>
-                    <li class="page-item {{ $movements->nextPageUrl() ?: 'disabled' }}"><a
-                            href="{{ $movements->nextPageUrl() }}" class="page-link">Próximo</a></li>
-                </ul>
-            </nav>
+            <x-pagination :paginator="$movements" />
         </div>
     </div>
 @endsection

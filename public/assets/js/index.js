@@ -8,6 +8,9 @@ $(function () {
   console.log(chart1Config);
 
 	var options = {
+    tooltip: {
+      theme: "dark"
+    },
 		series: [{
 			name: 'Entradas',
 			data: chart1Config.map((data) => data.amount)
@@ -29,7 +32,7 @@ $(function () {
 		},
 		plotOptions: {
 			bar: {
-				horizontal: !1,
+				horizontal: false,
 				columnWidth: "30%",
 				endingShape: "rounded"
 			}
@@ -58,7 +61,7 @@ $(function () {
 		colors: ['#0d6efd'],
 		dataLabels: {
 			enabled: false,
-			enabledOnSeries: [1]
+			enabledOnSeries: [1],
 		},
 		xaxis: {
 			categories: chart1Config.map((data) => data.period),

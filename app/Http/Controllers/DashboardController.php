@@ -35,6 +35,7 @@ class DashboardController extends Controller
                 sum(movements.amount) as amount'))
             ->groupBy(DB::raw('date_format(movements.created_at, "%m/%Y")'))
             ->orderBy(DB::raw('date_format(movements.created_at, "%m/%Y")'))
+            ->where("movements.type", MovementTypeEnum::IN->value)
             ->get()
             ->map(
                 fn ($movementGroup) => ["period" => $movementGroup->period, "amount" => $movementGroup->amount]

@@ -18,6 +18,9 @@
         </div>
     </div>
     <!--end breadcrumb-->
+    <a href="{{ route('debts.index') }}" class="btn btn-sm btn-outline-secondary mb-3 d-sm-none">
+        <i class="bi bi-caret-left-fill"></i>
+    </a>
 
     <div class="row">
         <div class="col-12">
@@ -39,7 +42,8 @@
                             </div>
                             <div class="col-sm-6">
                                 <h5 class="mb-2">Valor</h5>
-                                <input type="text" name="amount" value="{{ old('amount') }}" class="form-control" data-js-mask="money">
+                                <input type="text" name="amount" value="{{ old('amount') }}" class="form-control"
+                                    data-js-mask="money">
                                 <div class="form-text"><strong>Ex</strong>: 1.599,00</div>
                             </div>
                             <div class="col-sm-6">

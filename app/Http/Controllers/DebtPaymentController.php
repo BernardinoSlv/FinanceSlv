@@ -8,6 +8,8 @@ use App\Http\Requests\StoreDebtPaymentRequest;
 use App\Http\Requests\UpdateDebtPaymentRequest;
 use App\Models\Debt;
 use App\Models\Movement;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
@@ -22,6 +24,10 @@ class DebtPaymentController extends Controller
             abort(403);
         }
 
+        $debt->loadSum(["movements" => fn (Builder $query) => $query->where(
+            "movements.type",
+            MovementTypeEnum::OUT->value
+        )], "amount");
         $movements = $debt->movements()
             ->where("type", MovementTypeEnum::OUT->value)
             ->orderBy('id', "DESC")
@@ -59,8 +65,9 @@ class DebtPaymentController extends Controller
             "identifier_id" => $debt->identifier_id
         ]);
 
-        return redirect()->route("debts.payments.create", $debt)
-            ->with(Alert::success("Pagamento adicionado com sucesso."));
+        return response()->json([
+            "error" => false,
+        ], 201);
     }
 
     /**
@@ -97,10 +104,9 @@ class DebtPaymentController extends Controller
         $movement->amount = RealToFloatParser::parse($request->input("amount"));
         $movement->save();
 
-        return redirect()->route("debts.payments.edit", [
-            "debt" => $debt,
-            "movement" => $movement
-        ])->with(Alert::success("Pagamento atualizado com sucesso."));
+        return response()->json([
+            "error" => false,
+        ], 200);;
     }
 
     /**

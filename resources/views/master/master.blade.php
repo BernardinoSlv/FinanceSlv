@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Roksyn - Bootstrap 5 Admin Template</title>
+    <meta name="X-CSRF-TOKEN" content="{{ csrf_token() }}">
 
     <!--plugins-->
     <link href="{{ asset('assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css') }}" rel="stylesheet">
@@ -486,7 +487,7 @@
                         <div class="menu-title">Dashboard</div>
                     </a>
                 </li>
-                <li>
+                {{-- <li>
                     <a href="javascript:;" class="has-arrow">
                         <div class="parent-icon"><span class="material-symbols-outlined">apps</span>
                         </div>
@@ -515,7 +516,7 @@
                                     class="material-symbols-outlined">arrow_right</span>Calendar</a>
                         </li>
                     </ul>
-                </li>
+                </li> --}}
                 <li class="menu-label">Operações</li>
                 <li>
                     <a href="javascript:;" class="has-arrow">
@@ -920,6 +921,8 @@
     <!--BS Scripts-->
     <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/main.js') }}"></script>
+    <script src="{{ asset('assets/js/inits.js') }}" type="module"></script>
+    @yield('scripts')
 </body>
 
 </html>

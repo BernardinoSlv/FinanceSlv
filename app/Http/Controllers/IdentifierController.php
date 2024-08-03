@@ -22,7 +22,8 @@ class IdentifierController extends Controller
      */
     public function index()
     {
-        $identifiers = $this->_identifierRepository->allByUser(auth()->id());
+        $identifiers = auth()->user()->identifiers()->orderBy("identifiers.id", "DESC")
+            ->paginate();
 
         return view("identifiers.index", compact(
             "identifiers"
