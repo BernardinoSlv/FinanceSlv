@@ -2,8 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\MovementTypeEnum;
 use App\Rules\Amount;
+use Closure;
 use Illuminate\Foundation\Http\FormRequest;
+use Src\Parsers\RealToFloatParser;
 
 class UpdateDebtPaymentRequest extends FormRequest
 {
@@ -23,7 +26,24 @@ class UpdateDebtPaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "amount" => ["required", "string", new Amount]
+            "amount" => [
+                "required",
+                "string",
+                new Amount,
+                function (string $attributes, mixed $value, Closure $fail) {
+                    /** @var Debt */
+                    $debt = $this->route("debt");
+                    $totalPaid = (float) $debt->movements()
+                        ->where("movements.type", MovementTypeEnum::OUT->value)
+                        ->whereNot("movements.id", $this->route("movement")->id)
+                        ->sum("amount");
+                    $amount = RealToFloatParser::parse($value);
+
+                    if ($totalPaid + $amount > floatval($debt->amount)) {
+                        $fail("O valor do pagamento excedeu o total da dívida.");
+                    }
+                }
+            ]
         ];
     }
 }

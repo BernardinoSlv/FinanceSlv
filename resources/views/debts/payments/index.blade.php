@@ -127,7 +127,7 @@
                                             <td>
                                                 <strong>{{ $movement->id }}</strong>
                                             </td>
-                                            <td>R$ {{ $movement->amount }}</td>
+                                            <td>R$ @amount($movement->amount)</td>
                                             <td>
                                                 {{ $movement->created_at->format('d/m/Y H:i') }}
                                             </td>
@@ -140,7 +140,17 @@
                                                     </button>
                                                     <ul class="dropdown-menu">
                                                         <li>
-                                                            <a class="dropdown-item">Editar</a>
+
+                                                            <button type="button" class="dropdown-item"
+                                                                data-config="{{ json_encode([
+                                                                    'url' => route('debts.payments.update', [
+                                                                        'debt' => $debt,
+                                                                        'movement' => $movement,
+                                                                    ]),
+                                                                    'amount' => number_format($movement->amount,2, ","),
+                                                                ]) }}"
+                                                                data-bs-toggle="offcanvas"
+                                                                data-bs-target="#offcanvas-edit">Editar</button>
                                                         </li>
                                                         <li>
                                                             <form
@@ -187,6 +197,35 @@
                 <div class="mb-3">
                     <label for="input-amount" class="form-label fw-bold">Valor</label>
                     <input type="text" name="amount" class="form-control" id="input-amount" data-js-mask="money">
+                    <div class="invalid-feedback"></div>
+                    <div class="form-text">ex: 800,00</div>
+                </div>
+                <div class="mb-3">
+                    <label for="input-files" class="form-label fw-bold">Arquivos</label>
+                    <input type="file" class="form-control" name="files[]" multiple id="input-files">
+                    <div class="form-text">Comprovantes, assinaturas e etc...</div>
+                </div>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="offcanvas offcanvas-end" id="offcanvas-edit">
+        <div class="offcanvas-header">
+            <h5>Editar pagamento</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+            <form action="" method="POST" enctype="multipart/form-data" data-js-component="form-ajax" >
+                @csrf
+                @method('PUT')
+
+                <div class="mb-3">
+                    <label for="input-amount" class="form-label fw-bold">Valor</label>
+                    <input type="text" name="amount" class="form-control" id="input-amount" data-js-mask="money">
+                    <div class="invalid-feedback"></div>
                     <div class="form-text">ex: 800,00</div>
                 </div>
                 <div class="mb-3">
@@ -203,4 +242,18 @@
 @endsection
 
 @section('scripts')
+    <script>
+        window.addEventListener("load", () => {
+            const offcanvas = document.querySelector("#offcanvas-edit");
+
+            offcanvas.addEventListener("show.bs.offcanvas", (event) => {
+                const config = JSON.parse(event.relatedTarget.getAttribute("data-config"));
+                const form = offcanvas.querySelector("form");
+                const inputAmount = offcanvas.querySelector("input[name=amount]");
+
+                form.setAttribute("action", config.url)
+                inputAmount.value = config.amount;
+            });
+        });
+    </script>
 @endsection

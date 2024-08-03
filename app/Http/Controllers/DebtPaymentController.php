@@ -65,8 +65,9 @@ class DebtPaymentController extends Controller
             "identifier_id" => $debt->identifier_id
         ]);
 
-        return redirect()->route("debts.payments.index", $debt)
-            ->with(Alert::success("Pagamento adicionado com sucesso."));
+        return response()->json([
+            "error" => false,
+        ], 201);
     }
 
     /**
@@ -103,7 +104,9 @@ class DebtPaymentController extends Controller
         $movement->amount = RealToFloatParser::parse($request->input("amount"));
         $movement->save();
 
-        return redirect()->route("debts.payments.index", $debt)->with(Alert::success("Pagamento atualizado com sucesso."));
+        return response()->json([
+            "error" => false,
+        ], 200);;
     }
 
     /**
