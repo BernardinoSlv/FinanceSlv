@@ -8,13 +8,10 @@ use App\Models\Identifier;
 use App\Models\Movement;
 use App\Models\Quick;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class UserTest extends TestCase
 {
-    use RefreshDatabase;
-
     /**
      * deve retornar uma coleção vazia
      */

@@ -6,15 +6,12 @@ use App\Enums\MovementTypeEnum;
 use App\Models\Debt;
 use App\Models\Movement;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class DebtPaymentControllerTest extends TestCase
 {
-    use RefreshDatabase;
-
     /**
      * deve redirecionar para login
      */

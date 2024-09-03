@@ -7,13 +7,10 @@ use App\Models\Identifier;
 use App\Models\Movement;
 use App\Models\Quick;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class DebtTest extends TestCase
 {
-    use RefreshDatabase;
-
     /**
      * deve retornar o User
      */

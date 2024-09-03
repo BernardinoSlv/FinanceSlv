@@ -60,13 +60,14 @@ class DebtController extends Controller
         $debt->user_id = auth()->id();
         $debt->save();
 
-        if ($request->input("to_balance"))
+        if ($request->input('to_balance')) {
             $debt->movements()->create([
-                "identifier_id" => $debt->identifier_id,
-                "user_id" => $debt->user_id,
-                "type" => MovementTypeEnum::IN->value,
-                "amount" => $debt->amount
+                'identifier_id' => $debt->identifier_id,
+                'user_id' => $debt->user_id,
+                'type' => MovementTypeEnum::IN->value,
+                'amount' => $debt->amount,
             ]);
+        }
 
         return redirect()->route('debts.index')->with(
             Alert::success('Dívida criada com sucesso.')
@@ -76,7 +77,9 @@ class DebtController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Debt $debt) {}
+    public function show(Debt $debt)
+    {
+    }
 
     /**
      * Show the form for editing the specified resource.

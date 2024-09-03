@@ -7,15 +7,12 @@ use App\Models\Identifier;
 use App\Models\Movement;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Tests\TestCase;
 
 class DebtControllerTest extends TestCase
 {
-    use RefreshDatabase;
-
     /**
      * deve redirecionar para login
      */
@@ -128,19 +125,19 @@ class DebtControllerTest extends TestCase
             'identifier_id' => $user->identifiers->first(),
             'amount' => '200,00',
         ])->toArray();
-        $data["to_balance"] = "on";
+        $data['to_balance'] = 'on';
 
         $this->actingAs($user)->post(route('debts.store'), $data)
             ->assertFound()
             ->assertSessionHas('alert_type', 'success');
         $debt = Debt::query()->where([
-            ...Arr::except($data, ["to_balance"]),
+            ...Arr::except($data, ['to_balance']),
             'due_date' => date('Y-m-d', strtotime($data['due_date'])),
             'amount' => 200,
             'user_id' => $user->id,
         ])->first();
         $this->assertCount(1, $debt->movements);
-        $this->assertEquals(200, $debt->movements()->where("type", "in")->first()->amount);
+        $this->assertEquals(200, $debt->movements()->where('type', 'in')->first()->amount);
     }
 
     /**
@@ -368,8 +365,8 @@ class DebtControllerTest extends TestCase
         $user = User::factory()->has(
             Debt::factory()
                 ->has(Movement::factory(4)->sequence(
-                    ["type" => "in"],
-                    ["type" => "out"],
+                    ['type' => 'in'],
+                    ['type' => 'out'],
                 ))
         )->create();
         $debt = $user->debts->first();

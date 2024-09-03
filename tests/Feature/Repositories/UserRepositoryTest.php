@@ -4,15 +4,12 @@ namespace Tests\Feature\Repositories;
 
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryContract;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Tests\TestCase;
 
 class UserRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
-
     protected $seeds = true;
 
     /**

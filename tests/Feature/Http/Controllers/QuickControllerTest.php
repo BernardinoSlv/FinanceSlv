@@ -8,15 +8,12 @@ use App\Models\Movement;
 use App\Models\Quick;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Tests\TestCase;
 
 class QuickControllerTest extends TestCase
 {
-    use RefreshDatabase;
-
     /**
      * deve redirecionar para login
      */
@@ -320,7 +317,8 @@ class QuickControllerTest extends TestCase
         $this->assertDatabaseHas('movements', [
             'id' => $quick->movement->id,
             ...Arr::only($data, [
-                'type', 'identifier_id',
+                'type',
+                'identifier_id',
             ]),
             'amount' => 500.00,
         ]);
