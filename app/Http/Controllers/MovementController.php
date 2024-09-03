@@ -78,7 +78,7 @@ class MovementController extends Controller
      */
     public function edit(Movement $movement)
     {
-        if (Gate::denies('movement-edit', $movement)) {
+        if (Gate::denies('is-owner', $movement)) {
             abort(403);
         }
 
@@ -90,7 +90,7 @@ class MovementController extends Controller
      */
     public function update(UpdateMovementRequest $request, Movement $movement)
     {
-        if (Gate::denies('movement-edit', $movement)) {
+        if (Gate::denies('is-owner', $movement)) {
             abort(403);
         }
 
@@ -108,7 +108,7 @@ class MovementController extends Controller
      */
     public function destroy(Movement $movement)
     {
-        if (Gate::denies('movement-edit', $movement)) {
+        if (Gate::denies('is-owner', $movement)) {
             abort(403);
         }
 

@@ -24,7 +24,7 @@ class ExpenseFactory extends Factory
             "title" => fake()->word() . rand(0, 1000) . rand(0, 1000) . time(),
             "description" => fake()->text(100),
             "amount" => rand(100, 10000) / 100,
-            "due_day" => rand(0, 31),
+            "due_day" => rand(1, 31),
         ];
     }
 }

@@ -114,4 +114,30 @@ class ExpenseControllerTest extends TestCase
             "amount" => 200
         ]);
     }
+
+    /**
+     * deve ter status 403
+     */
+    public function test_edit_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $expense = Expense::factory()->create();
+
+        $this->actingAs($user)->get(route("expenses.edit", $expense))
+            ->assertForbidden();
+    }
+
+    /**
+     * deve ter status 200
+     */
+    public function test_edit_action(): void
+    {
+        $user = User::factory()->create();
+        $expense = Expense::factory()->for($user)->create();
+
+        $this->actingAs($user)->get(route("expenses.edit", $expense))
+            ->assertOk()
+            ->assertViewHas(["identifiers", "expense"])
+            ->assertViewIs("expenses.edit");
+    }
 }

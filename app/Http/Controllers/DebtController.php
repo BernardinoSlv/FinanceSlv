@@ -77,16 +77,14 @@ class DebtController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Debt $debt)
-    {
-    }
+    public function show(Debt $debt) {}
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(Debt $debt)
     {
-        if (Gate::denies('debt-edit', $debt)) {
+        if (Gate::denies('is-owner', $debt)) {
             abort(403);
         }
 
@@ -103,7 +101,7 @@ class DebtController extends Controller
      */
     public function update(UpdateDebtRequest $request, Debt $debt)
     {
-        if (Gate::denies('debt-edit', $debt)) {
+        if (Gate::denies('is-owner', $debt)) {
             abort(403);
         }
 
@@ -126,7 +124,7 @@ class DebtController extends Controller
      */
     public function destroy(Debt $debt)
     {
-        if (Gate::denies('debt-edit', $debt)) {
+        if (Gate::denies('is-owner', $debt)) {
             abort(403);
         }
 

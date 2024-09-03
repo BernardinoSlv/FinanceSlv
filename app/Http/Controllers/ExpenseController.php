@@ -6,6 +6,7 @@ use App\Helpers\Alert;
 use App\Http\Requests\StoreExpenseRequest;
 use App\Models\Expense;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
 class ExpenseController extends Controller
@@ -28,7 +29,7 @@ class ExpenseController extends Controller
      */
     public function create()
     {
-        $identifiers = auth()->user()->identifiers()->get();
+        $identifiers = auth()->user()->identifiers()->orderBy("name")->get();
 
         return view("expenses.create", compact("identifiers"));
     }
@@ -60,7 +61,11 @@ class ExpenseController extends Controller
      */
     public function edit(Expense $expense)
     {
-        //
+        if (Gate::denies("is-owner", $expense))
+            abort(403);
+        $identifiers = auth()->user()->identifiers()->orderBy("name")->get();
+
+        return view("expenses.edit", compact("identifiers", "expense"));
     }
 
     /**
