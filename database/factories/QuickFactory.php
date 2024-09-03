@@ -19,11 +19,12 @@ class QuickFactory extends Factory
     public function definition(): array
     {
         $user = User::factory()->create();
+
         return [
-            "user_id" => $user,
-            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
-            "title" => fake()->word(),
-            "description" => fake()->text(100),
+            'user_id' => $user,
+            'identifier_id' => Identifier::factory()->create(['user_id' => $user]),
+            'title' => fake()->word(),
+            'description' => fake()->text(100),
         ];
     }
 }

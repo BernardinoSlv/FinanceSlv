@@ -12,32 +12,32 @@ class FilterByTextPipe implements PipeContract
 {
     public function handle($query, Closure $next)
     {
-        $text = request("text");
-        $searchBy = request("search_by", null);
+        $text = request('text');
+        $searchBy = request('search_by', null);
 
         if ($text) {
-            if ($searchBy === "identifier") {
+            if ($searchBy === 'identifier') {
                 $query
                     ->leftJoin(
                         'identifiers',
-                        "identifiers.id",
-                        "=",
-                        "quicks.identifier_id"
+                        'identifiers.id',
+                        '=',
+                        'quicks.identifier_id'
                     )
-                    ->where("identifiers.name", "LIKE", "%{$text}%");
-            } else if ($searchBy === "title") {
-                $query->where("quicks.title", "LIKE", "%{$text}%");
+                    ->where('identifiers.name', 'LIKE', "%{$text}%");
+            } elseif ($searchBy === 'title') {
+                $query->where('quicks.title', 'LIKE', "%{$text}%");
             } else {
                 $query
                     ->leftJoin(
                         'identifiers',
-                        "identifiers.id",
-                        "=",
-                        "quicks.identifier_id"
+                        'identifiers.id',
+                        '=',
+                        'quicks.identifier_id'
                     )
                     ->where(function (Builder $query) use ($text) {
-                        $query->where("identifiers.name", "LIKE", "%{$text}%")
-                            ->orWhere("quicks.title", "LIKE", "%{$text}%");
+                        $query->where('identifiers.name', 'LIKE', "%{$text}%")
+                            ->orWhere('quicks.title', 'LIKE', "%{$text}%");
                     });
             }
         }

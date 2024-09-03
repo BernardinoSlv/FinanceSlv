@@ -14,13 +14,11 @@ enum MovementableEnum: string
 
     /**
      * check if can delete when delete movement
-     *
-     * @return boolean
      */
     public function canDelete(): bool
     {
         return in_array($this->value, [
-            Quick::class
+            Quick::class,
         ]);
     }
 }

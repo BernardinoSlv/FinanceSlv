@@ -6,7 +6,6 @@ use App\Enums\MovementTypeEnum;
 use App\Rules\Amount;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Src\Parsers\RealToFloatParser;
 
 class StoreQuickRequest extends FormRequest
 {
@@ -26,20 +25,20 @@ class StoreQuickRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "identifier_id" => [
-                "nullable",
-                Rule::exists("identifiers", "id")
-                    ->where("user_id", auth()->id())
+            'identifier_id' => [
+                'nullable',
+                Rule::exists('identifiers', 'id')
+                    ->where('user_id', auth()->id()),
             ],
-            "title" => ["required_without:identifier_id", "nullable",  "string", "between:2,256"],
-            "description" => ["nullable"],
-            "type" => [
-                "required", Rule::in([
+            'title' => ['required_without:identifier_id', 'nullable',  'string', 'between:2,256'],
+            'description' => ['nullable'],
+            'type' => [
+                'required', Rule::in([
                     MovementTypeEnum::IN->value,
                     MovementTypeEnum::OUT->value,
-                ])
+                ]),
             ],
-            "amount" => ["required", new Amount]
+            'amount' => ['required', new Amount],
         ];
     }
 }

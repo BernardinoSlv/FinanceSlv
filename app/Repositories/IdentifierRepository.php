@@ -19,6 +19,7 @@ class IdentifierRepository extends BaseRepository implements IdentifierRepositor
         $identifier = new Identifier($attribures);
         $identifier->user_id = $userId;
         $identifier->save();
+
         return $identifier;
     }
 }

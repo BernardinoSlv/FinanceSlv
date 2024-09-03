@@ -14,11 +14,11 @@ class File extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, "user_id", "id")->withTrashed();
+        return $this->belongsTo(User::class, 'user_id', 'id')->withTrashed();
     }
 
     public function fileable(): MorphTo
     {
-        return $this->morphTo("fileable")->withTrashed();
+        return $this->morphTo('fileable')->withTrashed();
     }
 }

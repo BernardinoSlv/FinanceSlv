@@ -4,8 +4,6 @@ namespace Tests\Feature\Repositories;
 
 use App\Models\Identifier;
 use App\Repositories\Contracts\IdentifierRepositoryContract;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class IdentifierRepositoryTest extends TestCase
@@ -17,9 +15,9 @@ class IdentifierRepositoryTest extends TestCase
 
         $this->_repository()->create($user->id, $data);
 
-        $this->assertDatabaseHas("identifiers", [
+        $this->assertDatabaseHas('identifiers', [
             ...$data,
-            "user_id" => $user->id
+            'user_id' => $user->id,
         ]);
     }
 

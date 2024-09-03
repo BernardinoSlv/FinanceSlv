@@ -38,9 +38,9 @@ class RouteServiceProvider extends ServiceProvider
         });
 
         Route::resourceVerbs([
-            "create" => "criar",
-            "update" => "atualizar",
-            "edit" => "editar"
+            'create' => 'criar',
+            'update' => 'atualizar',
+            'edit' => 'editar',
         ]);
     }
 }

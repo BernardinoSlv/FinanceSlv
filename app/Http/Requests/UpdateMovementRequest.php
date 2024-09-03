@@ -25,13 +25,13 @@ class UpdateMovementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "type" => [
-                "required", Rule::in([
+            'type' => [
+                'required', Rule::in([
                     MovementTypeEnum::IN->value,
                     MovementTypeEnum::OUT->value,
-                ])
+                ]),
             ],
-            "amount" => ["required", new Amount],
+            'amount' => ['required', new Amount],
 
         ];
     }

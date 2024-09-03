@@ -11,5 +11,4 @@ interface MovementRepositoryContract extends BaseRepositoryContract
     public function create(int $userId, array $attributes): Movement;
 
     public function deletePolymorph(string $movementableType, int $movementableId): int;
-
 }

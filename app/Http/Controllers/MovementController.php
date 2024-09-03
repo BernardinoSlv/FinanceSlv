@@ -29,7 +29,6 @@ class MovementController extends Controller
         //         $movement->save();
         //     });
 
-
         /** @var User $user */
         $user = auth()->user();
         $movements = $pipeline->send($user->movements())
@@ -37,17 +36,17 @@ class MovementController extends Controller
                 FilterByTextPipe::class,
                 OrderByPipe::class,
                 OperationTypePipe::class,
-                TypePipe::class
+                TypePipe::class,
             ])
             ->thenReturn()
             ->addSelect('movements.*')
-            ->with(["identifier", "movementable"])
+            ->with(['identifier', 'movementable'])
             ->paginate()
             ->withQueryString();
 
         // dd($movements->first());
 
-        return view("movements.index", compact("movements"));
+        return view('movements.index', compact('movements'));
     }
 
     /**
@@ -79,11 +78,11 @@ class MovementController extends Controller
      */
     public function edit(Movement $movement)
     {
-        if (Gate::denies("movement-edit", $movement)) {
+        if (Gate::denies('movement-edit', $movement)) {
             abort(403);
         }
 
-        return view("movements.edit", compact('movement'));
+        return view('movements.edit', compact('movement'));
     }
 
     /**
@@ -91,15 +90,17 @@ class MovementController extends Controller
      */
     public function update(UpdateMovementRequest $request, Movement $movement)
     {
-        if (Gate::denies("movement-edit", $movement)) abort(403);
+        if (Gate::denies('movement-edit', $movement)) {
+            abort(403);
+        }
 
         $movement->fill([
             ...$request->validated(),
-            "amount" => RealToFloatParser::parse($request->input("amount"))
+            'amount' => RealToFloatParser::parse($request->input('amount')),
         ])->save();
 
-        return redirect()->route("movements.edit", $movement)
-            ->with(Alert::success("Movimentação editada com sucesso."));
+        return redirect()->route('movements.edit', $movement)
+            ->with(Alert::success('Movimentação editada com sucesso.'));
     }
 
     /**
@@ -107,15 +108,18 @@ class MovementController extends Controller
      */
     public function destroy(Movement $movement)
     {
-        if (Gate::denies("movement-edit", $movement)) abort(403);
+        if (Gate::denies('movement-edit', $movement)) {
+            abort(403);
+        }
 
         $movementable = $movement->movementable;
         $movement->delete();
 
-        if (MovementableEnum::from(get_class($movementable))->canDelete())
+        if (MovementableEnum::from(get_class($movementable))->canDelete()) {
             $movementable->delete();
+        }
 
-        return redirect()->route("movements.index")
-            ->with(Alert::success("Movimentação deletada com sucesso."));
+        return redirect()->route('movements.index')
+            ->with(Alert::success('Movimentação deletada com sucesso.'));
     }
 }

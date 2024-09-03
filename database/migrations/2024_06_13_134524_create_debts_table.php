@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('debts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("user_id")->references("id")->on("users");
-            $table->foreignId("identifier_id")->references("id")->on("identifiers");
-            $table->decimal("amount");
-            $table->string("title")->nullable();
-            $table->text("description")->nullable();
-            $table->integer("installments", unsigned: true)->nullable();
-            $table->date("due_date")->nullable();
+            $table->foreignId('user_id')->references('id')->on('users');
+            $table->foreignId('identifier_id')->references('id')->on('identifiers');
+            $table->decimal('amount');
+            $table->string('title')->nullable();
+            $table->text('description')->nullable();
+            $table->integer('installments', unsigned: true)->nullable();
+            $table->date('due_date')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

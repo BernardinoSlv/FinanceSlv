@@ -14,20 +14,20 @@ class Identifier extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        "user_id",
-        "avatar",
-        "name",
-        "phone",
-        "description"
+        'user_id',
+        'avatar',
+        'name',
+        'phone',
+        'description',
     ];
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, "user_id", "id")->withTrashed();
+        return $this->belongsTo(User::class, 'user_id', 'id')->withTrashed();
     }
 
     public function movements(): HasMany
     {
-        return $this->hasMany(Movement::class, "identifier_id", "id");
+        return $this->hasMany(Movement::class, 'identifier_id', 'id');
     }
 }

@@ -7,7 +7,6 @@ use App\Models\Debt;
 use App\Models\Movement;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
@@ -24,7 +23,7 @@ class DebtPaymentControllerTest extends TestCase
         $debt = Debt::factory()->create();
 
         $this->get(route('debts.payments.index', $debt))
-            ->assertRedirectToRoute("auth.index");
+            ->assertRedirectToRoute('auth.index');
     }
 
     /**
@@ -34,7 +33,7 @@ class DebtPaymentControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->get(route("debts.payments.index", 0))
+        $this->actingAs($user)->get(route('debts.payments.index', 0))
             ->assertNotFound();
     }
 
@@ -46,7 +45,7 @@ class DebtPaymentControllerTest extends TestCase
         $user = User::factory()->create();
         $debt = Debt::factory()->create();
 
-        $this->actingAs($user)->get(route("debts.payments.index", $debt))
+        $this->actingAs($user)->get(route('debts.payments.index', $debt))
             ->assertForbidden();
     }
 
@@ -55,26 +54,26 @@ class DebtPaymentControllerTest extends TestCase
      */
     public function test_index_action(): void
     {
-        Debt::factory(2)->has(Movement::factory(), "movements")->create();
+        Debt::factory(2)->has(Movement::factory(), 'movements')->create();
 
         $user = User::factory()->has(Debt::factory())->create();
         /** @var Debt */
         $debt = $user->debts->first();
-        Movement::factory(2)->for($debt, "movementable")->create([
-            "type" => MovementTypeEnum::OUT->value,
-            "amount" => 50
+        Movement::factory(2)->for($debt, 'movementable')->create([
+            'type' => MovementTypeEnum::OUT->value,
+            'amount' => 50,
         ]);
 
-        $this->actingAs($user)->get(route("debts.payments.index", $debt))
+        $this->actingAs($user)->get(route('debts.payments.index', $debt))
             ->assertOk()
-            ->assertViewIs("debts.payments.index")
+            ->assertViewIs('debts.payments.index')
             ->assertViewHas(
-                "movements",
+                'movements',
                 function (LengthAwarePaginator $movements): bool {
                     return $movements->total() === 2;
                 }
             )
-            ->assertViewHas("debt", function (Debt $debt): bool {
+            ->assertViewHas('debt', function (Debt $debt): bool {
                 return floatval($debt->movements_sum_amount) === 100.00;
             });
     }
@@ -86,8 +85,8 @@ class DebtPaymentControllerTest extends TestCase
     {
         $debt = Debt::factory()->create();
 
-        $this->post(route("debts.payments.store", $debt))
-            ->assertRedirect(route("auth.index"));
+        $this->post(route('debts.payments.store', $debt))
+            ->assertRedirect(route('auth.index'));
     }
 
     /** deve ter status 404 */
@@ -95,7 +94,7 @@ class DebtPaymentControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->post(route("debts.payments.store", 0))
+        $this->actingAs($user)->post(route('debts.payments.store', 0))
             ->assertNotFound();
     }
 
@@ -107,9 +106,9 @@ class DebtPaymentControllerTest extends TestCase
         $user = User::factory()->create();
         $debt = Debt::factory()->create();
 
-        $this->actingAs($user)->post(route("debts.payments.store", $debt))
+        $this->actingAs($user)->post(route('debts.payments.store', $debt))
             ->assertFound()
-            ->assertSessionHasErrors("amount");
+            ->assertSessionHasErrors('amount');
     }
 
     /**
@@ -120,10 +119,10 @@ class DebtPaymentControllerTest extends TestCase
         $user = User::factory()->create();
         $debt = Debt::factory()->create();
         $data = Movement::factory()->make([
-            "amount" => "39,90"
+            'amount' => '39,90',
         ])->toArray();
 
-        $this->actingAs($user)->post(route("debts.payments.store", $debt), $data)
+        $this->actingAs($user)->post(route('debts.payments.store', $debt), $data)
             ->assertForbidden();
     }
 
@@ -133,16 +132,16 @@ class DebtPaymentControllerTest extends TestCase
     public function test_store_action_exceded_debt_amount(): void
     {
         $user = User::factory()->create();
-        $debt = Debt::factory()->for($user)->create(["amount" => 10]);
+        $debt = Debt::factory()->for($user)->create(['amount' => 10]);
         $data = Movement::factory()->make([
-            "amount" => "39,90"
+            'amount' => '39,90',
         ])->toArray();
 
-        $this->actingAs($user)->postJson(route("debts.payments.store", $debt), $data)
+        $this->actingAs($user)->postJson(route('debts.payments.store', $debt), $data)
             ->assertUnprocessable()
             ->assertJson(
-                fn (AssertableJson $json) => $json->has("message")
-                    ->where("errors.amount", ["O valor do pagamento excedeu o total da dívida."])
+                fn (AssertableJson $json) => $json->has('message')
+                    ->where('errors.amount', ['O valor do pagamento excedeu o total da dívida.'])
             );
     }
 
@@ -154,21 +153,21 @@ class DebtPaymentControllerTest extends TestCase
         $user = User::factory()->create();
         $debt = Debt::factory()->for($user)->create();
         $data = Movement::factory()->make([
-            "amount" => "39,90"
+            'amount' => '39,90',
         ])->toArray();
 
-        $this->actingAs($user)->post(route("debts.payments.store", $debt), $data)
+        $this->actingAs($user)->post(route('debts.payments.store', $debt), $data)
             ->assertCreated()
             ->assertJson([
-                "error" => false
+                'error' => false,
             ]);
-        $this->assertDatabaseHas("movements", [
-            "movementable_type" => Debt::class,
-            "movementable_id" => $debt->id,
+        $this->assertDatabaseHas('movements', [
+            'movementable_type' => Debt::class,
+            'movementable_id' => $debt->id,
             'amount' => 39.90,
-            "type" => MovementTypeEnum::OUT->value,
-            "user_id" => $user->id,
-            "identifier_id" => $debt->identifier_id
+            'type' => MovementTypeEnum::OUT->value,
+            'user_id' => $user->id,
+            'identifier_id' => $debt->identifier_id,
         ]);
     }
 
@@ -178,12 +177,12 @@ class DebtPaymentControllerTest extends TestCase
     public function test_edit_action_unauthenticated(): void
     {
         $debt = Debt::factory()->has(
-            Movement::factory()->state(["type" => MovementTypeEnum::OUT->value])
+            Movement::factory()->state(['type' => MovementTypeEnum::OUT->value])
         )->create();
         $movement = $debt->movements->first();
 
-        $this->get(route("debts.payments.index", $debt))
-            ->assertRedirectToRoute("auth.index");
+        $this->get(route('debts.payments.index', $debt))
+            ->assertRedirectToRoute('auth.index');
     }
 
     /**
@@ -192,15 +191,15 @@ class DebtPaymentControllerTest extends TestCase
     public function test_update_action_unauthenticated(): void
     {
         $debt = Debt::factory()->has(
-            Movement::factory()->state(["type" => MovementTypeEnum::OUT->value])
+            Movement::factory()->state(['type' => MovementTypeEnum::OUT->value])
         )->create();
         $movement = $debt->movements->first();
 
-        $this->put(route("debts.payments.update", [
-            "debt" => $debt,
-            "movement" => $movement
+        $this->put(route('debts.payments.update', [
+            'debt' => $debt,
+            'movement' => $movement,
         ]))
-            ->assertRedirectToRoute("auth.index");
+            ->assertRedirectToRoute('auth.index');
     }
 
     /**
@@ -211,9 +210,9 @@ class DebtPaymentControllerTest extends TestCase
         $user = User::factory()->has(Debt::factory())->create();
         $debt = $user->debts->first();
 
-        $this->actingAs($user)->put(route("debts.payments.update", [
-            "debt" => $debt,
-            "movement" => 0
+        $this->actingAs($user)->put(route('debts.payments.update', [
+            'debt' => $debt,
+            'movement' => 0,
         ]))
             ->assertNotFound();
     }
@@ -226,13 +225,13 @@ class DebtPaymentControllerTest extends TestCase
         $user = User::factory()->has(Debt::factory())->create();
         $movement = $user->debts->first()
             ->factory()->has(Movement::factory()->for($user)->state([
-                "type" => MovementTypeEnum::OUT->value
+                'type' => MovementTypeEnum::OUT->value,
             ]))
             ->create();
 
-        $this->actingAs($user)->put(route("debts.payments.update", [
-            "debt" => 0,
-            "movement" => $movement
+        $this->actingAs($user)->put(route('debts.payments.update', [
+            'debt' => 0,
+            'movement' => $movement,
         ]))
             ->assertNotFound();
     }
@@ -244,17 +243,17 @@ class DebtPaymentControllerTest extends TestCase
     {
         $user = User::factory()->has(Debt::factory())->create();
         $debt = Debt::factory()->create();
-        $movement = Movement::factory()->for($debt, "movementable")->for($user)->create([
-            "type" => MovementTypeEnum::OUT->value
+        $movement = Movement::factory()->for($debt, 'movementable')->for($user)->create([
+            'type' => MovementTypeEnum::OUT->value,
         ]);
 
-        $this->actingAs($user)->put(route("debts.payments.update", [
-            "debt" => $debt,
-            "movement" => $movement
+        $this->actingAs($user)->put(route('debts.payments.update', [
+            'debt' => $debt,
+            'movement' => $movement,
         ]))
             ->assertFound()
             ->assertSessionHasErrors([
-                "amount"
+                'amount',
             ]);
     }
 
@@ -265,13 +264,13 @@ class DebtPaymentControllerTest extends TestCase
     {
         $user = User::factory()->has(Debt::factory())->create();
         $debt = $user->debts->first();
-        $movement = Movement::factory()->for(Debt::factory()->create(), "movementable")->create([
-            "type" => MovementTypeEnum::OUT->value
+        $movement = Movement::factory()->for(Debt::factory()->create(), 'movementable')->create([
+            'type' => MovementTypeEnum::OUT->value,
         ]);
 
-        $this->actingAs($user)->put(route("debts.payments.update", [
-            "debt" => $debt,
-            'movement' => $movement
+        $this->actingAs($user)->put(route('debts.payments.update', [
+            'debt' => $debt,
+            'movement' => $movement,
         ]))
             ->assertNotFound();
     }
@@ -281,18 +280,18 @@ class DebtPaymentControllerTest extends TestCase
      */
     public function test_update_action_is_not_owner(): void
     {
-        $user = User::factory()->has(Debt::factory()->state(["amount" => 1000]))->create();
+        $user = User::factory()->has(Debt::factory()->state(['amount' => 1000]))->create();
         $debt = $user->debts->first();
-        $movement = Movement::factory()->for($debt, "movementable")->create([
-            "type" => MovementTypeEnum::OUT->value
+        $movement = Movement::factory()->for($debt, 'movementable')->create([
+            'type' => MovementTypeEnum::OUT->value,
         ]);
         $data = [
-            "amount" => "800,00"
+            'amount' => '800,00',
         ];
 
-        $this->actingAs($user)->put(route("debts.payments.update", [
-            "debt" => $debt,
-            "movement" => $movement
+        $this->actingAs($user)->put(route('debts.payments.update', [
+            'debt' => $debt,
+            'movement' => $movement,
         ]), $data)
             ->assertForbidden();
     }
@@ -303,17 +302,17 @@ class DebtPaymentControllerTest extends TestCase
     public function test_update_action_is_not_owner_from_debt(): void
     {
         $user = User::factory()->has(Debt::factory())->create();
-        $debt = Debt::factory()->create(["amount" => 1000]);
-        $movement = Movement::factory()->for($debt, "movementable")->for($user)->create([
-            "type" => MovementTypeEnum::OUT->value
+        $debt = Debt::factory()->create(['amount' => 1000]);
+        $movement = Movement::factory()->for($debt, 'movementable')->for($user)->create([
+            'type' => MovementTypeEnum::OUT->value,
         ]);
         $data = [
-            "amount" => "800,00"
+            'amount' => '800,00',
         ];
 
-        $this->actingAs($user)->put(route("debts.payments.update", [
-            "debt" => $debt,
-            "movement" => $movement
+        $this->actingAs($user)->put(route('debts.payments.update', [
+            'debt' => $debt,
+            'movement' => $movement,
         ]), $data)
             ->assertForbidden();
     }
@@ -325,54 +324,52 @@ class DebtPaymentControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $debt = Debt::factory()->for($user)
-            ->has(Movement::factory()->state(["amount" => 9.50]), "movements")
-            ->create(["amount" => 10]);
+            ->has(Movement::factory()->state(['amount' => 9.50]), 'movements')
+            ->create(['amount' => 10]);
         $movement = $debt->movements->first();
         $data = Movement::factory()->make([
-            "amount" => "39,90"
+            'amount' => '39,90',
         ])->toArray();
 
-        $this->actingAs($user)->putJson(route("debts.payments.update", [
-            "debt" => $debt,
-            "movement" => $movement
+        $this->actingAs($user)->putJson(route('debts.payments.update', [
+            'debt' => $debt,
+            'movement' => $movement,
         ]), $data)
             ->assertUnprocessable()
             ->assertJson(
-                fn (AssertableJson $json) => $json->has("message")
-                    ->where("errors.amount", ["O valor do pagamento excedeu o total da dívida."])
+                fn (AssertableJson $json) => $json->has('message')
+                    ->where('errors.amount', ['O valor do pagamento excedeu o total da dívida.'])
             );
     }
-
-
 
     /**
      * deve ter status 200 e view debts.payments.update
      */
     public function test_update_action(): void
     {
-        $user = User::factory()->has(Debt::factory()->state(["amount" => 10000]))->create();
+        $user = User::factory()->has(Debt::factory()->state(['amount' => 10000]))->create();
         $debt = $user->debts->first();
-        $movement = Movement::factory()->for($debt, "movementable")->for($user)->create([
-            "type" => MovementTypeEnum::OUT->value
+        $movement = Movement::factory()->for($debt, 'movementable')->for($user)->create([
+            'type' => MovementTypeEnum::OUT->value,
         ]);
         $data = [
-            "amount" => "800,00"
+            'amount' => '800,00',
         ];
 
-        $this->actingAs($user)->put(route("debts.payments.update", [
-            "debt" => $debt,
-            "movement" => $movement
+        $this->actingAs($user)->put(route('debts.payments.update', [
+            'debt' => $debt,
+            'movement' => $movement,
         ]), $data)
             ->assertOk()
             ->assertJson([
-                "error" => false
+                'error' => false,
             ]);
-        $this->assertDatabaseHas("movements", [
-            "id" => $movement->id,
-            "movementable_type" => Debt::class,
-            "movementable_id" => $debt->id,
-            "amount" => 800.00,
-            "identifier_id" => $debt->identifier_id
+        $this->assertDatabaseHas('movements', [
+            'id' => $movement->id,
+            'movementable_type' => Debt::class,
+            'movementable_id' => $debt->id,
+            'amount' => 800.00,
+            'identifier_id' => $debt->identifier_id,
         ]);
     }
 
@@ -382,15 +379,15 @@ class DebtPaymentControllerTest extends TestCase
     public function test_destroy_action_unauthenticated(): void
     {
         $debt = Debt::factory()->has(
-            Movement::factory()->state(["type" => MovementTypeEnum::OUT->value])
+            Movement::factory()->state(['type' => MovementTypeEnum::OUT->value])
         )->create();
         $movement = $debt->movements->first();
 
-        $this->delete(route("debts.payments.destroy", [
-            "debt" => $debt,
-            "movement" => $movement
+        $this->delete(route('debts.payments.destroy', [
+            'debt' => $debt,
+            'movement' => $movement,
         ]))
-            ->assertRedirectToRoute("auth.index");
+            ->assertRedirectToRoute('auth.index');
     }
 
     /**
@@ -401,9 +398,9 @@ class DebtPaymentControllerTest extends TestCase
         $user = User::factory()->has(Debt::factory())->create();
         $debt = $user->debts->first();
 
-        $this->actingAs($user)->delete(route("debts.payments.destroy", [
-            "debt" => $debt,
-            "movement" => 0
+        $this->actingAs($user)->delete(route('debts.payments.destroy', [
+            'debt' => $debt,
+            'movement' => 0,
         ]))
             ->assertNotFound();
     }
@@ -416,13 +413,13 @@ class DebtPaymentControllerTest extends TestCase
         $user = User::factory()->has(Debt::factory())->create();
         $movement = $user->debts->first()
             ->factory()->has(Movement::factory()->for($user)->state([
-                "type" => MovementTypeEnum::OUT->value
+                'type' => MovementTypeEnum::OUT->value,
             ]))
             ->create();
 
-        $this->actingAs($user)->delete(route("debts.payments.destroy", [
-            "debt" => 0,
-            "movement" => $movement
+        $this->actingAs($user)->delete(route('debts.payments.destroy', [
+            'debt' => 0,
+            'movement' => $movement,
         ]))
             ->assertNotFound();
     }
@@ -434,13 +431,13 @@ class DebtPaymentControllerTest extends TestCase
     {
         $user = User::factory()->has(Debt::factory())->create();
         $debt = $user->debts->first();
-        $movement = Movement::factory()->for(Debt::factory()->create(), "movementable")->create([
-            "type" => MovementTypeEnum::OUT->value
+        $movement = Movement::factory()->for(Debt::factory()->create(), 'movementable')->create([
+            'type' => MovementTypeEnum::OUT->value,
         ]);
 
-        $this->actingAs($user)->delete(route("debts.payments.destroy", [
-            "debt" => $debt,
-            'movement' => $movement
+        $this->actingAs($user)->delete(route('debts.payments.destroy', [
+            'debt' => $debt,
+            'movement' => $movement,
         ]))
             ->assertNotFound();
     }
@@ -452,13 +449,13 @@ class DebtPaymentControllerTest extends TestCase
     {
         $user = User::factory()->has(Debt::factory())->create();
         $debt = $user->debts->first();
-        $movement = Movement::factory()->for($debt, "movementable")->create([
-            "type" => MovementTypeEnum::OUT->value
+        $movement = Movement::factory()->for($debt, 'movementable')->create([
+            'type' => MovementTypeEnum::OUT->value,
         ]);
 
-        $this->actingAs($user)->delete(route("debts.payments.destroy", [
-            "debt" => $debt,
-            "movement" => $movement
+        $this->actingAs($user)->delete(route('debts.payments.destroy', [
+            'debt' => $debt,
+            'movement' => $movement,
         ]))
             ->assertForbidden();
     }
@@ -470,17 +467,16 @@ class DebtPaymentControllerTest extends TestCase
     {
         $user = User::factory()->has(Debt::factory())->create();
         $debt = Debt::factory()->create();
-        $movement = Movement::factory()->for($debt, "movementable")->for($user)->create([
-            "type" => MovementTypeEnum::OUT->value
+        $movement = Movement::factory()->for($debt, 'movementable')->for($user)->create([
+            'type' => MovementTypeEnum::OUT->value,
         ]);
 
-        $this->actingAs($user)->delete(route("debts.payments.destroy", [
-            "debt" => $debt,
-            "movement" => $movement
+        $this->actingAs($user)->delete(route('debts.payments.destroy', [
+            'debt' => $debt,
+            'movement' => $movement,
         ]))
             ->assertForbidden();
     }
-
 
     /**
      * deve ter status 200 e view debts.payments.destroy
@@ -489,16 +485,16 @@ class DebtPaymentControllerTest extends TestCase
     {
         $user = User::factory()->has(Debt::factory())->create();
         $debt = $user->debts->first();
-        $movement = Movement::factory()->for($debt, "movementable")->for($user)->create([
-            "type" => MovementTypeEnum::OUT->value
+        $movement = Movement::factory()->for($debt, 'movementable')->for($user)->create([
+            'type' => MovementTypeEnum::OUT->value,
         ]);
 
-        $this->actingAs($user)->delete(route("debts.payments.destroy", [
-            "debt" => $debt,
-            "movement" => $movement
+        $this->actingAs($user)->delete(route('debts.payments.destroy', [
+            'debt' => $debt,
+            'movement' => $movement,
         ]))
             ->assertRedirect(route('debts.payments.index', $debt))
-            ->assertSessionHas("alert_type", "success");
+            ->assertSessionHas('alert_type', 'success');
         $this->assertSoftDeleted($movement);
     }
 }

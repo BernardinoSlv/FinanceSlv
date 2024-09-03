@@ -7,7 +7,6 @@ use App\Http\Requests\StoreIdentifierRequest;
 use App\Http\Requests\UpdateIdentifierRequest;
 use App\Models\Identifier;
 use App\Repositories\Contracts\IdentifierRepositoryContract;
-use App\Repositories\IdentifierRepository;
 use Illuminate\Support\Facades\Gate;
 
 class IdentifierController extends Controller
@@ -22,11 +21,11 @@ class IdentifierController extends Controller
      */
     public function index()
     {
-        $identifiers = auth()->user()->identifiers()->orderBy("identifiers.id", "DESC")
+        $identifiers = auth()->user()->identifiers()->orderBy('identifiers.id', 'DESC')
             ->paginate();
 
-        return view("identifiers.index", compact(
-            "identifiers"
+        return view('identifiers.index', compact(
+            'identifiers'
         ));
     }
 
@@ -35,7 +34,7 @@ class IdentifierController extends Controller
      */
     public function create()
     {
-        return view("identifiers.create");
+        return view('identifiers.create');
     }
 
     /**
@@ -45,14 +44,14 @@ class IdentifierController extends Controller
     {
         $data = $request->validated();
 
-        if ($request->file("avatar")) {
-            $data["avatar"] = $request->file("avatar")->store("avatar");
+        if ($request->file('avatar')) {
+            $data['avatar'] = $request->file('avatar')->store('avatar');
         }
 
         $this->_identifierRepository->create(auth()->id(), $data);
 
-        return redirect()->route("identifiers.index")->with(
-            Alert::success("Entidade criada com sucesso.")
+        return redirect()->route('identifiers.index')->with(
+            Alert::success('Entidade criada com sucesso.')
         );
     }
 
@@ -69,12 +68,12 @@ class IdentifierController extends Controller
      */
     public function edit(Identifier $identifier)
     {
-        if (Gate::denies("identifier-edit", $identifier)) {
+        if (Gate::denies('identifier-edit', $identifier)) {
             abort(404);
         }
 
-        return  view("identifiers.edit", compact(
-            "identifier"
+        return view('identifiers.edit', compact(
+            'identifier'
         ));
     }
 
@@ -83,19 +82,19 @@ class IdentifierController extends Controller
      */
     public function update(UpdateIdentifierRequest $request, Identifier $identifier)
     {
-        if (Gate::denies("identifier-edit", $identifier)) {
+        if (Gate::denies('identifier-edit', $identifier)) {
             abort(404);
         }
 
         $data = $request->validated();
-        if ($request->file("avatar")) {
-            $data["avatar"] = $request->file("avatar")->store("avatar");
+        if ($request->file('avatar')) {
+            $data['avatar'] = $request->file('avatar')->store('avatar');
         }
 
         $this->_identifierRepository->update($identifier->id, $data);
 
-        return redirect()->route("identifiers.edit", $identifier)->with(
-            Alert::success("Entidade atualizada com sucesso.")
+        return redirect()->route('identifiers.edit', $identifier)->with(
+            Alert::success('Entidade atualizada com sucesso.')
         );
     }
 
@@ -104,13 +103,14 @@ class IdentifierController extends Controller
      */
     public function destroy(Identifier $identifier)
     {
-        if (Gate::denies("identifier-edit", $identifier)) {
+        if (Gate::denies('identifier-edit', $identifier)) {
             abort(404);
         }
 
         $this->_identifierRepository->delete($identifier->id);
-        return redirect()->route("identifiers.index")->with(
-            Alert::success("Entidade removida com sucesso.")
+
+        return redirect()->route('identifiers.index')->with(
+            Alert::success('Entidade removida com sucesso.')
         );
     }
 }

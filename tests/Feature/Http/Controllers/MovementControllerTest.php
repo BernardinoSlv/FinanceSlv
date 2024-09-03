@@ -2,15 +2,12 @@
 
 namespace Tests\Feature\Http\Controllers;
 
-use App\Enums\MovementTypeEnum;
 use App\Models\Debt;
 use App\Models\Movement;
 use App\Models\Quick;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Arr;
 use Tests\TestCase;
 
 class MovementControllerTest extends TestCase
@@ -22,7 +19,7 @@ class MovementControllerTest extends TestCase
      */
     public function test_index_action_unauthenticated(): void
     {
-        $this->get(route('movements.index'))->assertRedirectToRoute("auth.index");
+        $this->get(route('movements.index'))->assertRedirectToRoute('auth.index');
     }
 
     /**
@@ -41,13 +38,14 @@ class MovementControllerTest extends TestCase
 
         $this->actingAs($user)->get(route('movements.index'))
             ->assertOk()
-            ->assertViewIs("movements.index")
-            ->assertViewHas("movements", function (LengthAwarePaginator $movements) {
-                if (!$movements->first()->relationLoaded("movementable")) {
+            ->assertViewIs('movements.index')
+            ->assertViewHas('movements', function (LengthAwarePaginator $movements) {
+                if (! $movements->first()->relationLoaded('movementable')) {
                     return false;
-                } elseif (!$movements->first()->relationLoaded("identifier")) {
+                } elseif (! $movements->first()->relationLoaded('identifier')) {
                     return false;
                 }
+
                 return $movements->total() === 2;
             });
     }
@@ -57,10 +55,10 @@ class MovementControllerTest extends TestCase
      */
     public function test_destroy_action_unauthenticated(): void
     {
-        $movement = Movement::factory()->for(Quick::factory(), "movementable")->create();
+        $movement = Movement::factory()->for(Quick::factory(), 'movementable')->create();
 
-        $this->delete(route("movements.destroy", $movement))
-            ->assertRedirectToRoute("auth.index");
+        $this->delete(route('movements.destroy', $movement))
+            ->assertRedirectToRoute('auth.index');
     }
 
     /**
@@ -70,7 +68,7 @@ class MovementControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->delete(route("movements.destroy", 0))
+        $this->actingAs($user)->delete(route('movements.destroy', 0))
             ->assertNotFound();
     }
 
@@ -80,9 +78,9 @@ class MovementControllerTest extends TestCase
     public function test_destroy_action_is_not_owner(): void
     {
         $user = User::factory()->create();
-        $movement = Movement::factory()->for(Quick::factory(), "movementable")->create();
+        $movement = Movement::factory()->for(Quick::factory(), 'movementable')->create();
 
-        $this->actingAs($user)->delete(route("movements.destroy", $movement))
+        $this->actingAs($user)->delete(route('movements.destroy', $movement))
             ->assertForbidden();
     }
 
@@ -94,12 +92,12 @@ class MovementControllerTest extends TestCase
         $user = User::factory()->create();
         $movement = Movement::factory()
             ->for($user)
-            ->for(Debt::factory(), "movementable")
+            ->for(Debt::factory(), 'movementable')
             ->create();
 
         $this->actingAs($user)->delete(route('movements.destroy', $movement))
-            ->assertRedirect(route("movements.index"))
-            ->assertSessionHas("alert_type", "success");
+            ->assertRedirect(route('movements.index'))
+            ->assertSessionHas('alert_type', 'success');
         $this->assertSoftDeleted($movement);
     }
 
@@ -111,12 +109,12 @@ class MovementControllerTest extends TestCase
         $user = User::factory()->create();
         $movement = Movement::factory()
             ->for($user)
-            ->for(Quick::factory(), "movementable")
+            ->for(Quick::factory(), 'movementable')
             ->create();
 
         $this->actingAs($user)->delete(route('movements.destroy', $movement))
-            ->assertRedirect(route("movements.index"))
-            ->assertSessionHas("alert_type", "success");
+            ->assertRedirect(route('movements.index'))
+            ->assertSessionHas('alert_type', 'success');
         $this->assertSoftDeleted($movement);
         $this->assertSoftDeleted($movement->movementable);
     }

@@ -7,7 +7,6 @@ use App\Models\Movement;
 use App\Models\Quick;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class FileTest extends TestCase
@@ -23,9 +22,9 @@ class FileTest extends TestCase
 
         $user = User::factory()->create();
         $file = File::factory()->create([
-            "user_id" => $user,
-            "fileable_type" => Quick::class,
-            "fileable_id" => Quick::factory()->create()
+            'user_id' => $user,
+            'fileable_type' => Quick::class,
+            'fileable_id' => Quick::factory()->create(),
         ]);
 
         $this->assertEquals($user->id, $file->user->id);
@@ -41,9 +40,9 @@ class FileTest extends TestCase
 
         $user = User::factory()->trashed()->create();
         $file = File::factory()->create([
-            "user_id" => $user,
-            "fileable_type" => Quick::class,
-            "fileable_id" => Quick::factory()->create()
+            'user_id' => $user,
+            'fileable_type' => Quick::class,
+            'fileable_id' => Quick::factory()->create(),
         ]);
 
         $this->assertEquals($user->id, $file->user->id);
@@ -58,8 +57,8 @@ class FileTest extends TestCase
 
         $quick = Quick::factory()->create();
         $file = File::factory()->create([
-            "fileable_type" => Quick::class,
-            "fileable_id" => $quick
+            'fileable_type' => Quick::class,
+            'fileable_id' => $quick,
         ]);
 
         $this->assertInstanceOf(Quick::class, $file->fileable);
@@ -72,17 +71,17 @@ class FileTest extends TestCase
     public function test_fileable_method_using_movement(): void
     {
         Movement::factory(2)->create([
-            "movementable_type" => Quick::class,
-            "movementable_id" => Quick::factory()->create()
+            'movementable_type' => Quick::class,
+            'movementable_id' => Quick::factory()->create(),
         ]);
 
         $movement = Movement::factory()->create([
-            "movementable_type" => Quick::class,
-            "movementable_id" => Quick::factory()->create()
+            'movementable_type' => Quick::class,
+            'movementable_id' => Quick::factory()->create(),
         ]);
         $file = File::factory()->create([
-            "fileable_type" => Movement::class,
-            "fileable_id" => $movement
+            'fileable_type' => Movement::class,
+            'fileable_id' => $movement,
         ]);
 
         $this->assertInstanceOf(Movement::class, $file->fileable);
@@ -98,8 +97,8 @@ class FileTest extends TestCase
 
         $quick = Quick::factory()->trashed()->create();
         $file = File::factory()->create([
-            "fileable_type" => Quick::class,
-            "fileable_id" => $quick
+            'fileable_type' => Quick::class,
+            'fileable_id' => $quick,
         ]);
 
         $this->assertInstanceOf(Quick::class, $file->fileable);

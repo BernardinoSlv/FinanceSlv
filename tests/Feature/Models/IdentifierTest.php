@@ -5,7 +5,6 @@ namespace Tests\Feature\Models;
 use App\Models\Identifier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class IdentifierTest extends TestCase
@@ -20,7 +19,7 @@ class IdentifierTest extends TestCase
         User::factory(2)->create();
 
         $user = User::factory()->create();
-        $identifier = Identifier::factory()->create(["user_id" => $user]);
+        $identifier = Identifier::factory()->create(['user_id' => $user]);
 
         $this->assertEquals($user->id, $identifier->user->id);
     }
@@ -34,7 +33,7 @@ class IdentifierTest extends TestCase
         User::factory(2)->trashed()->create();
 
         $user = User::factory()->trashed()->create();
-        $identifier = Identifier::factory()->create(["user_id" => $user]);
+        $identifier = Identifier::factory()->create(['user_id' => $user]);
 
         $this->assertEquals($user->id, $identifier->user->id);
     }

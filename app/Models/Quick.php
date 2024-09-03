@@ -13,24 +13,24 @@ class Quick extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        "user_id",
-        "identifier_id",
-        "title",
-        "description"
+        'user_id',
+        'identifier_id',
+        'title',
+        'description',
     ];
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, "user_id", "id")->withTrashed();
+        return $this->belongsTo(User::class, 'user_id', 'id')->withTrashed();
     }
 
     public function identifier(): BelongsTo
     {
-        return $this->belongsTo(Identifier::class, "identifier_id", "id")->withTrashed();
+        return $this->belongsTo(Identifier::class, 'identifier_id', 'id')->withTrashed();
     }
 
     public function movement(): MorphOne
     {
-        return $this->morphOne(Movement::class, "movementable");
+        return $this->morphOne(Movement::class, 'movementable');
     }
 }

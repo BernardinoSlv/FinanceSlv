@@ -18,11 +18,11 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            "name" => fake()->name(),
-            "email" => fake()->unique()->email() . time(),
-            "email_verified_at" => now(),
-            "password" => Hash::make("password"),
-            "avatar" => "test.jpg",
+            'name' => fake()->name(),
+            'email' => fake()->unique()->email().time(),
+            'email_verified_at' => now(),
+            'password' => Hash::make('password'),
+            'avatar' => 'test.jpg',
         ];
     }
 }

@@ -20,12 +20,12 @@ class MovementFactory extends Factory
     public function definition(): array
     {
         return [
-            "user_id" => User::factory()->create(),
-            "identifier_id" => Identifier::factory()->create(),
+            'user_id' => User::factory()->create(),
+            'identifier_id' => Identifier::factory()->create(),
             // "movementable_type" => ,
             // "movementable_id" => ,
-            "type" => MovementTypeEnum::IN->value,
-            "amount" => rand(1, 1000),
+            'type' => MovementTypeEnum::IN->value,
+            'amount' => rand(1, 1000),
         ];
     }
 }

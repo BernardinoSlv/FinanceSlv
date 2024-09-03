@@ -13,30 +13,30 @@ class Debt extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        "identifier_id",
-        "title",
-        "description",
-        "amount",
-        "installments",
-        "due_date"
+        'identifier_id',
+        'title',
+        'description',
+        'amount',
+        'installments',
+        'due_date',
     ];
 
     protected $casts = [
-        "due_date" => "date"
+        'due_date' => 'date',
     ];
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, "user_id", "id")->withTrashed();
+        return $this->belongsTo(User::class, 'user_id', 'id')->withTrashed();
     }
 
     public function movements(): MorphMany
     {
-        return $this->morphMany(Movement::class, "movementable");
+        return $this->morphMany(Movement::class, 'movementable');
     }
 
     public function identifier(): BelongsTo
     {
-        return $this->belongsTo(Identifier::class, "identifier_id", "id")->withTrashed();
+        return $this->belongsTo(Identifier::class, 'identifier_id', 'id')->withTrashed();
     }
 }

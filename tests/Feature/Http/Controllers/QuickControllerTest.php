@@ -9,7 +9,6 @@ use App\Models\Quick;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Tests\TestCase;
@@ -23,8 +22,8 @@ class QuickControllerTest extends TestCase
      */
     public function test_index_action_unauthenticated(): void
     {
-        $this->get(route("quicks.index"))
-            ->assertRedirect(route("auth.index"));
+        $this->get(route('quicks.index'))
+            ->assertRedirect(route('auth.index'));
     }
 
     /**
@@ -35,12 +34,12 @@ class QuickControllerTest extends TestCase
         Quick::factory(2)->create();
 
         $user = User::factory()->create();
-        Quick::factory(2)->create(["user_id" => $user]);
+        Quick::factory(2)->create(['user_id' => $user]);
 
-        $this->actingAs($user)->get(route("quicks.index"))
+        $this->actingAs($user)->get(route('quicks.index'))
             ->assertOk()
-            ->assertViewIs("quicks.index")
-            ->assertViewHas("quicks", function (LengthAwarePaginator $quicks): bool {
+            ->assertViewIs('quicks.index')
+            ->assertViewHas('quicks', function (LengthAwarePaginator $quicks): bool {
                 return $quicks->total() === 2;
             });
     }
@@ -50,8 +49,8 @@ class QuickControllerTest extends TestCase
      */
     public function test_create_action_unauthenticated(): void
     {
-        $this->get(route("quicks.create"))
-            ->assertRedirect(route("auth.index"));
+        $this->get(route('quicks.create'))
+            ->assertRedirect(route('auth.index'));
     }
 
     /**
@@ -63,10 +62,10 @@ class QuickControllerTest extends TestCase
 
         $user = User::factory()->has(Identifier::factory(2))->create();
 
-        $this->actingAs($user)->get(route("quicks.create"))
+        $this->actingAs($user)->get(route('quicks.create'))
             ->assertOk()
-            ->assertViewIs("quicks.create")
-            ->assertViewHas("identifiers", function (Collection $identifiers): bool {
+            ->assertViewIs('quicks.create')
+            ->assertViewHas('identifiers', function (Collection $identifiers): bool {
                 return $identifiers->count() === 2;
             });
     }
@@ -76,8 +75,8 @@ class QuickControllerTest extends TestCase
      */
     public function test_store_action_unathenticated(): void
     {
-        $this->post(route("quicks.store"))
-            ->assertRedirect(route("auth.index"));
+        $this->post(route('quicks.store'))
+            ->assertRedirect(route('auth.index'));
     }
 
     /**
@@ -87,14 +86,14 @@ class QuickControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->post(route("quicks.store"))
+        $this->actingAs($user)->post(route('quicks.store'))
             ->assertFound()
             ->assertSessionHasErrors([
-                "title",
-                "type",
-                "amount"
+                'title',
+                'type',
+                'amount',
             ])
-            ->assertSessionDoesntHaveErrors(["description", "identifier_id"]);
+            ->assertSessionDoesntHaveErrors(['description', 'identifier_id']);
     }
 
     /**
@@ -104,21 +103,21 @@ class QuickControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $data = Quick::factory()->make([
-            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
-            "type" => MovementTypeEnum::IN->value,
-            "amount" => 500.00
+            'identifier_id' => Identifier::factory()->create(['user_id' => $user]),
+            'type' => MovementTypeEnum::IN->value,
+            'amount' => 500.00,
         ])->toArray();
 
-        $this->actingAs($user)->post(route("quicks.store"), $data)
+        $this->actingAs($user)->post(route('quicks.store'), $data)
             ->assertFound()
             ->assertSessionHasErrors([
-                "amount",
+                'amount',
             ])
             ->assertSessionDoesntHaveErrors([
-                "description",
-                "title",
-                "type",
-                "identifier_id"
+                'description',
+                'title',
+                'type',
+                'identifier_id',
             ]);
     }
 
@@ -129,21 +128,21 @@ class QuickControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $data = Quick::factory()->make([
-            "identifier_id" => Identifier::factory()->create(),
-            "type" => MovementTypeEnum::IN->value,
-            "amount" => "500,00"
+            'identifier_id' => Identifier::factory()->create(),
+            'type' => MovementTypeEnum::IN->value,
+            'amount' => '500,00',
         ])->toArray();
 
-        $this->actingAs($user)->post(route("quicks.store"), $data)
+        $this->actingAs($user)->post(route('quicks.store'), $data)
             ->assertFound()
             ->assertSessionHasErrors([
-                "identifier_id",
+                'identifier_id',
             ])
             ->assertSessionDoesntHaveErrors([
-                "description",
-                "title",
-                "type",
-                "amount"
+                'description',
+                'title',
+                'type',
+                'amount',
             ]);
     }
 
@@ -154,28 +153,28 @@ class QuickControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $data = Quick::factory()->make([
-            "identifier_id" => Identifier::factory()->create(["user_id" => $user]),
-            "type" => MovementTypeEnum::IN->value,
-            "amount" => "500,00"
+            'identifier_id' => Identifier::factory()->create(['user_id' => $user]),
+            'type' => MovementTypeEnum::IN->value,
+            'amount' => '500,00',
         ])->toArray();
 
-        $this->actingAs($user)->post(route("quicks.store"), $data)
-            ->assertRedirect(route("quicks.index"))
-            ->assertSessionHas("alert_type", "success");
+        $this->actingAs($user)->post(route('quicks.store'), $data)
+            ->assertRedirect(route('quicks.index'))
+            ->assertSessionHas('alert_type', 'success');
 
-        $this->assertDatabaseHas("quicks", [
-            ...Arr::except($data, ["type", "amount"]),
-            "user_id" => $user->id,
+        $this->assertDatabaseHas('quicks', [
+            ...Arr::except($data, ['type', 'amount']),
+            'user_id' => $user->id,
         ]);
         $quick = Quick::query()->where([
-            ...Arr::except($data, ["type", "amount"]),
-            "user_id" => $user->id,
+            ...Arr::except($data, ['type', 'amount']),
+            'user_id' => $user->id,
         ])->first();
-        $this->assertDatabaseHas("movements", [
-            ...Arr::except($data, ["description", "title"]),
-            "movementable_type" => Quick::class,
-            "movementable_id" => $quick->id,
-            "user_id" => $user->id,
+        $this->assertDatabaseHas('movements', [
+            ...Arr::except($data, ['description', 'title']),
+            'movementable_type' => Quick::class,
+            'movementable_id' => $quick->id,
+            'user_id' => $user->id,
         ]);
     }
 
@@ -186,8 +185,8 @@ class QuickControllerTest extends TestCase
     {
         $quick = Quick::factory()->create([]);
 
-        $this->get(route("quicks.edit", $quick))
-            ->assertRedirect(route("auth.index"));
+        $this->get(route('quicks.edit', $quick))
+            ->assertRedirect(route('auth.index'));
     }
 
     /**
@@ -197,7 +196,7 @@ class QuickControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->get(route("quicks.edit", 0))
+        $this->actingAs($user)->get(route('quicks.edit', 0))
             ->assertNotFound();
     }
 
@@ -207,9 +206,9 @@ class QuickControllerTest extends TestCase
     public function test_edit_action_trashed(): void
     {
         $user = User::factory()->create();
-        $quick = Quick::factory()->trashed()->create(["user_id" => $user]);
+        $quick = Quick::factory()->trashed()->create(['user_id' => $user]);
 
-        $this->actingAs($user)->get(route("quicks.edit", $quick))
+        $this->actingAs($user)->get(route('quicks.edit', $quick))
             ->assertNotFound();
     }
 
@@ -221,7 +220,7 @@ class QuickControllerTest extends TestCase
         $user = User::factory()->create();
         $quick = Quick::factory()->create();
 
-        $this->actingAs($user)->get(route("quicks.edit", $quick))
+        $this->actingAs($user)->get(route('quicks.edit', $quick))
             ->assertForbidden();
     }
 
@@ -231,13 +230,13 @@ class QuickControllerTest extends TestCase
     public function test_edit_action(): void
     {
         $user = User::factory()->create();
-        $quick = Quick::factory()->create(["user_id" => $user]);
+        $quick = Quick::factory()->create(['user_id' => $user]);
 
-        $this->actingAs($user)->get(route("quicks.edit", $quick))
+        $this->actingAs($user)->get(route('quicks.edit', $quick))
             ->assertOk()
-            ->assertViewIs("quicks.edit")
-            ->assertViewHas("identifiers")
-            ->assertViewHas("quick", fn (Quick $actualQuick): bool => $quick->id === $actualQuick->id);
+            ->assertViewIs('quicks.edit')
+            ->assertViewHas('identifiers')
+            ->assertViewHas('quick', fn (Quick $actualQuick): bool => $quick->id === $actualQuick->id);
     }
 
     /**deve redirecionar para login */
@@ -246,7 +245,7 @@ class QuickControllerTest extends TestCase
         $quick = Quick::factory()->create();
 
         $this->put(route('quicks.update', $quick))
-            ->assertRedirectToRoute("auth.index");
+            ->assertRedirectToRoute('auth.index');
     }
 
     /**
@@ -256,7 +255,7 @@ class QuickControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->put(route("quicks.update", 0))
+        $this->actingAs($user)->put(route('quicks.update', 0))
             ->assertNotFound();
     }
 
@@ -268,12 +267,12 @@ class QuickControllerTest extends TestCase
         $user = User::factory()->has(Quick::factory())->create();
         $quick = $user->quicks->first();
 
-        $this->actingAs($user)->put(route("quicks.update", $quick))
+        $this->actingAs($user)->put(route('quicks.update', $quick))
             ->assertFound()
             ->assertSessionHasErrors([
-                "title",
-                "type",
-                "amount"
+                'title',
+                'type',
+                'amount',
             ]);
     }
 
@@ -286,11 +285,11 @@ class QuickControllerTest extends TestCase
         $quick = Quick::factory()->create();
         $data = Quick::factory()->make([
             'identifier_id' => $user->identifiers->first(),
-            "amount" => "500,00",
-            "type" => MovementTypeEnum::IN->value
+            'amount' => '500,00',
+            'type' => MovementTypeEnum::IN->value,
         ])->toArray();
 
-        $this->actingAs($user)->put(route("quicks.update", $quick), $data)
+        $this->actingAs($user)->put(route('quicks.update', $quick), $data)
             ->assertForbidden();
     }
 
@@ -307,23 +306,23 @@ class QuickControllerTest extends TestCase
         $quick = $user->quicks->first();
         $data = Quick::factory()->make([
             'identifier_id' => $user->identifiers->first(),
-            "amount" => "500,00",
-            "type" => MovementTypeEnum::IN->value
+            'amount' => '500,00',
+            'type' => MovementTypeEnum::IN->value,
         ])->toArray();
 
         $this->actingAs($user)->put(route('quicks.update', $quick), $data)
-            ->assertRedirectToRoute("quicks.edit", $quick)
-            ->assertSessionHas("alert_type", "success");
-        $this->assertDatabaseHas("quicks", [
-            "id" => $quick->id,
-            ...Arr::only($data, ['identifier_id', 'title', "description"])
+            ->assertRedirectToRoute('quicks.edit', $quick)
+            ->assertSessionHas('alert_type', 'success');
+        $this->assertDatabaseHas('quicks', [
+            'id' => $quick->id,
+            ...Arr::only($data, ['identifier_id', 'title', 'description']),
         ]);
         $this->assertDatabaseHas('movements', [
-            "id" => $quick->movement->id,
+            'id' => $quick->movement->id,
             ...Arr::only($data, [
-                "type", "identifier_id"
+                'type', 'identifier_id',
             ]),
-            "amount" => 500.00
+            'amount' => 500.00,
         ]);
     }
 
@@ -334,8 +333,8 @@ class QuickControllerTest extends TestCase
     {
         $quick = Quick::factory()->create();
 
-        $this->delete(route("quicks.destroy", $quick))
-            ->assertRedirectToRoute("auth.index");
+        $this->delete(route('quicks.destroy', $quick))
+            ->assertRedirectToRoute('auth.index');
     }
 
     /**
@@ -345,7 +344,7 @@ class QuickControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->delete(route("quicks.destroy", 0))
+        $this->actingAs($user)->delete(route('quicks.destroy', 0))
             ->assertNotFound();
     }
 
@@ -357,7 +356,7 @@ class QuickControllerTest extends TestCase
         $user = User::factory()->create();
         $quick = Quick::factory()->create();
 
-        $this->actingAs($user)->delete(route("quicks.destroy", $quick))
+        $this->actingAs($user)->delete(route('quicks.destroy', $quick))
             ->assertForbidden();
     }
 
@@ -375,9 +374,9 @@ class QuickControllerTest extends TestCase
         $quick = $user->quicks->first();
         $movement = $quick->movement;
 
-        $this->actingAs($user)->delete(route("quicks.destroy", $quick))
-            ->assertRedirect(route("quicks.index"))
-            ->assertSessionHas("alert_type", "success");
+        $this->actingAs($user)->delete(route('quicks.destroy', $quick))
+            ->assertRedirect(route('quicks.index'))
+            ->assertSessionHas('alert_type', 'success');
         $this->assertSoftDeleted($quick);
         $this->assertSoftDeleted($movement);
     }

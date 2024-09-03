@@ -30,23 +30,23 @@ class createRecords extends Command
      */
     public function handle()
     {
-        $identifiers = Identifier::factory(30)->create(["user_id" => $this->argument("user")]);
+        $identifiers = Identifier::factory(30)->create(['user_id' => $this->argument('user')]);
         Debt::factory(20)
             ->sequence(...$identifiers->map(
-                fn ($identifier) => ["identifier_id" => $identifier->id]
+                fn ($identifier) => ['identifier_id' => $identifier->id]
             )->toArray())
-            ->create(["user_id" => $this->argument("user")]);
+            ->create(['user_id' => $this->argument('user')]);
         Quick::factory(20)
             ->sequence(...$identifiers->map(
-                fn ($identifier) => ["identifier_id" => $identifier->id]
+                fn ($identifier) => ['identifier_id' => $identifier->id]
             )->toArray())
-            ->has(Movement::factory()->state(["type" => MovementTypeEnum::IN->value, "identifier_id" => $identifiers->first(), "user_id" => $this->argument("user")]), "movement")
-            ->create(["user_id" => $this->argument("user")]);
+            ->has(Movement::factory()->state(['type' => MovementTypeEnum::IN->value, 'identifier_id' => $identifiers->first(), 'user_id' => $this->argument('user')]), 'movement')
+            ->create(['user_id' => $this->argument('user')]);
         Quick::factory(20)
             ->sequence(...$identifiers->map(
-                fn ($identifier) => ["identifier_id" => $identifier->id]
+                fn ($identifier) => ['identifier_id' => $identifier->id]
             )->toArray())
-            ->has(Movement::factory()->state(["type" => MovementTypeEnum::OUT->value, "identifier_id" => $identifiers->first(), "user_id" => $this->argument("user")]), "movement")
-            ->create(["user_id" => $this->argument("user")]);
+            ->has(Movement::factory()->state(['type' => MovementTypeEnum::OUT->value, 'identifier_id' => $identifiers->first(), 'user_id' => $this->argument('user')]), 'movement')
+            ->create(['user_id' => $this->argument('user')]);
     }
 }
