@@ -110,4 +110,17 @@ Route::middleware('checkAuth')->group(function () {
             'update' => 'identifiers.update',
             'destroy' => 'identifiers.destroy',
         ]);
+
+    // expenses
+    Route::resource('despesas', ExpenseController::class)
+        ->parameter('despesas', 'expense')
+        ->names([
+            'index' => 'expenses.index',
+            'create' => 'expenses.create',
+            'store' => 'expenses.store',
+            'show' => 'expenses.show',
+            'edit' => 'expenses.edit',
+            'update' => 'expenses.update',
+            'destroy' => 'expenses.destroy',
+        ]);
 });

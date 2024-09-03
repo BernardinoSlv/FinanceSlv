@@ -25,6 +25,6 @@ class Expense extends Model
 
     public function identifier(): BelongsTo
     {
-        return $this->belongsTo(identifier::class, "identifier_id", "id")->withTrashed();
+        return $this->belongsTo(Identifier::class, "identifier_id", "id")->withTrashed();
     }
 }
