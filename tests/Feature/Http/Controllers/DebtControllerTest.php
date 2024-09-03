@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
 use Tests\TestCase;
 
 class DebtControllerTest extends TestCase
@@ -115,6 +116,31 @@ class DebtControllerTest extends TestCase
             'amount' => 200,
             'user_id' => $user->id,
         ]);
+    }
+
+    /**
+     * deve redirecionar e adicionar o valor no saldo
+     */
+    public function test_store_action_checked_to_balance(): void
+    {
+        $user = User::factory()->has(Identifier::factory())->create();
+        $data = Debt::factory()->make([
+            'identifier_id' => $user->identifiers->first(),
+            'amount' => '200,00',
+        ])->toArray();
+        $data["to_balance"] = "on";
+
+        $this->actingAs($user)->post(route('debts.store'), $data)
+            ->assertFound()
+            ->assertSessionHas('alert_type', 'success');
+        $debt = Debt::query()->where([
+            ...Arr::except($data, ["to_balance"]),
+            'due_date' => date('Y-m-d', strtotime($data['due_date'])),
+            'amount' => 200,
+            'user_id' => $user->id,
+        ])->first();
+        $this->assertCount(1, $debt->movements);
+        $this->assertEquals(200, $debt->movements()->where("type", "in")->first()->amount);
     }
 
     /**
@@ -332,5 +358,26 @@ class DebtControllerTest extends TestCase
             ->assertRedirect(route('debts.index'))
             ->assertSessionHas('alert_type', 'success');
         $this->assertSoftDeleted($debt);
+    }
+
+    /**
+     * deve remover todas as movimentações
+     */
+    public function test_destroy_action_with_movements(): void
+    {
+        $user = User::factory()->has(
+            Debt::factory()
+                ->has(Movement::factory(4)->sequence(
+                    ["type" => "in"],
+                    ["type" => "out"],
+                ))
+        )->create();
+        $debt = $user->debts->first();
+
+        $this->actingAs($user)->delete(route('debts.destroy', $debt))
+            ->assertRedirect(route('debts.index'))
+            ->assertSessionHas('alert_type', 'success');
+        $this->assertSoftDeleted($debt);
+        $this->assertCount(0, $debt->movements);
     }
 }

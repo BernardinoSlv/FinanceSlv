@@ -34,6 +34,7 @@ class StoreDebtRequest extends FormRequest
             'amount' => ['required', new Amount],
             'installments' => ['nullable', 'integer', 'min:1'],
             'due_date' => ['nullable', 'date'],
+            'to_balance' => ["nullable", "in:on"]
         ];
     }
 }
