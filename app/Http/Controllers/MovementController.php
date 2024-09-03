@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\MovementableEnum;
 use App\Helpers\Alert;
 use App\Http\Requests\StoreMovementRequest;
 use App\Http\Requests\UpdateMovementRequest;
@@ -108,7 +109,11 @@ class MovementController extends Controller
     {
         if (Gate::denies("movement-edit", $movement)) abort(403);
 
+        $movementable = $movement->movementable;
         $movement->delete();
+
+        if (MovementableEnum::from(get_class($movementable))->canDelete())
+            $movementable->delete();
 
         return redirect()->route("movements.index")
             ->with(Alert::success("Movimentação deletada com sucesso."));

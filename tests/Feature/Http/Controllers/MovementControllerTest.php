@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Enums\MovementTypeEnum;
+use App\Models\Debt;
 use App\Models\Movement;
 use App\Models\Quick;
 use App\Models\User;
@@ -93,6 +94,23 @@ class MovementControllerTest extends TestCase
         $user = User::factory()->create();
         $movement = Movement::factory()
             ->for($user)
+            ->for(Debt::factory(), "movementable")
+            ->create();
+
+        $this->actingAs($user)->delete(route('movements.destroy', $movement))
+            ->assertRedirect(route("movements.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertSoftDeleted($movement);
+    }
+
+    /**
+     * deve redirecionar e remover o quick
+     */
+    public function test_destroy_action_a_quick(): void
+    {
+        $user = User::factory()->create();
+        $movement = Movement::factory()
+            ->for($user)
             ->for(Quick::factory(), "movementable")
             ->create();
 
@@ -100,5 +118,6 @@ class MovementControllerTest extends TestCase
             ->assertRedirect(route("movements.index"))
             ->assertSessionHas("alert_type", "success");
         $this->assertSoftDeleted($movement);
+        $this->assertSoftDeleted($movement->movementable);
     }
 }
