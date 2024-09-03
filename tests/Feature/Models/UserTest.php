@@ -3,6 +3,7 @@
 namespace Tests\Feature\Models;
 
 use App\Models\Debt;
+use App\Models\Expense;
 use App\Models\File;
 use App\Models\Identifier;
 use App\Models\Movement;
@@ -165,5 +166,38 @@ class UserTest extends TestCase
         Debt::factory(2)->trashed()->create(['user_id' => $user]);
 
         $this->assertCount(2, $user->debts);
+    }
+
+    /**
+     * deve retornar uma coleção vazia
+     */
+    public function test_expenses_relation_empty(): void
+    {
+        Expense::factory(2)->create();
+
+        $user = User::factory()->create();
+
+        $this->assertCount(0, $user->expenses);
+    }
+
+    /**
+     * deve retornar uma coleção com 2 Expense
+     */
+    public function test_expenses_relation(): void
+    {
+        Expense::factory(2)->create();
+
+        $user = User::factory()->create();
+        $expenses = Expense::factory(2)->create([
+            "user_id" => $user
+        ]);
+
+        $this->assertInstanceOf(Expense::class, $user->expenses->first());
+        $this->assertCount(
+            2,
+            $user->expenses->filter(
+                fn(Expense $expense) => in_array($expense->id, [$expenses->get(0)->id, $expenses->get(1)->id])
+            )
+        );
     }
 }
