@@ -141,12 +141,7 @@
             </div>
         </div>
         <div class="card-footer">
-            <nav class="">
-                <ul class="pagination pagination-sm justify-content-end">
-                    <li class="page-item"><a href="" class="page-link">Anterior</a></li>
-                    <li class="page-item"><a href="" class="page-link">Próximo</a></li>
-                </ul>
-            </nav>
+            <x-pagination :paginator="$identifiers" />
         </div>
     </div>
 @endsection

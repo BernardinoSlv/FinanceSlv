@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId("user_id")->references("id")->on("users");
             $table->morphs("fileable");
-            $table->string("type");
+            $table->enum("type", ["image", "pdf", "excel"]);
             $table->string("path");
             $table->unsignedBigInteger("size");
             $table->text("description")->nullable();

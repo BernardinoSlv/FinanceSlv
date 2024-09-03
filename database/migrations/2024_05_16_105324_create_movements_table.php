@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId("identifier_id")->nullable()->references("id")->on("identifiers");
             $table->foreignId("user_id")->references("id")->on("users");
             $table->morphs("movementable");
-            $table->string("type");
+            $table->enum("type", ["in", "out"]);
             $table->decimal("amount");
             $table->date("effetive_at")->nullable();
             $table->timestamps();
