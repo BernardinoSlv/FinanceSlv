@@ -39,10 +39,20 @@ class ExpenseController extends Controller
      */
     public function store(StoreExpenseRequest $request)
     {
-        $expenses = auth()->user()->expenses()->create([
+        $expense = auth()->user()->expenses()->create([
             ...$request->validated(),
             "amount" => RealToFloatParser::parse($request->amount)
         ]);
+
+        if (now()->day < $expense->due_day)
+            $expense->movements()->create([
+                "user_id" => auth()->id(),
+                "effetive_at" => now()->day($expense->due_day),
+                "closed_at" => null,
+                "amount" => $expense->amount
+            ]);
+
+
 
         return redirect()->route("expenses.index")
             ->with(Alert::success("Despesa criada com sucesso."));

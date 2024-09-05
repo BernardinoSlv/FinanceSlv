@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Support\Models\Traits\HasMovements;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Expense extends Model
 {
-    use HasFactory;
+    use HasFactory, HasMovements;
 
     public $fillable = [
         "identifier_id",

@@ -14,6 +14,7 @@ return new class extends Migration
     {
         Schema::table('movements', function (Blueprint $table) {
             $table->date("closed_at")
+                ->nullable()
                 ->default(new Expression("(CURRENT_DATE)"))
                 ->after("effetive_at");
             $table->decimal("fees_amount")->default(0)->after("closed_at");

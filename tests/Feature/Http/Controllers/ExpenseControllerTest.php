@@ -99,20 +99,55 @@ class ExpenseControllerTest extends TestCase
      */
     public function test_store_action(): void
     {
+        // travando o dia no meio do mês pois será colocado due_day antes do dia
+        $this->travelTo(now()->day(15));
+
+
         $user = User::factory()
             ->has(Identifier::factory())->create();
         $data = Expense::factory()->make([
             "amount" => "200,00",
-            "identifier_id" => $user->identifiers->get(0)
+            "identifier_id" => $user->identifiers->get(0),
+            "due_day" => 1
         ])->toArray();
 
         $this->actingAs($user)->post(route("expenses.store"), $data)
             ->assertRedirect(route("expenses.index"))
             ->assertSessionHas("alert_type", "success");
-        $this->assertDatabaseHas("expenses", [
+        $this->assertNotNull($expense = Expense::query()->where([
             ...Arr::except($data, "user_id"),
             "amount" => 200
-        ]);
+        ])->first());
+        $this->assertCount(0, $expense->movements);
+    }
+
+    /**
+     * deve criar uma movimentação de despesa
+     */
+    public function test_store_action_before_the_due_day(): void
+    {
+        // travando o dia no início do mês
+        $this->travelTo(now()->day(1));
+
+        $user = User::factory()
+            ->has(Identifier::factory())->create();
+        $data = Expense::factory()->make([
+            "amount" => "200,00",
+            "identifier_id" => $user->identifiers->get(0),
+            "due_day" => 10
+        ])->toArray();
+        $this->actingAs($user)->post(route("expenses.store"), $data)
+            ->assertRedirect(route("expenses.index"))
+            ->assertSessionHas("alert_type", "success");
+        $expense = Expense::query()->where([
+            ...Arr::except($data, "user_id"),
+            "amount" => 200
+        ])->first();
+        $this->assertCount(1, $expense->movements()->where([
+            "effetive_at" => now()->day(10)->format("Y-m-d"),
+            "closed_at" => null,
+            "fees_amount" => 0
+        ])->get());
     }
 
     /**
