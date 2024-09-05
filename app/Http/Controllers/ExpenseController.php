@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\MovementTypeEnum;
 use App\Helpers\Alert;
 use App\Http\Requests\StoreExpenseRequest;
+use App\Http\Requests\UpdateExpenseRequest;
 use App\Models\Expense;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -46,10 +48,15 @@ class ExpenseController extends Controller
 
         if (now()->day < $expense->due_day)
             $expense->movements()->create([
+                "type" => MovementTypeEnum::OUT->value,
                 "user_id" => auth()->id(),
-                "effetive_at" => now()->day($expense->due_day),
+                "effetive_at" => now()->day(
+                    $expense->due_day > now()->daysInMonth
+                        ? now()->daysInMonth
+                        : $expense->due_day
+                ),
                 "closed_at" => null,
-                "amount" => $expense->amount
+                "amount" => $expense->amount,
             ]);
 
 
@@ -81,9 +88,22 @@ class ExpenseController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Expense $expense)
+    public function update(UpdateExpenseRequest $request, Expense $expense)
     {
-        //
+        if (Gate::denies("is-owner", $expense))
+            abort(403);
+        $expense->fill([
+            ...$request->validated(),
+            "amount" => RealToFloatParser::parse($request->amount)
+        ]);
+        if ($expense->isDirty()) {
+            if (($previousDueDay = $expense->getOriginal("due_day")) !== $expense->due_day) {
+                // where define if will create a new movements .
+            }
+            $expense->save();
+        }
+        return redirect()->route("expenses.edit", $expense)
+            ->with(Alert::success("Despesa atualizada com sucesso."));
     }
 
     /**
