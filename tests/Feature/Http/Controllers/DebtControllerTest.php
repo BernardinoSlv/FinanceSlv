@@ -7,12 +7,14 @@ use App\Models\Identifier;
 use App\Models\Movement;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Tests\TestCase;
 
 class DebtControllerTest extends TestCase
 {
+    use RefreshDatabase;
     /**
      * deve redirecionar para login
      */

@@ -6,12 +6,14 @@ use App\Enums\MovementTypeEnum;
 use App\Models\Debt;
 use App\Models\Movement;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class DebtPaymentControllerTest extends TestCase
 {
+    use RefreshDatabase;
     /**
      * deve redirecionar para login
      */
@@ -137,7 +139,7 @@ class DebtPaymentControllerTest extends TestCase
         $this->actingAs($user)->postJson(route('debts.payments.store', $debt), $data)
             ->assertUnprocessable()
             ->assertJson(
-                fn (AssertableJson $json) => $json->has('message')
+                fn(AssertableJson $json) => $json->has('message')
                     ->where('errors.amount', ['O valor do pagamento excedeu o total da dívida.'])
             );
     }
@@ -334,7 +336,7 @@ class DebtPaymentControllerTest extends TestCase
         ]), $data)
             ->assertUnprocessable()
             ->assertJson(
-                fn (AssertableJson $json) => $json->has('message')
+                fn(AssertableJson $json) => $json->has('message')
                     ->where('errors.amount', ['O valor do pagamento excedeu o total da dívida.'])
             );
     }

@@ -6,11 +6,13 @@ use App\Models\Debt;
 use App\Models\Movement;
 use App\Models\Quick;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Tests\TestCase;
 
 class MovementControllerTest extends TestCase
 {
+    use RefreshDatabase;
     /**
      * deve redirecionar para login
      */

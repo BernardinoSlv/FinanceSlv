@@ -14,6 +14,7 @@ use Tests\TestCase;
 
 class ExpenseControllerTest extends TestCase
 {
+    use RefreshDatabase;
     /**
      * deve redirecionar para login
      */

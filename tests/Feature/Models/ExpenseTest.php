@@ -11,6 +11,7 @@ use Tests\TestCase;
 
 class ExpenseTest extends TestCase
 {
+    use RefreshDatabase;
     /**
      * deve retornar o User
      */
