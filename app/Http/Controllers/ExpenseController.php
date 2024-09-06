@@ -105,7 +105,9 @@ class ExpenseController extends Controller
                     || now()->day($expense->due_day)->diffInDays(now()) >= 0
                 ) {
                     if (
-                        !$expense->movements()->whereYear("effetive_date", now()->year)
+                        !$expense->movements()
+                            ->withTrashed()
+                            ->whereYear("effetive_date", now()->year)
                             ->whereMonth("effetive_date", now()->month)->count()
                     ) {
                         $expense->movements()->create([

@@ -276,6 +276,7 @@ class ExpenseControllerTest extends TestCase
         ])->get());
     }
 
+
     /**
      * deve alterar o dia e não deve criar outra movimentação
      */
@@ -312,6 +313,46 @@ class ExpenseControllerTest extends TestCase
         $expense->refresh();
         $this->assertCount(1, $expense->movements);
         $this->assertEquals($movement->id, $expense->movements->first()->id);
+    }
+
+    /**
+     * deve alterar o dia e não deve criar outra movimentação
+     */
+    public function test_update_action_due_day_to_later_and_trashed_stored_monthly_movement(): void
+    {
+        // travando no dia 10 do mês
+        $this->travelTo(now()->day(10));
+
+        $user = User::factory()
+            ->has(Identifier::factory())
+            ->has(
+                Expense::factory(state: ["due_day" => 1])
+                    ->has(
+                        Movement::factory()
+                            ->state([
+                                "closed_date" => now()->subDay(),
+                                "fees_amount" => 0,
+                                "effetive_date" => now()->subDay(),
+                                "type" => "out"
+                            ])->trashed()
+                    )
+            )
+            ->create();
+
+        $expense = $user->expenses->first();
+        $movement = $expense->movements()->withTrashed()->first();
+
+        $data = Expense::factory()->make([
+            "identifier_id" => $user->identifiers->first(),
+            "amount" => "500,00",
+            "due_day" => 20 // 20 dias a mais da due_day a do data atual
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("expenses.update", $expense), $data)
+            ->assertSessionHas("alert_type", "success");
+        $expense->refresh();
+        $this->assertCount(1, $expense->movements()->withTrashed()->get());
+        $this->assertEquals($movement->id, $expense->movements()->withTrashed()->first()->id);
     }
 
     /**
@@ -432,4 +473,19 @@ class ExpenseControllerTest extends TestCase
                 ->get()
         );
     }
+
+    /**
+     * deve ter stauts 403
+     */
+    public function test_destroy_action_is_not_owner(): void {}
+
+    /**
+     * deve redirecionar com mensagem de sucesso
+     */
+    public function test_destroy_action(): void {}
+
+    /**
+     * deve deletar a despesa e deixar as movimentações
+     */
+    public function test_destroy_action_has_movements(): void {}
 }
