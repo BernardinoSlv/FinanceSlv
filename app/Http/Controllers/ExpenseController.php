@@ -137,6 +137,11 @@ class ExpenseController extends Controller
      */
     public function destroy(Expense $expense)
     {
-        //
+        if (Gate::denies("is-owner", $expense))
+            abort(403);
+        $expense->delete();
+
+        return redirect()->route("expenses.index")
+            ->with(Alert::success("Despesa removida com sucesso."));
     }
 }

@@ -477,15 +477,47 @@ class ExpenseControllerTest extends TestCase
     /**
      * deve ter stauts 403
      */
-    public function test_destroy_action_is_not_owner(): void {}
+    public function test_destroy_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $expense = Expense::factory()->create();
+
+        $this->actingAs($user)->delete(route("expenses.destroy", $expense))
+            ->assertForbidden();
+    }
 
     /**
      * deve redirecionar com mensagem de sucesso
      */
-    public function test_destroy_action(): void {}
+    public function test_destroy_action(): void
+    {
+        $user = User::factory()
+            ->has(Expense::factory())
+            ->create();
+        $expense = $user->expenses->first();
+
+        $this->actingAs($user)->delete(route("expenses.destroy", $expense))
+            ->assertRedirect(route("expenses.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertSoftDeleted($expense);
+    }
 
     /**
      * deve deletar a despesa e deixar as movimentações
      */
-    public function test_destroy_action_has_movements(): void {}
+    public function test_destroy_action_has_movements(): void
+    {
+        $user = User::factory()
+            ->has(Expense::factory()
+                ->has(Movement::factory(2)))
+            ->create();
+        $expense = $user->expenses->first();
+
+        $this->actingAs($user)->delete(route("expenses.destroy", $expense))
+            ->assertRedirect(route("expenses.index"))
+            ->assertSessionHas("alert_type", "success");
+        $expense->refresh();
+        $this->assertSoftDeleted($expense);
+        $this->assertCount(2, $expense->movements);
+    }
 }
