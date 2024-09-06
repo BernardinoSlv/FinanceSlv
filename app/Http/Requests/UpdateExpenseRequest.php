@@ -30,7 +30,8 @@ class UpdateExpenseRequest extends FormRequest
             ],
             "title" => [
                 "required",
-                Rule::unique("expenses", "title")->where("identifier_id", $this->identifier_id)
+                Rule::unique("expenses", "title")
+                    ->where("identifier_id", $this->identifier_id)
                     ->ignore($this->expense->id)
             ],
             "description" => ["nullable"],

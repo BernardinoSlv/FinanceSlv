@@ -26,8 +26,9 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form method="POST" action="{{ route('expenses.store') }}">
+                    <form method="POST" action="{{ route('expenses.update', $expense) }}">
                         @csrf
+                        @method('PUT')
 
                         @include('includes.alerts')
 
