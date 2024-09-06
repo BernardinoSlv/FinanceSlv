@@ -144,8 +144,8 @@ class ExpenseControllerTest extends TestCase
             "amount" => 200
         ])->first();
         $this->assertCount(1, $expense->movements()->where([
-            "effetive_at" => now()->day(10)->format("Y-m-d"),
-            "closed_at" => null,
+            "effetive_date" => now()->day(10)->format("Y-m-d"),
+            "closed_date" => null,
             "fees_amount" => 0,
             "type" => "out"
         ])->get());
@@ -265,8 +265,8 @@ class ExpenseControllerTest extends TestCase
         $this->assertCount(1, $expense->movements);
         $this->assertCount(1, $expense->movements()->where([
             "type" => "out",
-            "effetive_at" => now()->day(10)->format("Y-m-d"),
-            "closed_at" => null,
+            "effetive_date" => now()->day(10)->format("Y-m-d"),
+            "closed_date" => null,
             "fees_amount" => 0
         ])->get());
     }

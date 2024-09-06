@@ -13,11 +13,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('movements', function (Blueprint $table) {
-            $table->date("closed_at")
+            $table->date("closed_date")
                 ->nullable()
                 ->default(new Expression("(CURRENT_DATE)"))
                 ->after("effetive_at");
-            $table->decimal("fees_amount")->default(0)->after("closed_at");
+            $table->decimal("fees_amount")->default(0)->after("closed_date");
+            $table->renameColumn("effetive_at", "effetive_date");
         });
     }
 
@@ -27,7 +28,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('movements', function (Blueprint $table) {
-            $table->dropColumn(["closed_at", "fees_amount"]);
+            $table->dropColumn(["closed_date", "fees_amount"]);
         });
     }
 };

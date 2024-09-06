@@ -53,7 +53,7 @@ class OrderByPipe implements PipeContract
                 $query->orderBy(
                     DB::raw('(
                         CASE
-                            WHEN movements.effetive_at is not null THEN movements.effetive_at
+                            WHEN movements.effetive_date is not null THEN movements.effetive_date
                             ELSE movements.created_at
                         END
                     )'),

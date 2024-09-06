@@ -215,13 +215,13 @@
                                         <a href="javascript:;">{{ $movement->identifier?->name }}</a>
                                     </td>
                                     <td>
-                                        @if ($movement->effetive_at)
-                                            @if ($movement->effetive_at->gt($movement->created_at))
+                                        @if ($movement->effetive_date)
+                                            @if ($movement->effetive_date->gt($movement->created_at))
                                                 <span class="text-warning fw-bold">
-                                                    {{ $movement->effetive_at->format('d/m/Y') }}
+                                                    {{ $movement->effetive_date->format('d/m/Y') }}
                                                 </span>
                                             @else
-                                                {{ $movement->effetive_at->format('d/m/Y') }}
+                                                {{ $movement->effetive_date->format('d/m/Y') }}
                                             @endif
                                         @else
                                             {{ $movement->created_at->format('d/m/Y') }}

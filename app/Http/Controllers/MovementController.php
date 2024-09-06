@@ -25,7 +25,7 @@ class MovementController extends Controller
     {
         // Movement::query()->where("movementable_type", Debt::class)
         //     ->each(function (Movement $movement) {
-        //         $movement->effetive_at = now()->addDays(rand(0, 30));
+        //         $movement->effetive_date = now()->addDays(rand(0, 30));
         //         $movement->save();
         //     });
 

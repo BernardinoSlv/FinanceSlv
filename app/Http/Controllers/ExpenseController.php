@@ -50,12 +50,12 @@ class ExpenseController extends Controller
             $expense->movements()->create([
                 "type" => MovementTypeEnum::OUT->value,
                 "user_id" => auth()->id(),
-                "effetive_at" => now()->day(
+                "effetive_date" => now()->day(
                     $expense->due_day > now()->daysInMonth
                         ? now()->daysInMonth
                         : $expense->due_day
                 ),
-                "closed_at" => null,
+                "closed_date" => null,
                 "amount" => $expense->amount,
             ]);
 
