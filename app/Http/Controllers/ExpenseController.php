@@ -48,8 +48,9 @@ class ExpenseController extends Controller
 
         if (now()->day < $expense->due_day)
             $expense->movements()->create([
-                "type" => MovementTypeEnum::OUT->value,
                 "user_id" => auth()->id(),
+                "identifier_id" => $expense->identifier_id,
+                "type" => MovementTypeEnum::OUT->value,
                 "effetive_date" => now()->day(
                     $expense->due_day > now()->daysInMonth
                         ? now()->daysInMonth
@@ -98,7 +99,30 @@ class ExpenseController extends Controller
         ]);
         if ($expense->isDirty()) {
             if (($previousDueDay = $expense->getOriginal("due_day")) !== $expense->due_day) {
-                // where define if will create a new movements .
+                // caso o novo dia de vencimento ainda não tenha passado
+                if (
+                    now()->day($previousDueDay)->diffInDays(now()->day($expense->due_day)) >= 0
+                    || now()->day($expense->due_day)->diffInDays(now()) >= 0
+                ) {
+                    if (
+                        !$expense->movements()->whereYear("effetive_date", now()->year)
+                            ->whereMonth("effetive_date", now()->month)->count()
+                    ) {
+                        $expense->movements()->create([
+                            "identifier_id" => $expense->identifier_id,
+                            "user_id" => auth()->id(),
+                            "type" => MovementTypeEnum::OUT->value,
+                            "amount" => $expense->amount,
+                            "fees_amount" => 0,
+                            "effetive_date" => now()->day(
+                                $expense->due_day > now()->daysInMonth
+                                    ? now()->daysInMonth
+                                    : $expense->due_day
+                            ),
+                            "closed_date" => null
+                        ]);
+                    }
+                }
             }
             $expense->save();
         }

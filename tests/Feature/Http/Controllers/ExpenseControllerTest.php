@@ -4,6 +4,7 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Expense;
 use App\Models\Identifier;
+use App\Models\Movement;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -144,6 +145,7 @@ class ExpenseControllerTest extends TestCase
             "amount" => 200
         ])->first();
         $this->assertCount(1, $expense->movements()->where([
+            "identifier_id" => $data["identifier_id"],
             "effetive_date" => now()->day(10)->format("Y-m-d"),
             "closed_date" => null,
             "fees_amount" => 0,
@@ -257,27 +259,177 @@ class ExpenseControllerTest extends TestCase
         $data = Expense::factory()->make([
             "identifier_id" => $user->identifiers->first(),
             "amount" => "500,00",
-            "due_day" => 10
+            "due_day" => 10 // 10 dias do due_day a da data atual
         ])->toArray();
 
         $this->actingAs($user)->put(route("expenses.update", $expense), $data)
             ->assertSessionHas("alert_type", "success");
         $this->assertCount(1, $expense->movements);
         $this->assertCount(1, $expense->movements()->where([
+            "identifier_id" => $data["identifier_id"],
+            "user_id" => $user->id,
             "type" => "out",
+            "amount" => 500.00,
             "effetive_date" => now()->day(10)->format("Y-m-d"),
             "closed_date" => null,
-            "fees_amount" => 0
+            "fees_amount" => 0.00
         ])->get());
     }
 
     /**
      * deve alterar o dia e não deve criar outra movimentação
      */
-    public function test_update_action_due_day_to_later_and_already_stored_monthly_movement(): void {}
+    public function test_update_action_due_day_to_later_and_already_stored_monthly_movement(): void
+    {
+        // travando no dia 10 do mês
+        $this->travelTo(now()->day(10));
+
+        $user = User::factory()
+            ->has(Identifier::factory())
+            ->has(
+                Expense::factory(state: ["due_day" => 1])
+                    ->has(Movement::factory()
+                        ->state([
+                            "closed_date" => now()->subDay(),
+                            "fees_amount" => 0,
+                            "effetive_date" => now()->subDay(),
+                            "type" => "out"
+                        ]))
+            )
+            ->create();
+
+        $expense = $user->expenses->first();
+        $movement = $expense->movements->first();
+
+        $data = Expense::factory()->make([
+            "identifier_id" => $user->identifiers->first(),
+            "amount" => "500,00",
+            "due_day" => 20 // 20 dias a mais da due_day a do data atual
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("expenses.update", $expense), $data)
+            ->assertSessionHas("alert_type", "success");
+        $expense->refresh();
+        $this->assertCount(1, $expense->movements);
+        $this->assertEquals($movement->id, $expense->movements->first()->id);
+    }
 
     /**
-     * deve mudar sem alterar nenhuma movimentação
+     * deve mudar sem adicionar movimentão
      */
-    public function test_update_actino_due_day_to_previous(): void {}
+    public function test_update_action_due_day_to_previous_but_not_previous_current_date(): void
+    {
+        // travando no dia 10 do mês
+        $this->travelTo(now()->day(20));
+
+        $user = User::factory()
+            ->has(Identifier::factory())
+            ->has(
+                Expense::factory(state: ["due_day" => 1])
+                    ->has(Movement::factory()
+                        ->state([
+                            "closed_date" => now()->day(25),
+                            "fees_amount" => 0,
+                            "effetive_date" => now()->day(25),
+                            "type" => "out"
+                        ]))
+            )
+            ->create();
+
+        $expense = $user->expenses->first();
+        $movement = $expense->movements->first();
+
+        $data = Expense::factory()->make([
+            "identifier_id" => $user->identifiers->first(),
+            "amount" => "500,00",
+            "due_day" => 23 // 2 dias antes , e 3 dias após a data atual
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("expenses.update", $expense), $data)
+            ->assertSessionHas("alert_type", "success");
+        $expense->refresh();
+        $this->assertCount(1, $expense->movements);
+        $this->assertEquals($movement->id, $expense->movements->first()->id);
+    }
+
+    /** deve alterar sem adicionar movimentação  */
+    public function test_update_action_due_day_to_previous_also_current_date(): void
+    {
+        // travando no dia 10 do mês
+        $this->travelTo(now()->day(20));
+
+        $user = User::factory()
+            ->has(Identifier::factory())
+            ->has(
+                Expense::factory(state: ["due_day" => 1])
+                    ->has(Movement::factory()
+                        ->state([
+                            "closed_date" => now()->day(25),
+                            "fees_amount" => 0,
+                            "effetive_date" => now()->day(25),
+                            "type" => "out"
+                        ]))
+            )
+            ->create();
+
+        $expense = $user->expenses->first();
+        $movement = $expense->movements->first();
+
+        $data = Expense::factory()->make([
+            "identifier_id" => $user->identifiers->first(),
+            "amount" => "500,00",
+            "due_day" => 15 // 10 dias antes , e 5 dias após a data atual
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("expenses.update", $expense), $data)
+            ->assertSessionHas("alert_type", "success");
+        $expense->refresh();
+        $this->assertCount(1, $expense->movements);
+        $this->assertEquals($movement->id, $expense->movements->first()->id);
+    }
+
+    /** deve alterar sem adicionar movimentação  */
+    public function test_update_action_due_day_to_previous_also_current_date_and_not_movement_in_current_monthly(): void
+    {
+        // travando no dia 10 do mês
+        $this->travelTo(now()->day(20));
+
+        $user = User::factory()
+            ->has(Identifier::factory())
+            ->has(
+                Expense::factory(state: ["due_day" => 1])
+                    ->has(Movement::factory()
+                        ->state([
+                            "closed_date" => now()->subMonth(),
+                            "fees_amount" => 0,
+                            "effetive_date" => now()->subMonth(),
+                            "type" => "out"
+                        ]))
+            )
+            ->create();
+
+        $expense = $user->expenses->first();
+        $movement = $expense->movements->first();
+
+        $data = Expense::factory()->make([
+            "identifier_id" => $user->identifiers->first(),
+            "amount" => "500,00",
+            "due_day" => 15 // 10 dias antes , e 5 dias após a data atual
+        ])->toArray();
+
+        $this->actingAs($user)->put(route("expenses.update", $expense), $data)
+            ->assertSessionHas("alert_type", "success");
+        $expense->refresh();
+        $this->assertCount(2, $expense->movements);
+        $this->assertCount(
+            1,
+            $expense->movements()
+                ->where([
+                    "effetive_date" => now()->day(15)->format("Y-m-d"),
+                    "amount" => 500,
+                    "closed_date" => null,
+                ])
+                ->get()
+        );
+    }
 }
