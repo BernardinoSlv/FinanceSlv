@@ -24,17 +24,17 @@ class StoreExpenseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "identifier_id" => [
-                "required",
-                Rule::exists("identifiers", "id")->where("user_id", auth()->id())
+            'identifier_id' => [
+                'required',
+                Rule::exists('identifiers', 'id')->where('user_id', auth()->id()),
             ],
-            "title" => [
-                "required",
-                Rule::unique("expenses", "title")->where("identifier_id", $this->identifier_id)
+            'title' => [
+                'required',
+                Rule::unique('expenses', 'title')->where('identifier_id', $this->identifier_id),
             ],
-            "description" => ["nullable"],
-            "amount" => ["required", new Amount],
-            "due_day" => ["required", "integer", "min:1", "max:31"]
+            'description' => ['nullable'],
+            'amount' => ['required', new Amount],
+            'due_day' => ['required', 'integer', 'min:1', 'max:31'],
         ];
     }
 }

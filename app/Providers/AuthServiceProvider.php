@@ -4,10 +4,6 @@ namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
 
-use App\Models\Debt;
-use App\Models\Identifier;
-use App\Models\Movement;
-use App\Models\Quick;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;

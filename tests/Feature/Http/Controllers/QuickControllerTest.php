@@ -16,6 +16,7 @@ use Tests\TestCase;
 class QuickControllerTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * deve redirecionar para login
      */
@@ -235,7 +236,7 @@ class QuickControllerTest extends TestCase
             ->assertOk()
             ->assertViewIs('quicks.edit')
             ->assertViewHas('identifiers')
-            ->assertViewHas('quick', fn(Quick $actualQuick): bool => $quick->id === $actualQuick->id);
+            ->assertViewHas('quick', fn (Quick $actualQuick): bool => $quick->id === $actualQuick->id);
     }
 
     /**deve redirecionar para login */

@@ -7,7 +7,6 @@ use App\Models\Identifier;
 use App\Models\Movement;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Tests\TestCase;
@@ -15,13 +14,14 @@ use Tests\TestCase;
 class ExpenseControllerTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * deve redirecionar para login
      */
     public function test_index_action_unauthenticated(): void
     {
-        $this->get(route("expenses.index"))
-            ->assertRedirect(route("auth.index"));
+        $this->get(route('expenses.index'))
+            ->assertRedirect(route('auth.index'));
     }
 
     /**
@@ -33,12 +33,12 @@ class ExpenseControllerTest extends TestCase
             ->has(Expense::factory(2))
             ->create();
 
-        $this->actingAs($user)->get(route("expenses.index"))
+        $this->actingAs($user)->get(route('expenses.index'))
             ->assertOk()
-            ->assertViewHas("expenses", function (LengthAwarePaginator $expenses): bool {
+            ->assertViewHas('expenses', function (LengthAwarePaginator $expenses): bool {
                 return $expenses->total() === 2;
             })
-            ->assertViewIs("expenses.index");
+            ->assertViewIs('expenses.index');
     }
 
     /**deve ter status 200 */
@@ -46,10 +46,10 @@ class ExpenseControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->get(route("expenses.create"))
+        $this->actingAs($user)->get(route('expenses.create'))
             ->assertOk()
-            ->assertViewIs("expenses.create")
-            ->assertViewHas(["identifiers"]);
+            ->assertViewIs('expenses.create')
+            ->assertViewHas(['identifiers']);
     }
 
     /**
@@ -59,16 +59,16 @@ class ExpenseControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->post(route("expenses.store"))
+        $this->actingAs($user)->post(route('expenses.store'))
             ->assertFound()
             ->assertSessionHasErrors([
-                "identifier_id",
-                "title",
-                "amount",
-                "due_day"
+                'identifier_id',
+                'title',
+                'amount',
+                'due_day',
             ])
             ->assertSessionDoesntHaveErrors([
-                "description"
+                'description',
             ]);
     }
 
@@ -79,20 +79,20 @@ class ExpenseControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $data = Expense::factory()->make([
-            "amount" => "200,00"
+            'amount' => '200,00',
         ])->toArray();
 
-        $this->actingAs($user)->post(route("expenses.store"), $data)
+        $this->actingAs($user)->post(route('expenses.store'), $data)
             ->assertFound()
             ->assertSessionHasErrors([
-                "identifier_id",
+                'identifier_id',
 
             ])
             ->assertSessionDoesntHaveErrors([
-                "title",
-                "amount",
-                "due_day",
-                "description"
+                'title',
+                'amount',
+                'due_day',
+                'description',
             ]);
     }
 
@@ -104,21 +104,20 @@ class ExpenseControllerTest extends TestCase
         // travando o dia no meio do mês pois será colocado due_day antes do dia
         $this->travelTo(now()->day(15));
 
-
         $user = User::factory()
             ->has(Identifier::factory())->create();
         $data = Expense::factory()->make([
-            "amount" => "200,00",
-            "identifier_id" => $user->identifiers->get(0),
-            "due_day" => 1
+            'amount' => '200,00',
+            'identifier_id' => $user->identifiers->get(0),
+            'due_day' => 1,
         ])->toArray();
 
-        $this->actingAs($user)->post(route("expenses.store"), $data)
-            ->assertRedirect(route("expenses.index"))
-            ->assertSessionHas("alert_type", "success");
+        $this->actingAs($user)->post(route('expenses.store'), $data)
+            ->assertRedirect(route('expenses.index'))
+            ->assertSessionHas('alert_type', 'success');
         $this->assertNotNull($expense = Expense::query()->where([
-            ...Arr::except($data, "user_id"),
-            "amount" => 200
+            ...Arr::except($data, 'user_id'),
+            'amount' => 200,
         ])->first());
         $this->assertCount(0, $expense->movements);
     }
@@ -134,23 +133,23 @@ class ExpenseControllerTest extends TestCase
         $user = User::factory()
             ->has(Identifier::factory())->create();
         $data = Expense::factory()->make([
-            "amount" => "200,00",
-            "identifier_id" => $user->identifiers->get(0),
-            "due_day" => 10
+            'amount' => '200,00',
+            'identifier_id' => $user->identifiers->get(0),
+            'due_day' => 10,
         ])->toArray();
-        $this->actingAs($user)->post(route("expenses.store"), $data)
-            ->assertRedirect(route("expenses.index"))
-            ->assertSessionHas("alert_type", "success");
+        $this->actingAs($user)->post(route('expenses.store'), $data)
+            ->assertRedirect(route('expenses.index'))
+            ->assertSessionHas('alert_type', 'success');
         $expense = Expense::query()->where([
-            ...Arr::except($data, "user_id"),
-            "amount" => 200
+            ...Arr::except($data, 'user_id'),
+            'amount' => 200,
         ])->first();
         $this->assertCount(1, $expense->movements()->where([
-            "identifier_id" => $data["identifier_id"],
-            "effetive_date" => now()->day(10)->format("Y-m-d"),
-            "closed_date" => null,
-            "fees_amount" => 0,
-            "type" => "out"
+            'identifier_id' => $data['identifier_id'],
+            'effetive_date' => now()->day(10)->format('Y-m-d'),
+            'closed_date' => null,
+            'fees_amount' => 0,
+            'type' => 'out',
         ])->get());
     }
 
@@ -162,7 +161,7 @@ class ExpenseControllerTest extends TestCase
         $user = User::factory()->create();
         $expense = Expense::factory()->create();
 
-        $this->actingAs($user)->get(route("expenses.edit", $expense))
+        $this->actingAs($user)->get(route('expenses.edit', $expense))
             ->assertForbidden();
     }
 
@@ -174,10 +173,10 @@ class ExpenseControllerTest extends TestCase
         $user = User::factory()->create();
         $expense = Expense::factory()->for($user)->create();
 
-        $this->actingAs($user)->get(route("expenses.edit", $expense))
+        $this->actingAs($user)->get(route('expenses.edit', $expense))
             ->assertOk()
-            ->assertViewHas(["identifiers", "expense"])
-            ->assertViewIs("expenses.edit");
+            ->assertViewHas(['identifiers', 'expense'])
+            ->assertViewIs('expenses.edit');
     }
 
     /** deve redirecionar com erros de validação  */
@@ -188,16 +187,16 @@ class ExpenseControllerTest extends TestCase
             ->create();
         $expense = $user->expenses->first();
 
-        $this->actingAs($user)->put(route("expenses.update", $expense))
+        $this->actingAs($user)->put(route('expenses.update', $expense))
             ->assertFound()
             ->assertSessionHasErrors([
-                "identifier_id",
-                "title",
-                "amount",
-                "due_day"
+                'identifier_id',
+                'title',
+                'amount',
+                'due_day',
             ])
             ->assertSessionDoesntHaveErrors([
-                "description"
+                'description',
             ]);
     }
 
@@ -211,11 +210,11 @@ class ExpenseControllerTest extends TestCase
             ->create();
         $expense = Expense::factory()->create();
         $data = Expense::factory()->make([
-            "identifier_id" => $user->identifiers->first(),
-            "amount" => "500,00 "
+            'identifier_id' => $user->identifiers->first(),
+            'amount' => '500,00 ',
         ])->toArray();
 
-        $this->actingAs($user)->put(route("expenses.update", $expense), $data)
+        $this->actingAs($user)->put(route('expenses.update', $expense), $data)
             ->assertForbidden();
     }
 
@@ -226,22 +225,29 @@ class ExpenseControllerTest extends TestCase
     {
         $user = User::factory()
             ->has(Identifier::factory())
-            ->has(Expense::factory())
+            ->has(
+                Expense::factory()
+                    ->has(Movement::factory(2, [
+                        'effetive_date' => now(),
+                    ]))
+            )
             ->create();
         $expense = $user->expenses->first();
         $data = Expense::factory()->make([
-            "identifier_id" => $user->identifiers->first(),
-            "amount" => "500,00",
-            "due_day" => now()->day
+            'identifier_id' => $user->identifiers->first(),
+            'amount' => '500,00',
+            'due_day' => now()->day,
         ])->toArray();
 
-        $this->actingAs($user)->put(route("expenses.update", $expense), $data)
-            ->assertRedirect(route("expenses.edit", $expense))
-            ->assertSessionHas("alert_type", "success");
-        $this->assertDatabaseHas("expenses", [
-            ...Arr::except($data, ["user_id"]),
-            "amount" => 500.00
+        $expense->refresh();
+        $this->actingAs($user)->put(route('expenses.update', $expense), $data)
+            ->assertRedirect(route('expenses.edit', $expense))
+            ->assertSessionHas('alert_type', 'success');
+        $this->assertDatabaseHas('expenses', [
+            ...Arr::except($data, ['user_id']),
+            'amount' => 500.00,
         ]);
+        $this->assertCount(2, $expense->movements()->where('identifier_id', $data['identifier_id'])->get());
     }
 
     /**
@@ -254,29 +260,28 @@ class ExpenseControllerTest extends TestCase
 
         $user = User::factory()
             ->has(Identifier::factory())
-            ->has(Expense::factory(state: ["due_day" => 1]))
+            ->has(Expense::factory(state: ['due_day' => 1]))
             ->create();
         $expense = $user->expenses->first();
         $data = Expense::factory()->make([
-            "identifier_id" => $user->identifiers->first(),
-            "amount" => "500,00",
-            "due_day" => 10 // 10 dias do due_day a da data atual
+            'identifier_id' => $user->identifiers->first(),
+            'amount' => '500,00',
+            'due_day' => 10, // 10 dias do due_day a da data atual
         ])->toArray();
 
-        $this->actingAs($user)->put(route("expenses.update", $expense), $data)
-            ->assertSessionHas("alert_type", "success");
+        $this->actingAs($user)->put(route('expenses.update', $expense), $data)
+            ->assertSessionHas('alert_type', 'success');
         $this->assertCount(1, $expense->movements);
         $this->assertCount(1, $expense->movements()->where([
-            "identifier_id" => $data["identifier_id"],
-            "user_id" => $user->id,
-            "type" => "out",
-            "amount" => 500.00,
-            "effetive_date" => now()->day(10)->format("Y-m-d"),
-            "closed_date" => null,
-            "fees_amount" => 0.00
+            'identifier_id' => $data['identifier_id'],
+            'user_id' => $user->id,
+            'type' => 'out',
+            'amount' => 500.00,
+            'effetive_date' => now()->day(10)->format('Y-m-d'),
+            'closed_date' => null,
+            'fees_amount' => 0.00,
         ])->get());
     }
-
 
     /**
      * deve alterar o dia e não deve criar outra movimentação
@@ -289,13 +294,13 @@ class ExpenseControllerTest extends TestCase
         $user = User::factory()
             ->has(Identifier::factory())
             ->has(
-                Expense::factory(state: ["due_day" => 1])
+                Expense::factory(state: ['due_day' => 1])
                     ->has(Movement::factory()
                         ->state([
-                            "closed_date" => now()->subDay(),
-                            "fees_amount" => 0,
-                            "effetive_date" => now()->subDay(),
-                            "type" => "out"
+                            'closed_date' => now()->subDay(),
+                            'fees_amount' => 0,
+                            'effetive_date' => now()->subDay(),
+                            'type' => 'out',
                         ]))
             )
             ->create();
@@ -304,13 +309,13 @@ class ExpenseControllerTest extends TestCase
         $movement = $expense->movements->first();
 
         $data = Expense::factory()->make([
-            "identifier_id" => $user->identifiers->first(),
-            "amount" => "500,00",
-            "due_day" => 20 // 20 dias a mais da due_day a do data atual
+            'identifier_id' => $user->identifiers->first(),
+            'amount' => '500,00',
+            'due_day' => 20, // 20 dias a mais da due_day a do data atual
         ])->toArray();
 
-        $this->actingAs($user)->put(route("expenses.update", $expense), $data)
-            ->assertSessionHas("alert_type", "success");
+        $this->actingAs($user)->put(route('expenses.update', $expense), $data)
+            ->assertSessionHas('alert_type', 'success');
         $expense->refresh();
         $this->assertCount(1, $expense->movements);
         $this->assertEquals($movement->id, $expense->movements->first()->id);
@@ -327,14 +332,14 @@ class ExpenseControllerTest extends TestCase
         $user = User::factory()
             ->has(Identifier::factory())
             ->has(
-                Expense::factory(state: ["due_day" => 1])
+                Expense::factory(state: ['due_day' => 1])
                     ->has(
                         Movement::factory()
                             ->state([
-                                "closed_date" => now()->subDay(),
-                                "fees_amount" => 0,
-                                "effetive_date" => now()->subDay(),
-                                "type" => "out"
+                                'closed_date' => now()->subDay(),
+                                'fees_amount' => 0,
+                                'effetive_date' => now()->subDay(),
+                                'type' => 'out',
                             ])->trashed()
                     )
             )
@@ -344,13 +349,13 @@ class ExpenseControllerTest extends TestCase
         $movement = $expense->movements()->withTrashed()->first();
 
         $data = Expense::factory()->make([
-            "identifier_id" => $user->identifiers->first(),
-            "amount" => "500,00",
-            "due_day" => 20 // 20 dias a mais da due_day a do data atual
+            'identifier_id' => $user->identifiers->first(),
+            'amount' => '500,00',
+            'due_day' => 20, // 20 dias a mais da due_day a do data atual
         ])->toArray();
 
-        $this->actingAs($user)->put(route("expenses.update", $expense), $data)
-            ->assertSessionHas("alert_type", "success");
+        $this->actingAs($user)->put(route('expenses.update', $expense), $data)
+            ->assertSessionHas('alert_type', 'success');
         $expense->refresh();
         $this->assertCount(1, $expense->movements()->withTrashed()->get());
         $this->assertEquals($movement->id, $expense->movements()->withTrashed()->first()->id);
@@ -367,13 +372,13 @@ class ExpenseControllerTest extends TestCase
         $user = User::factory()
             ->has(Identifier::factory())
             ->has(
-                Expense::factory(state: ["due_day" => 1])
+                Expense::factory(state: ['due_day' => 1])
                     ->has(Movement::factory()
                         ->state([
-                            "closed_date" => now()->day(25),
-                            "fees_amount" => 0,
-                            "effetive_date" => now()->day(25),
-                            "type" => "out"
+                            'closed_date' => now()->day(25),
+                            'fees_amount' => 0,
+                            'effetive_date' => now()->day(25),
+                            'type' => 'out',
                         ]))
             )
             ->create();
@@ -382,13 +387,13 @@ class ExpenseControllerTest extends TestCase
         $movement = $expense->movements->first();
 
         $data = Expense::factory()->make([
-            "identifier_id" => $user->identifiers->first(),
-            "amount" => "500,00",
-            "due_day" => 23 // 2 dias antes , e 3 dias após a data atual
+            'identifier_id' => $user->identifiers->first(),
+            'amount' => '500,00',
+            'due_day' => 23, // 2 dias antes , e 3 dias após a data atual
         ])->toArray();
 
-        $this->actingAs($user)->put(route("expenses.update", $expense), $data)
-            ->assertSessionHas("alert_type", "success");
+        $this->actingAs($user)->put(route('expenses.update', $expense), $data)
+            ->assertSessionHas('alert_type', 'success');
         $expense->refresh();
         $this->assertCount(1, $expense->movements);
         $this->assertEquals($movement->id, $expense->movements->first()->id);
@@ -403,13 +408,13 @@ class ExpenseControllerTest extends TestCase
         $user = User::factory()
             ->has(Identifier::factory())
             ->has(
-                Expense::factory(state: ["due_day" => 1])
+                Expense::factory(state: ['due_day' => 1])
                     ->has(Movement::factory()
                         ->state([
-                            "closed_date" => now()->day(25),
-                            "fees_amount" => 0,
-                            "effetive_date" => now()->day(25),
-                            "type" => "out"
+                            'closed_date' => now()->day(25),
+                            'fees_amount' => 0,
+                            'effetive_date' => now()->day(25),
+                            'type' => 'out',
                         ]))
             )
             ->create();
@@ -418,13 +423,13 @@ class ExpenseControllerTest extends TestCase
         $movement = $expense->movements->first();
 
         $data = Expense::factory()->make([
-            "identifier_id" => $user->identifiers->first(),
-            "amount" => "500,00",
-            "due_day" => 15 // 10 dias antes , e 5 dias após a data atual
+            'identifier_id' => $user->identifiers->first(),
+            'amount' => '500,00',
+            'due_day' => 15, // 10 dias antes , e 5 dias após a data atual
         ])->toArray();
 
-        $this->actingAs($user)->put(route("expenses.update", $expense), $data)
-            ->assertSessionHas("alert_type", "success");
+        $this->actingAs($user)->put(route('expenses.update', $expense), $data)
+            ->assertSessionHas('alert_type', 'success');
         $expense->refresh();
         $this->assertCount(1, $expense->movements);
         $this->assertEquals($movement->id, $expense->movements->first()->id);
@@ -439,13 +444,13 @@ class ExpenseControllerTest extends TestCase
         $user = User::factory()
             ->has(Identifier::factory())
             ->has(
-                Expense::factory(state: ["due_day" => 1])
+                Expense::factory(state: ['due_day' => 1])
                     ->has(Movement::factory()
                         ->state([
-                            "closed_date" => now()->subMonth(),
-                            "fees_amount" => 0,
-                            "effetive_date" => now()->subMonth(),
-                            "type" => "out"
+                            'closed_date' => now()->subMonth(),
+                            'fees_amount' => 0,
+                            'effetive_date' => now()->subMonth(),
+                            'type' => 'out',
                         ]))
             )
             ->create();
@@ -454,22 +459,22 @@ class ExpenseControllerTest extends TestCase
         $movement = $expense->movements->first();
 
         $data = Expense::factory()->make([
-            "identifier_id" => $user->identifiers->first(),
-            "amount" => "500,00",
-            "due_day" => 15 // 10 dias antes , e 5 dias após a data atual
+            'identifier_id' => $user->identifiers->first(),
+            'amount' => '500,00',
+            'due_day' => 15, // 10 dias antes , e 5 dias após a data atual
         ])->toArray();
 
-        $this->actingAs($user)->put(route("expenses.update", $expense), $data)
-            ->assertSessionHas("alert_type", "success");
+        $this->actingAs($user)->put(route('expenses.update', $expense), $data)
+            ->assertSessionHas('alert_type', 'success');
         $expense->refresh();
         $this->assertCount(2, $expense->movements);
         $this->assertCount(
             1,
             $expense->movements()
                 ->where([
-                    "effetive_date" => now()->day(15)->format("Y-m-d"),
-                    "amount" => 500,
-                    "closed_date" => null,
+                    'effetive_date' => now()->day(15)->format('Y-m-d'),
+                    'amount' => 500,
+                    'closed_date' => null,
                 ])
                 ->get()
         );
@@ -483,7 +488,7 @@ class ExpenseControllerTest extends TestCase
         $user = User::factory()->create();
         $expense = Expense::factory()->create();
 
-        $this->actingAs($user)->delete(route("expenses.destroy", $expense))
+        $this->actingAs($user)->delete(route('expenses.destroy', $expense))
             ->assertForbidden();
     }
 
@@ -497,9 +502,9 @@ class ExpenseControllerTest extends TestCase
             ->create();
         $expense = $user->expenses->first();
 
-        $this->actingAs($user)->delete(route("expenses.destroy", $expense))
-            ->assertRedirect(route("expenses.index"))
-            ->assertSessionHas("alert_type", "success");
+        $this->actingAs($user)->delete(route('expenses.destroy', $expense))
+            ->assertRedirect(route('expenses.index'))
+            ->assertSessionHas('alert_type', 'success');
         $this->assertSoftDeleted($expense);
     }
 
@@ -514,9 +519,9 @@ class ExpenseControllerTest extends TestCase
             ->create();
         $expense = $user->expenses->first();
 
-        $this->actingAs($user)->delete(route("expenses.destroy", $expense))
-            ->assertRedirect(route("expenses.index"))
-            ->assertSessionHas("alert_type", "success");
+        $this->actingAs($user)->delete(route('expenses.destroy', $expense))
+            ->assertRedirect(route('expenses.index'))
+            ->assertSessionHas('alert_type', 'success');
         $expense->refresh();
         $this->assertSoftDeleted($expense);
         $this->assertCount(2, $expense->movements);

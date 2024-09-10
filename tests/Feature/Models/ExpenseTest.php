@@ -6,12 +6,12 @@ use App\Models\Expense;
 use App\Models\Identifier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class ExpenseTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * deve retornar o User
      */
@@ -19,7 +19,7 @@ class ExpenseTest extends TestCase
     {
         $user = User::factory()->create();
         $expense = Expense::factory()->create([
-            "user_id" => $user
+            'user_id' => $user,
         ]);
 
         $this->assertEquals($user->id, $expense->user->id);
@@ -32,7 +32,7 @@ class ExpenseTest extends TestCase
     {
         $user = User::factory()->trashed()->create();
         $expense = Expense::factory()->create([
-            "user_id" => $user
+            'user_id' => $user,
         ]);
 
         $this->assertEquals($user->id, $expense->user->id);
@@ -45,7 +45,7 @@ class ExpenseTest extends TestCase
     {
         $identifier = Identifier::factory()->create();
         $expense = Expense::factory()->create([
-            "identifier_id" => $identifier
+            'identifier_id' => $identifier,
         ]);
 
         $this->assertEquals($identifier->id, $expense->identifier->id);
@@ -58,7 +58,7 @@ class ExpenseTest extends TestCase
     {
         $identifier = Identifier::factory()->trashed()->create();
         $expense = Expense::factory()->create([
-            "identifier_id" => $identifier
+            'identifier_id' => $identifier,
         ]);
 
         $this->assertEquals($identifier->id, $expense->identifier->id);

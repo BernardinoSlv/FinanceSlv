@@ -50,7 +50,7 @@ class QuickController extends Controller
          * @var User
          */
         $user = auth()->user();
-        $identifiers = $user->identifiers()->orderBy("name")->get();
+        $identifiers = $user->identifiers()->orderBy('name')->get();
 
         return view('quicks.create', compact('identifiers'));
     }
@@ -79,7 +79,9 @@ class QuickController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Quick $quick) {}
+    public function show(Quick $quick)
+    {
+    }
 
     /**
      * Show the form for editing the specified resource.
@@ -94,7 +96,7 @@ class QuickController extends Controller
          * @var User
          */
         $user = auth()->user();
-        $identifiers = $user->identifiers()->orderBy("name")->get();
+        $identifiers = $user->identifiers()->orderBy('name')->get();
 
         return view('quicks.edit', compact('quick', 'identifiers'));
     }

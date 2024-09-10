@@ -9,7 +9,6 @@ use App\Http\Controllers\IdentifierController;
 use App\Http\Controllers\MovementController;
 use App\Http\Controllers\QuickController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------

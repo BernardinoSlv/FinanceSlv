@@ -77,7 +77,9 @@ class DebtController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Debt $debt) {}
+    public function show(Debt $debt)
+    {
+    }
 
     /**
      * Show the form for editing the specified resource.

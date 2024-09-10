@@ -13,7 +13,8 @@ class IdentifierController extends Controller
 {
     public function __construct(
         protected IdentifierRepositoryContract $_identifierRepository
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of the resource.

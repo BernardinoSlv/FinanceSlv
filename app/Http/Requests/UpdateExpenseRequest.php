@@ -24,19 +24,19 @@ class UpdateExpenseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "identifier_id" => [
-                "required",
-                Rule::exists("identifiers", "id")->where("user_id", auth()->id())
+            'identifier_id' => [
+                'required',
+                Rule::exists('identifiers', 'id')->where('user_id', auth()->id()),
             ],
-            "title" => [
-                "required",
-                Rule::unique("expenses", "title")
-                    ->where("identifier_id", $this->identifier_id)
-                    ->ignore($this->expense->id)
+            'title' => [
+                'required',
+                Rule::unique('expenses', 'title')
+                    ->where('identifier_id', $this->identifier_id)
+                    ->ignore($this->expense->id),
             ],
-            "description" => ["nullable"],
-            "amount" => ["required", new Amount],
-            "due_day" => ["required", "integer", "min:1", "max:31"]
+            'description' => ['nullable'],
+            'amount' => ['required', new Amount],
+            'due_day' => ['required', 'integer', 'min:1', 'max:31'],
         ];
     }
 }

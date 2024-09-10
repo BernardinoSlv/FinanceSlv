@@ -12,6 +12,7 @@ use Tests\TestCase;
 class MovementTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * deve retornar o User
      */

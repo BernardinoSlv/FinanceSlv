@@ -12,6 +12,7 @@ use Tests\TestCase;
 class QuickTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * deve retornar o User
      */

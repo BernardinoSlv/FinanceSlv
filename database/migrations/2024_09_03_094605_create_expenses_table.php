@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("user_id")->references("id")->on("users");
-            $table->foreignId("identifier_id")->references("id")->on("identifiers");
-            $table->string("title");
-            $table->text("description")->nullable();
-            $table->decimal("amount");
-            $table->tinyInteger("due_day");
+            $table->foreignId('user_id')->references('id')->on('users');
+            $table->foreignId('identifier_id')->references('id')->on('identifiers');
+            $table->string('title');
+            $table->text('description')->nullable();
+            $table->decimal('amount');
+            $table->tinyInteger('due_day');
             $table->timestamps();
             $table->softDeletes();
         });

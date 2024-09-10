@@ -12,6 +12,7 @@ use Tests\TestCase;
 class FileTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * deve retornar o usuário
      */

@@ -20,9 +20,9 @@ class Movement extends Model
         'movementable_id',
         'type',
         'amount',
-        "effetive_date",
-        "closed_date",
-        "fees_amount"
+        'effetive_date',
+        'closed_date',
+        'fees_amount',
     ];
 
     public $casts = [

@@ -19,12 +19,12 @@ class ExpenseFactory extends Factory
     public function definition(): array
     {
         return [
-            "user_id" => User::factory()->create(),
-            "identifier_id" => Identifier::factory()->create(),
-            "title" => fake()->word() . rand(0, 1000) . rand(0, 1000) . time(),
-            "description" => fake()->text(100),
-            "amount" => rand(100, 10000) / 100,
-            "due_day" => rand(1, 31),
+            'user_id' => User::factory()->create(),
+            'identifier_id' => Identifier::factory()->create(),
+            'title' => fake()->word().rand(0, 1000).rand(0, 1000).time(),
+            'description' => fake()->text(100),
+            'amount' => rand(100, 10000) / 100,
+            'due_day' => rand(1, 31),
         ];
     }
 }

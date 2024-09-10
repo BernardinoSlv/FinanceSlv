@@ -30,32 +30,32 @@ class CreateMovementToExpense extends Command
     public function handle()
     {
         $users = User::query()
-            ->with("expenses", function (HasMany $query) {
-                $query->whereDoesntHave("movements", function (Builder $query) {
-                    $query->withTrashed()->whereYear("effetive_date", now()->year)
-                        ->whereMonth("effetive_date", now()->month);
+            ->with('expenses', function (HasMany $query) {
+                $query->whereDoesntHave('movements', function (Builder $query) {
+                    $query->withTrashed()->whereYear('effetive_date', now()->year)
+                        ->whereMonth('effetive_date', now()->month);
                 })
-                    ->where("due_day", ">=", now()->day);
+                    ->where('due_day', '>=', now()->day);
             })
-            ->whereHas("expenses", function (Builder $query) {
-                $query->whereDoesntHave("movements", function (Builder $query) {
-                    $query->withTrashed()->whereYear("effetive_date", now()->year)
-                        ->whereMonth("effetive_date", now()->month);
+            ->whereHas('expenses', function (Builder $query) {
+                $query->whereDoesntHave('movements', function (Builder $query) {
+                    $query->withTrashed()->whereYear('effetive_date', now()->year)
+                        ->whereMonth('effetive_date', now()->month);
                 })
-                    ->where("due_day", ">=", now()->day);
+                    ->where('due_day', '>=', now()->day);
             })
             ->get();
 
         foreach ($users as $user) {
             foreach ($user->expenses as $expense) {
                 $expense->movements()->create([
-                    "user_id" => $user->id,
-                    "identifier_id" => $expense->identifier_id,
-                    "type" => MovementTypeEnum::OUT->value,
-                    "effetive_date" => now()->day($expense->due_day),
-                    "closed_date" => null,
-                    "amount" => $expense->amount,
-                    "fees_amount" => 0
+                    'user_id' => $user->id,
+                    'identifier_id' => $expense->identifier_id,
+                    'type' => MovementTypeEnum::OUT->value,
+                    'effetive_date' => now()->day($expense->due_day),
+                    'closed_date' => null,
+                    'amount' => $expense->amount,
+                    'fees_amount' => 0,
                 ]);
             }
         }

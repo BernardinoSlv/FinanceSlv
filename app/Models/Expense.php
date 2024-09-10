@@ -13,20 +13,20 @@ class Expense extends Model
     use HasFactory, HasMovements, SoftDeletes;
 
     public $fillable = [
-        "identifier_id",
-        "title",
-        "description",
-        "amount",
-        "due_day"
+        'identifier_id',
+        'title',
+        'description',
+        'amount',
+        'due_day',
     ];
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, "user_id", "id")->withTrashed();
+        return $this->belongsTo(User::class, 'user_id', 'id')->withTrashed();
     }
 
     public function identifier(): BelongsTo
     {
-        return $this->belongsTo(Identifier::class, "identifier_id", "id")->withTrashed();
+        return $this->belongsTo(Identifier::class, 'identifier_id', 'id')->withTrashed();
     }
 }

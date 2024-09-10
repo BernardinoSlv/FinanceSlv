@@ -15,6 +15,7 @@ use Tests\TestCase;
 class UserTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * deve retornar uma coleção vazia
      */
@@ -191,14 +192,14 @@ class UserTest extends TestCase
 
         $user = User::factory()->create();
         $expenses = Expense::factory(2)->create([
-            "user_id" => $user
+            'user_id' => $user,
         ]);
 
         $this->assertInstanceOf(Expense::class, $user->expenses->first());
         $this->assertCount(
             2,
             $user->expenses->filter(
-                fn(Expense $expense) => in_array($expense->id, [$expenses->get(0)->id, $expenses->get(1)->id])
+                fn (Expense $expense) => in_array($expense->id, [$expenses->get(0)->id, $expenses->get(1)->id])
             )
         );
     }

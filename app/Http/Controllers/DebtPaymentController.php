@@ -23,7 +23,7 @@ class DebtPaymentController extends Controller
             abort(403);
         }
 
-        $debt->loadSum(['movements' => fn(Builder $query) => $query->where(
+        $debt->loadSum(['movements' => fn (Builder $query) => $query->where(
             'movements.type',
             MovementTypeEnum::OUT->value
         )], 'amount');
@@ -40,8 +40,9 @@ class DebtPaymentController extends Controller
      */
     public function create(Debt $debt)
     {
-        if (Gate::denies('is-owner', $debt))
+        if (Gate::denies('is-owner', $debt)) {
             abort(403);
+        }
 
         return view('debts.payments.create', compact('debt'));
     }
@@ -51,8 +52,9 @@ class DebtPaymentController extends Controller
      */
     public function store(StoreDebtPaymentRequest $request, Debt $debt)
     {
-        if (Gate::denies('is-owner', $debt))
+        if (Gate::denies('is-owner', $debt)) {
             abort(403);
+        }
 
         $debt->movements()->create([
             ...$request->validated(),

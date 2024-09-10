@@ -2,12 +2,10 @@
 
 namespace App\Models;
 
-use App\Support\Models\Trait\HasMovements;
 use App\Support\Models\Traits\HasMovements as TraitsHasMovements;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Debt extends Model
@@ -31,7 +29,6 @@ class Debt extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'id')->withTrashed();
     }
-
 
     public function identifier(): BelongsTo
     {

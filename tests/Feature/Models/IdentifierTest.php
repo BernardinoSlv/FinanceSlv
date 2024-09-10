@@ -10,6 +10,7 @@ use Tests\TestCase;
 class IdentifierTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * deve retornar o User
      */

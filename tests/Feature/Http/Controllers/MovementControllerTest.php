@@ -13,6 +13,7 @@ use Tests\TestCase;
 class MovementControllerTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * deve redirecionar para login
      */

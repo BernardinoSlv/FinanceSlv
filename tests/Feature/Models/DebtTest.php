@@ -13,6 +13,7 @@ use Tests\TestCase;
 class DebtTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * deve retornar o User
      */
