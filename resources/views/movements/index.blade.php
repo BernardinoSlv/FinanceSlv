@@ -230,6 +230,12 @@
                                         @else
                                             {{ $movement->created_at->format('d/m/Y') }}
                                         @endif
+                                        <br>
+                                        @if ($movement->effetive_date?->lt(now()->format('Y-m-d')))
+                                            <div class="badge text-bg-danger">Atrasada</div>
+                                        @elseif (!$movement->closed_date)
+                                            <div class="badge text-bg-warning">Em aberto</div>
+                                        @endif
                                     </td>
                                     <td>
                                         <div class="dropdown">
