@@ -20,22 +20,35 @@ class DashboardController extends Controller
             ->sum('amount');
         $totalExit = (float) $user->movements()
             ->where('type', MovementTypeEnum::OUT->value)
+            ->whereNotNull("closed_date")
             ->sum('amount');
-        $totalDebts = (float) $user->debts()->sum('debts.amount') - $user->movements()->where('movementable_type', Debt::class)
+        $totalDebts = (float) $user->debts()->sum('debts.amount') - $user->movements()->where([
+            'movementable_type' => Debt::class,
+            "type" => MovementTypeEnum::OUT->value
+        ])
             ->sum('movements.amount');
+        $totalInOpen = (float) $user->movements()->whereNull("closed_date")->sum(DB::raw("amount + fees_amount"));
 
         // graficos
         $dataChart1 = $user->movements()
             ->select(DB::raw('
-                date_format(movements.created_at, "%m/%Y") as period,
-                sum(movements.amount) as amount'))
-            ->groupBy(DB::raw('date_format(movements.created_at, "%m/%Y")'))
-            ->orderBy(DB::raw('date_format(movements.created_at, "%m/%Y")'))
-            ->where('movements.type', MovementTypeEnum::IN->value)
+            date_format(closed_date, "%y-%m") as period,
+            sum(
+                case
+                    when movements.type = "in" then amount
+                    else 0
+                end
+            ) as entry_amount,
+            sum(
+                case
+                    when movements.type = "out" then amount
+                    else 0
+                end
+            ) as exit_amount'))
+            ->groupBy("period")
+            ->orderBy("period")
+            ->whereNotNull("closed_date")
             ->get()
-            ->map(
-                fn ($movementGroup) => ['period' => $movementGroup->period, 'amount' => $movementGroup->amount]
-            )
             ->toArray();
 
         $topIdendifiersEntry = $user->identifiers()
@@ -75,6 +88,7 @@ class DashboardController extends Controller
             ->get();
 
         return view('dashboard.index', compact(
+            'totalInOpen',
             'totalEntry',
             'totalExit',
             'totalDebts',

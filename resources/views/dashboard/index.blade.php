@@ -17,12 +17,27 @@
                 </div>
             </div>
         </div>
+        <div @class(['col', 'd-none' => !$totalInOpen])>
+            <div class="card radius-10 border-0 border-start border-4" style="border-color: orangered !important;">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="">
+                            <p class="mb-1 fw-bold">Em aberto</p>
+                            <h4 class="mb-0" style="color:orangered;">@amount($totalInOpen)</h4>
+                        </div>
+                        <div class="ms-auto widget-icon text-white" style="background-color:orangered;">
+                            <i class="bi bi-book"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="col">
             <div class="card radius-10 border-0 border-start border-success border-4">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="">
-                            <p class="mb-1 fw-bold">Total de entradas</p>
+                            <p class="mb-1 fw-bold">Entradas</p>
                             <h4 class="mb-0 text-success">@amount($totalEntry)</h4>
                         </div>
                         <div class="ms-auto widget-icon bg-success text-white">
@@ -37,7 +52,7 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="">
-                            <p class="mb-1 fw-bold">Total de saída</p>
+                            <p class="mb-1 fw-bold">Saída</p>
                             <h4 class="mb-0 text-danger">@amount($totalExit)</h4>
                         </div>
                         <div class="ms-auto widget-icon bg-danger text-white">
@@ -53,7 +68,7 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="">
-                            <p class="mb-1 fw-bold">Total em dívidas</p>
+                            <p class="mb-1 fw-bold">Dívidas</p>
                             <h4 class="mb-0 text-warning">@amount($totalDebts)</h4>
                         </div>
                         <div class="ms-auto widget-icon bg-warning text-white">
@@ -67,12 +82,12 @@
 
 
     <div class="row">
-        <div class="col-lg-8">
+        <div class="col-lg-12">
             <div class="card">
                 <div class="card-header bg-transparent">
                     <div class="d-flex align-items-center">
                         <div class="">
-                            <h6 class="mb-0 fw-bold">Entradas</h6>
+                            <h6 class="mb-0 fw-bold">Entradas/Saídas</h6>
                         </div>
                         <div class="dropdown ms-auto">
                             <button type="button" class="btn-option dropdown-toggle dropdown-toggle-nocaret cursor-pointer"
@@ -91,68 +106,11 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <div id="chart1" data-config={{ json_encode($dataChart1) }}></div>
+                    <div id="chart1" data-config={{ json_encode($dataChart1) }}>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4">
-            <div class="card">
-                <div class="card-header bg-transparent">
-                    <div class="d-flex align-items-center">
-                        <div class="">
-                            <h6 class="mb-0 fw-bold">Estastísticas</h6>
-                        </div>
-                        <div class="dropdown ms-auto">
-                            <button type="button" class="btn-option dropdown-toggle dropdown-toggle-nocaret cursor-pointer"
-                                data-bs-toggle="dropdown"><i class="bi bi-three-dots fs-4"></i>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="javascript:;">Action</a>
-                                </li>
-                                <li><a class="dropdown-item" href="javascript:;">Another action</a>
-                                </li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="javascript:;">Something else here</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div id="chart2"
-                        data-config="{{ json_encode([
-                            'totalEntry' => floatval($totalEntry),
-                            'totalExit' => floatval($totalExit),
-                            'totalDebts' => floatval($totalDebts),
-                        ]) }}">
-                    </div>
-                </div>
-                <ul class="list-group list-group-flush mb-0">
-                    @php
-                        $tempTotalAll = $totalEntry + $totalExit + $totalDebts;
-                    @endphp
-
-                    <li class="list-group-item border-top d-flex justify-content-between align-items-center bg-transparent">
-                        Entradas<span class="badge bg-success rounded-pill">
-                            {{ number_format(!$tempTotalAll ? 0 : (100 / $tempTotalAll) * $totalEntry, 1) }}%
-                        </span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
-                        Saídas<span class="badge bg-danger rounded-pill">
-                            {{ number_format(!$tempTotalAll ? 0 : (100 / $tempTotalAll) * $totalExit, 1) }}%
-                        </span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
-                        Dívidas<span class="badge bg-warning rounded-pill">
-                            {{ number_format(!$tempTotalAll ? 0 : (100 / $tempTotalAll) * $totalDebts, 1) }}%
-                        </span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
     </div><!--end row-->
 
 

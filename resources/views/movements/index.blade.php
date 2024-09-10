@@ -216,7 +216,11 @@
                                     </td>
                                     <td>
                                         @if ($movement->effetive_date)
-                                            @if ($movement->effetive_date->gt($movement->created_at))
+                                            @if ($movement->effetive_date->lt(now()->format('Y-m-d')) && !$movement->closed_date)
+                                                <span class="text-danger fw-bold">
+                                                    {{ $movement->effetive_date->format('d/m/Y') }}
+                                                </span>
+                                            @elseif ($movement->effetive_date->gte(now()->format('Y-m-d')))
                                                 <span class="text-warning fw-bold">
                                                     {{ $movement->effetive_date->format('d/m/Y') }}
                                                 </span>

@@ -12,8 +12,11 @@ $(function () {
       theme: "dark"
     },
 		series: [{
-			name: 'Entradas',
-			data: chart1Config.map((data) => data.amount)
+			name: 'Entrada',
+			data: chart1Config.map((data) => data.entry_amount)
+		}, {
+			name: 'Saída',
+			data: chart1Config.map((data) => data.exit_amount)
 		}],
 		chart: {
 			foreColor: '#9ba7b2',
@@ -49,22 +52,22 @@ $(function () {
 		fill: {
 			type: 'gradient',
 			gradient: {
-			  shade: 'light',
+			  shade: 'dark',
 			  type: 'vertical',
-			  shadeIntensity: 0.5,
-			  gradientToColors: ['#01e195'],
+			  shadeIntensity: 0.7,
+			  // gradientToColors: ['#fff'],
 			  inverseColors: true,
 			  opacityFrom: 1,
 			  opacityTo: 1,
 			}
 		  },
-		colors: ['#0d6efd'],
+		colors: ['#0d6efd', "#ff0000"],
 		dataLabels: {
 			enabled: false,
 			enabledOnSeries: [1],
 		},
 		xaxis: {
-			categories: chart1Config.map((data) => data.period),
+			categories: chart1Config.map(data => data.period),
 		},
 	};
 	var chart = new ApexCharts(chart1Elem, options);
