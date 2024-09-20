@@ -3,11 +3,14 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Debt;
+use App\Models\Expense;
 use App\Models\Movement;
 use App\Models\Quick;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class MovementControllerTest extends TestCase
@@ -48,6 +51,96 @@ class MovementControllerTest extends TestCase
 
                 return $movements->total() === 2;
             });
+    }
+
+    /** deve ter status 422 */
+    public function test_update_action_without_data(): void
+    {
+        $user = User::factory()
+            ->create();
+        Expense::factory()
+            ->has(Movement::factory(null, [
+                "closed_date" => null,
+                "user_id" => $user
+            ]))
+            ->create(["user_id" => $user]);
+        $movement = $user->expenses->first()->movements->first();
+
+        $this->actingAs($user)->putJson(route("movements.update", $movement))
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(["fees_amount", "status"]);
+    }
+
+    /** deve ter status 400 */
+    public function test_update_action_already_closed(): void
+    {
+        $user = User::factory()
+            ->create();
+        Expense::factory()
+            ->has(Movement::factory(null, [
+                "user_id" => $user
+            ]))
+            ->create(["user_id" => $user]);
+        $movement = $user->expenses->first()->movements->first();
+        $data = [
+            "fees_amount" => "20,00"
+        ];
+
+        $this->actingAs($user)->putJson(route("movements.update", $movement), $data)
+            ->assertBadRequest()
+            ->assertJson([
+                "message" => "Não é permitido atualizar movimentações já fechadas."
+            ]);
+    }
+
+    /** deve ter status 403 */
+    public function test_update_action_is_not_owner(): void
+    {
+        $user = User::factory()
+            ->create();
+        Expense::factory()
+            ->has(Movement::factory(null))
+            ->create(["user_id" => $user]);
+        $movement = $user->expenses->first()->movements->first();
+        $data = [
+            "fees_amount" => "20,00"
+        ];
+
+        $this->actingAs($user)->putJson(route("movements.update", $movement), $data)
+            ->assertForbidden();
+    }
+
+    /** deve ter status 200 */
+    public function test_update_action(): void
+    {
+        $this->travelBack();
+
+        $this->freezeTime(function (Carbon $time): void {
+            $user = User::factory()
+                ->create();
+            Expense::factory()
+                ->has(Movement::factory(null, [
+                    "closed_date" => null,
+                    "user_id" => $user
+                ]))
+                ->create(["user_id" => $user]);
+            $movement = $user->expenses->first()->movements->first();
+            $data = [
+                "fees_amount" => "20,00",
+                "status" => 1
+            ];
+
+            $this->actingAs($user)->putJson(route("movements.update", $movement), $data)
+                ->assertOk()
+                ->assertJson(
+                    fn(AssertableJson $json) => $json->has("message")
+                );
+            $this->assertDatabaseHas("movements", [
+                "id" => $movement->id,
+                "fees_amount" => 20.00,
+                "closed_date" => now("Y-m-d")
+            ]);
+        });
     }
 
     /**

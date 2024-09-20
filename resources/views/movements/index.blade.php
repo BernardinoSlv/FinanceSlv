@@ -193,17 +193,18 @@
                         </thead>
                         <tbody>
                             @foreach ($movements as $movement)
+                                @php
+                                    $movementableType = \App\Enums\MovementableEnum::from(
+                                        get_class($movement->movementable),
+                                    );
+                                @endphp
                                 <tr>
                                     <td>
                                         <strong>{{ $movement->id }}</strong>
                                     </td>
                                     <td>
                                         <span class=" border-bottom">
-                                            @if (get_class($movement->movementable) === 'App\\Models\\Quick')
-                                                Simples
-                                            @else
-                                                Dívida
-                                            @endif
+                                            {{ $movementableType->getLabel() }}
                                         </span>
                                     </td>
                                     <td>
@@ -246,20 +247,15 @@
                                             </button>
                                             <ul class="dropdown-menu">
                                                 <li>
-                                                    @switch(get_class($movement->movementable))
-                                                        @case('App\\Models\\Debt')
-                                                            <a class="dropdown-item"
-                                                                href="{{ route('debts.edit', $movement->movementable) }}">Editar</a>
-                                                        @break
-
-                                                        @case('App\\Models\\Quick')
-                                                            <a class="dropdown-item"
-                                                                href="{{ route('quicks.edit', $movement->movementable) }}">Editar</a>
-                                                        @break
-
-                                                        @default
-                                                    @endswitch
-
+                                                    @if (!$movement->closed_date)
+                                                        <button class="dropdown-item"
+                                                            data-config="{{ json_encode([
+                                                                'url' => route('movements.update', $movement),
+                                                            ]) }}"
+                                                            data-bs-toggle="modal" data-bs-target="#modal-edit-in-open">
+                                                            Atualizar
+                                                        </button>
+                                                    @endif
                                                 </li>
                                                 <li>
                                                     <form action="{{ route('movements.destroy', $movement) }}"
@@ -285,4 +281,60 @@
             <x-pagination :paginator="$movements" />
         </div>
     </div>
+@endsection
+
+@section('modals')
+    <div class="modal" id="modal-edit-in-open">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form action="" method="PUT" data-js-component="form-ajax">
+                        <div class="mb-3 text-end">
+                            <button class="btn-close" data-dismiss="modal"></button>
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Título</label>
+                            <input type="text" class="form-control" id="modal-input-title" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Valor</label>
+                            <input type="text" class="form-control" id="modal-input-amount" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Juros</label>
+                            <input type="text" class="form-control" name="fees_amount" data-js-mask="money"
+                                id="modal-input-fees_amount">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Situação</label>
+                            <select name="status" class="form-control" id="modal-input-status">
+                                <option value="">Em aberto</option>
+                                <option value="1">Concluído</option>
+                            </select>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="text-end">
+                            <button class="btn btn-primary">Atualizar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+
+@section('scripts')
+    <script>
+        window.addEventListener('load', () => {
+            const modal = document.querySelector("#modal-edit-in-open");
+
+            modal.addEventListener("show.bs.modal", (event) => {
+                const config = JSON.parse(event.relatedTarget.getAttribute("data-config"));
+
+                console.log(config);
+            });
+        });
+    </script>
 @endsection
