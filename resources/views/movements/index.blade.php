@@ -193,38 +193,56 @@
                         </thead>
                         <tbody>
                             @foreach ($movements as $movement)
+                                @php
+                                    $movementableType = \App\Enums\MovementableEnum::from(
+                                        get_class($movement->movementable),
+                                    );
+                                @endphp
                                 <tr>
                                     <td>
                                         <strong>{{ $movement->id }}</strong>
                                     </td>
                                     <td>
                                         <span class=" border-bottom">
-                                            @if (get_class($movement->movementable) === 'App\\Models\\Quick')
-                                                Simples
-                                            @else
-                                                Dívida
-                                            @endif
+                                            {{ $movementableType->getLabel() }}
                                         </span>
                                     </td>
                                     <td>
                                         <x-movement-type :movement="$movement" />
                                     </td>
                                     <td>{{ $movement->movementable->title }}</td>
-                                    <td>R$ {{ number_format($movement->amount, '2', ',', '.') }}</td>
+                                    <td>
+                                        R$ @amount($movement->amount)
+
+                                        @if (floatval($movement->fees_amount))
+                                            <br>
+                                            <span class="badge text-bg-warning">+@amount($movement->fees_amount)</span>
+                                        @endif
+                                    </td>
                                     <td>
                                         <a href="javascript:;">{{ $movement->identifier?->name }}</a>
                                     </td>
                                     <td>
-                                        @if ($movement->effetive_at)
-                                            @if ($movement->effetive_at->gt($movement->created_at))
+                                        @if ($movement->effetive_date)
+                                            @if ($movement->effetive_date->lt(now()->format('Y-m-d')) && !$movement->closed_date)
+                                                <span class="text-danger fw-bold">
+                                                    {{ $movement->effetive_date->format('d/m/Y') }}
+                                                </span>
+                                            @elseif ($movement->effetive_date->gte(now()->format('Y-m-d')))
                                                 <span class="text-warning fw-bold">
-                                                    {{ $movement->effetive_at->format('d/m/Y') }}
+                                                    {{ $movement->effetive_date->format('d/m/Y') }}
                                                 </span>
                                             @else
-                                                {{ $movement->effetive_at->format('d/m/Y') }}
+                                                {{ $movement->effetive_date->format('d/m/Y') }}
                                             @endif
                                         @else
                                             {{ $movement->created_at->format('d/m/Y') }}
+                                        @endif
+                                        <br>
+                                        @if ($movement->effetive_date?->lt(now()->format('Y-m-d')) && !$movement->closed_date)
+                                            <div class="badge text-bg-danger">Atrasada</div>
+                                        @elseif (!$movement->closed_date)
+                                            <div class="badge text-bg-warning">Em aberto</div>
                                         @endif
                                     </td>
                                     <td>
@@ -236,20 +254,18 @@
                                             </button>
                                             <ul class="dropdown-menu">
                                                 <li>
-                                                    @switch(get_class($movement->movementable))
-                                                        @case('App\\Models\\Debt')
-                                                            <a class="dropdown-item"
-                                                                href="{{ route('debts.edit', $movement->movementable) }}">Editar</a>
-                                                        @break
-
-                                                        @case('App\\Models\\Quick')
-                                                            <a class="dropdown-item"
-                                                                href="{{ route('quicks.edit', $movement->movementable) }}">Editar</a>
-                                                        @break
-
-                                                        @default
-                                                    @endswitch
-
+                                                    @if (!$movement->closed_date)
+                                                        <button class="dropdown-item"
+                                                            data-config="{{ json_encode([
+                                                                'url' => route('movements.update', $movement),
+                                                                'title' => $movement->title . ' ' . $movement->identifier->name,
+                                                                'amount' => number_format($movement->amount, 2, ','),
+                                                                'fees_amount' => number_format($movement->fees_amount, 2, ','),
+                                                            ]) }}"
+                                                            data-bs-toggle="modal" data-bs-target="#modal-edit-in-open">
+                                                            Atualizar
+                                                        </button>
+                                                    @endif
                                                 </li>
                                                 <li>
                                                     <form action="{{ route('movements.destroy', $movement) }}"
@@ -275,4 +291,71 @@
             <x-pagination :paginator="$movements" />
         </div>
     </div>
+@endsection
+
+@section('modals')
+    <div class="modal" id="modal-edit-in-open">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="mb-3 text-end">
+                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="" method="PUT" data-js-component="form-ajax">
+                        @method('PUT')
+
+                        <div class="mb-3">
+                            <label for="" class="form-label">Título</label>
+                            <input type="text" class="form-control" id="modal-input-title" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Valor</label>
+                            <input type="text" class="form-control" id="modal-input-amount" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Juros</label>
+                            <input type="text" class="form-control" name="fees_amount" data-js-mask="money"
+                                id="modal-input-fees-amount">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Situação</label>
+                            <select name="status" class="form-control" id="modal-input-status">
+                                <option value="">Em aberto</option>
+                                <option value="1">Concluído</option>
+                            </select>
+                            <div class="form-text">
+                                <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+                                Após fechado não é possível atualizá-la
+                            </div>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="text-end">
+                            <button class="btn btn-primary">Atualizar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+
+@section('scripts')
+    <script>
+        window.addEventListener('load', () => {
+            const modal = document.querySelector("#modal-edit-in-open");
+
+            modal.addEventListener("show.bs.modal", (event) => {
+                const config = JSON.parse(event.relatedTarget.getAttribute("data-config"));
+                const form = modal.querySelector("form");
+
+                form.setAttribute("action", config.url);
+
+                modal.querySelector("#modal-input-title").value = config.title;
+                modal.querySelector("#modal-input-amount").value = config.amount;
+                modal.querySelector("#modal-input-fees-amount").value = config.fees_amount;
+            });
+        });
+    </script>
 @endsection

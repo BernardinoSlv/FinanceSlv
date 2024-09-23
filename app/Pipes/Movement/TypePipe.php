@@ -12,12 +12,13 @@ class TypePipe implements PipeContract
 {
     public function handle($query, Closure $next)
     {
-        $type = request("type");
+        $type = request('type');
 
-        if ($type === "in")
-            $query->where("movements.type", MovementTypeEnum::IN->value);
-        else if ($type === "out")
-            $query->where("movements.type", MovementTypeEnum::OUT->value);
+        if ($type === 'in') {
+            $query->where('movements.type', MovementTypeEnum::IN->value);
+        } elseif ($type === 'out') {
+            $query->where('movements.type', MovementTypeEnum::OUT->value);
+        }
 
         return $next($query);
     }

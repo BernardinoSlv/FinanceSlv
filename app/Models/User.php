@@ -23,7 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        "avatar"
+        'avatar',
     ];
 
     /**
@@ -48,26 +48,31 @@ class User extends Authenticatable
 
     public function identifiers(): HasMany
     {
-        return $this->hasMany(Identifier::class, "user_id", "id");
+        return $this->hasMany(Identifier::class, 'user_id', 'id');
     }
 
     public function movements(): HasMany
     {
-        return $this->hasMany(Movement::class, "user_id", "id");
+        return $this->hasMany(Movement::class, 'user_id', 'id');
     }
 
     public function quicks(): HasMany
     {
-        return $this->hasMany(Quick::class, "user_id", "id");
+        return $this->hasMany(Quick::class, 'user_id', 'id');
     }
 
     public function files(): HasMany
     {
-        return $this->hasMany(File::class, "user_id", "id");
+        return $this->hasMany(File::class, 'user_id', 'id');
     }
 
     public function debts(): HasMany
     {
-        return $this->hasMany(Debt::class, "user_id", "id");
+        return $this->hasMany(Debt::class, 'user_id', 'id');
+    }
+
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class, 'user_id', 'id');
     }
 }

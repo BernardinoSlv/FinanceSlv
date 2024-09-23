@@ -7,7 +7,6 @@ use App\Models\Movement;
 use App\Models\Quick;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class MovementTest extends TestCase
@@ -23,9 +22,9 @@ class MovementTest extends TestCase
 
         $user = User::factory()->create();
         $movement = Movement::factory()->create([
-            "user_id" => $user,
-            "movementable_type" => Quick::class,
-            "movementable_id" => Quick::factory()->create()
+            'user_id' => $user,
+            'movementable_type' => Quick::class,
+            'movementable_id' => Quick::factory()->create(),
         ]);
 
         $this->assertEquals($user->id, $movement->user->id);
@@ -41,9 +40,9 @@ class MovementTest extends TestCase
 
         $user = User::factory()->trashed()->create();
         $movement = Movement::factory()->create([
-            "user_id" => $user,
-            "movementable_type" => Quick::class,
-            "movementable_id" => Quick::factory()->create()
+            'user_id' => $user,
+            'movementable_type' => Quick::class,
+            'movementable_id' => Quick::factory()->create(),
         ]);
 
         $this->assertEquals($user->id, $movement->user->id);
@@ -58,8 +57,8 @@ class MovementTest extends TestCase
 
         $quick = Quick::factory()->create();
         $movement = Movement::factory()->create([
-            "movementable_type" => Quick::class,
-            "movementable_id" => $quick
+            'movementable_type' => Quick::class,
+            'movementable_id' => $quick,
         ]);
 
         $this->assertInstanceOf(Quick::class, $movement->movementable);
@@ -76,8 +75,8 @@ class MovementTest extends TestCase
 
         $quick = Quick::factory()->trashed()->create();
         $movement = Movement::factory()->create([
-            "movementable_type" => Quick::class,
-            "movementable_id" => $quick
+            'movementable_type' => Quick::class,
+            'movementable_id' => $quick,
         ]);
 
         $this->assertInstanceOf(Quick::class, $movement->movementable);
@@ -93,8 +92,8 @@ class MovementTest extends TestCase
 
         $identifier = Identifier::factory()->create();
         $movement = Movement::factory()
-            ->for(Quick::factory(), "movementable")
-            ->create(["identifier_id" => $identifier]);
+            ->for(Quick::factory(), 'movementable')
+            ->create(['identifier_id' => $identifier]);
 
         $this->assertEquals($identifier->id, $movement->identifier->id);
     }
@@ -108,8 +107,8 @@ class MovementTest extends TestCase
 
         $identifier = Identifier::factory()->create();
         $movement = Movement::factory()
-            ->for(Quick::factory()->trashed(), "movementable")
-            ->create(["identifier_id" => $identifier]);
+            ->for(Quick::factory()->trashed(), 'movementable')
+            ->create(['identifier_id' => $identifier]);
 
         $this->assertEquals($identifier->id, $movement->identifier->id);
     }

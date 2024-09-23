@@ -19,13 +19,13 @@ class DebtFactory extends Factory
     public function definition(): array
     {
         return [
-            "user_id" => User::factory()->create(),
-            "identifier_id" => Identifier::factory()->create(),
-            "title" => fake()->words(3, true),
-            "amount" => rand(0, 1000),
-            "description" => fake()->text(100),
-            "installments" => rand(1, 12),
-            "due_date" => now()->addMonth()->format("Y-m-d")
+            'user_id' => User::factory()->create(),
+            'identifier_id' => Identifier::factory()->create(),
+            'title' => fake()->words(3, true),
+            'amount' => rand(0, 1000),
+            'description' => fake()->text(100),
+            'installments' => rand(1, 12),
+            'due_date' => now()->addMonth()->format('Y-m-d'),
         ];
     }
 }

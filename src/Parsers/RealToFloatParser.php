@@ -10,11 +10,11 @@ namespace Src\Parsers;
 class RealToFloatParser implements ParserContract
 {
     /**
-     * @param string $value
+     * @param  string  $value
      * @return float
      */
     public static function parse(mixed $value): mixed
     {
-        return (float) str_replace(",", ".", str_replace(".", "", strval($value)));
+        return (float) str_replace(',', '.', str_replace('.', '', strval($value)));
     }
 }

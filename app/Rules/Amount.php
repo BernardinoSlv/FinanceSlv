@@ -15,8 +15,8 @@ class Amount implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!preg_match(RegexEnum::AMOUNT->value, $value)) {
-            $fail("O campo valor não tem um formato válido");
+        if (! preg_match(RegexEnum::AMOUNT->value, $value)) {
+            $fail('O campo valor não tem um formato válido');
         }
     }
 }

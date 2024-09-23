@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\MovementableEnum;
 use App\Helpers\Alert;
 use App\Http\Requests\StoreMovementRequest;
 use App\Http\Requests\UpdateMovementRequest;
@@ -11,9 +12,11 @@ use App\Pipes\Movement\FilterByTextPipe;
 use App\Pipes\Movement\OperationTypePipe;
 use App\Pipes\Movement\OrderByPipe;
 use App\Pipes\Movement\TypePipe;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class MovementController extends Controller
 {
@@ -24,10 +27,9 @@ class MovementController extends Controller
     {
         // Movement::query()->where("movementable_type", Debt::class)
         //     ->each(function (Movement $movement) {
-        //         $movement->effetive_at = now()->addDays(rand(0, 30));
+        //         $movement->effetive_date = now()->addDays(rand(0, 30));
         //         $movement->save();
         //     });
-
 
         /** @var User $user */
         $user = auth()->user();
@@ -36,17 +38,17 @@ class MovementController extends Controller
                 FilterByTextPipe::class,
                 OrderByPipe::class,
                 OperationTypePipe::class,
-                TypePipe::class
+                TypePipe::class,
             ])
             ->thenReturn()
             ->addSelect('movements.*')
-            ->with(["identifier", "movementable"])
+            ->with(['identifier', 'movementable'])
             ->paginate()
             ->withQueryString();
 
         // dd($movements->first());
 
-        return view("movements.index", compact("movements"));
+        return view('movements.index', compact('movements'));
     }
 
     /**
@@ -78,27 +80,33 @@ class MovementController extends Controller
      */
     public function edit(Movement $movement)
     {
-        if (Gate::denies("movement-edit", $movement)) {
+        if (Gate::denies('is-owner', $movement)) {
             abort(403);
         }
 
-        return view("movements.edit", compact('movement'));
+        return view('movements.edit', compact('movement'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateMovementRequest $request, Movement $movement)
+    public function update(UpdateMovementRequest $request, Movement $movement): JsonResponse
     {
-        if (Gate::denies("movement-edit", $movement)) abort(403);
-
+        if (Gate::denies('is-owner', $movement))
+            throw new HttpException(403, "Não autorizado.");
+        else if ($movement->closed_date)
+            return response()->json([
+                "message" => "Não é permitido atualizar movimentações já fechadas."
+            ], 400);
         $movement->fill([
-            ...$request->validated(),
-            "amount" => RealToFloatParser::parse($request->input("amount"))
-        ])->save();
+            "fees_amount" => intval($request->fees_amount) ?? null,
+            "closed_date" => intval($request->status) ? now() : null
+        ]);
+        $movement->save();
 
-        return redirect()->route("movements.edit", $movement)
-            ->with(Alert::success("Movimentação editada com sucesso."));
+        return response()->json([
+            "message" => "Atualizado com sucesso."
+        ]);
     }
 
     /**
@@ -106,11 +114,18 @@ class MovementController extends Controller
      */
     public function destroy(Movement $movement)
     {
-        if (Gate::denies("movement-edit", $movement)) abort(403);
+        if (Gate::denies('is-owner', $movement)) {
+            abort(403);
+        }
 
+        $movementable = $movement->movementable;
         $movement->delete();
 
-        return redirect()->route("movements.index")
-            ->with(Alert::success("Movimentação deletada com sucesso."));
+        if (MovementableEnum::from(get_class($movementable))->canDelete()) {
+            $movementable->delete();
+        }
+
+        return redirect()->route('movements.index')
+            ->with(Alert::success('Movimentação deletada com sucesso.'));
     }
 }

@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('movements', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("identifier_id")->nullable()->references("id")->on("identifiers");
-            $table->foreignId("user_id")->references("id")->on("users");
-            $table->morphs("movementable");
-            $table->string("type");
-            $table->decimal("amount");
-            $table->date("effetive_at")->nullable();
+            $table->foreignId('identifier_id')->nullable()->references('id')->on('identifiers');
+            $table->foreignId('user_id')->references('id')->on('users');
+            $table->morphs('movementable');
+            $table->enum('type', ['in', 'out']);
+            $table->decimal('amount');
+            $table->date('effetive_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

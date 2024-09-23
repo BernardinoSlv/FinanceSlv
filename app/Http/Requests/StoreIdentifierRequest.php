@@ -24,13 +24,13 @@ class StoreIdentifierRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "name" => [
-                "required", "min:1", "max:256",
-                Rule::unique("identifiers", "name")->where("user_id", auth()->id())
+            'name' => [
+                'required', 'min:1', 'max:256',
+                Rule::unique('identifiers', 'name')->where('user_id', auth()->id()),
             ],
-            "avatar" => ["nullable", "image", "mimetypes:image/jpeg,image/jpg,image/png"],
-            "phone" => ["nullable", "regex:/\(\d{2}\)\s\d{4,5}-\d{4}/"],
-            "description" => ["nullable"]
+            'avatar' => ['nullable', 'image', 'mimetypes:image/jpeg,image/jpg,image/png'],
+            'phone' => ['nullable', "regex:/\(\d{2}\)\s\d{4,5}-\d{4}/"],
+            'description' => ['nullable'],
         ];
     }
 }

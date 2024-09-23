@@ -15,52 +15,47 @@ class OrderByPipe implements PipeContract
 {
     public function handle($query, Closure $next)
     {
-        $orderBy = request("order_by");
-        $orderType = request("order_type");
-        $orderType = $orderType === "a" ? "ASC" : "DESC";
+        $orderBy = request('order_by');
+        $orderType = request('order_type');
+        $orderType = $orderType === 'a' ? 'ASC' : 'DESC';
 
         switch ($orderBy) {
-            case "title":
+            case 'title':
                 $query
-                    ->leftJoin("quicks", function (JoinClause $join): void {
-                        $join->on("quicks.id", "=", "movements.movementable_id")
-                            ->where("movements.movementable_type", Quick::class);
+                    ->leftJoin('quicks', function (JoinClause $join): void {
+                        $join->on('quicks.id', '=', 'movements.movementable_id')
+                            ->where('movements.movementable_type', Quick::class);
                     })
-                    ->leftJoin("debts", function (JoinClause $join): void {
-                        $join->on("debts.id", "=", "movements.movementable_id")
-                            ->where("movements.movementable_type", Debt::class);
+                    ->leftJoin('debts', function (JoinClause $join): void {
+                        $join->on('debts.id', '=', 'movements.movementable_id')
+                            ->where('movements.movementable_type', Debt::class);
                     })
-                    ->orderBy(DB::raw("
+                    ->orderBy(DB::raw('
                     (
                         case
                         when quicks.title is not null THEN quicks.title
                         else debts.title
                         end
-                    )"), $orderType);
+                    )'), $orderType);
                 break;
-            case "amount":
-                $query->orderBy("movements.amount", $orderType);
+            case 'amount':
+                $query->orderBy('movements.amount', $orderType);
                 break;
-            case "identifier":
+            case 'identifier':
                 $query->leftJoin(
-                    "identifiers",
-                    "identifiers.id",
-                    "=",
-                    "movements.identifier_id"
-                )->orderBy("identifiers.name", $orderType);
+                    'identifiers',
+                    'identifiers.id',
+                    '=',
+                    'movements.identifier_id'
+                )->orderBy('identifiers.name', $orderType);
                 break;
             default:
                 $query->orderBy(
-                    DB::raw("(
-                        CASE
-                            WHEN movements.effetive_at is not null THEN movements.effetive_at
-                            ELSE movements.created_at
-                        END
-                    )"),
+                    DB::raw('COALESCE(movements.closed_date, movements.effetive_date)'),
                     $orderType
                 );
         }
-        $query->orderBy('movements.id', "DESC");
+        $query->orderBy('movements.id', 'DESC');
 
         return $next($query);
     }

@@ -12,38 +12,37 @@ class StatusPipe implements PipeContract
 {
     public function handle($query, Closure $next)
     {
-        $status = request("status");
+        $status = request('status');
 
         switch ($status) {
-            case "paid":
-                $query->where(DB::raw("(
+            case 'paid':
+                $query->where(DB::raw('(
                     select sum(movements.amount) from movements
-                    where movements.movementable_type = \"App\\\\Models\\\\Debt\"
+                    where movements.movementable_type = "App\\\\Models\\\\Debt"
                     and movements.movementable_id = debts.id
-                )"), ">=", DB::raw("debts.amount"));
+                )'), '>=', DB::raw('debts.amount'));
                 break;
-            case "paying":
+            case 'paying':
                 $query
-                    ->where(DB::raw("(
+                    ->where(DB::raw('(
                         select sum(movements.amount) from movements
-                        where movements.movementable_type = \"App\\\\Models\\\\Debt\"
+                        where movements.movementable_type = "App\\\\Models\\\\Debt"
                         and movements.movementable_id = debts.id
-                    )"), "<", DB::raw("debts.amount"))
-                    ->where(DB::raw("(
+                    )'), '<', DB::raw('debts.amount'))
+                    ->where(DB::raw('(
                         select sum(movements.amount) from movements
-                        where movements.movementable_type = \"App\\\\Models\\\\Debt\"
+                        where movements.movementable_type = "App\\\\Models\\\\Debt"
                         and movements.movementable_id = debts.id
-                    )"), "!=", 0);
+                    )'), '!=', 0);
                 break;
-            case "no-paying";
-                $query->where(DB::raw("(
+            case 'no-paying':
+                $query->where(DB::raw('(
                     select sum(movements.amount) from movements
-                    where movements.movementable_type = \"App\\\\Models\\\\Debt\"
+                    where movements.movementable_type = "App\\\\Models\\\\Debt"
                     and movements.movementable_id = debts.id
-                )"), "=", null);
+                )'), '=', null);
                 break;
         }
-
 
         return $next($query);
     }

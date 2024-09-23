@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Src\Parsers;
 
-use Error;
-
 interface ParserContract
 {
     /**

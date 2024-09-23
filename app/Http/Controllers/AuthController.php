@@ -18,48 +18,47 @@ class AuthController extends Controller
 
     public function index()
     {
-        return view("auth.index");
+        return view('auth.index');
     }
 
     public function indexStore(Request $request)
     {
         $data = $request->validate([
-            "email" => ["required", "email"],
-            "password" => ["required", "min:8", "max:256"]
+            'email' => ['required', 'email'],
+            'password' => ['required', 'min:8', 'max:256'],
         ]);
 
-        if (!Auth::attempt(
+        if (! Auth::attempt(
             $data,
             $request->remember ? true : false
         )) {
-            return redirect()->route("auth.index")->with(
-                Alert::danger("E-mail e/ou senha incorretos.")
+            return redirect()->route('auth.index')->with(
+                Alert::danger('E-mail e/ou senha incorretos.')
             )->withInput();
         }
 
-        return redirect()->route("dashboard.index");
+        return redirect()->route('dashboard.index');
     }
-
 
     public function create()
     {
-        return view("auth.create");
+        return view('auth.create');
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            "name" => ["required", "min:3", "max:256", "regex:/\w+ \w+/i"],
-            "email" => ["required", "email", "unique:users"],
-            "password" => ["required", "min:8", "max:256"],
-            "confirm_password" => ["required", "same:password"],
-            "terms" => ["required"]
+            'name' => ['required', 'min:3', 'max:256', "regex:/\w+ \w+/i"],
+            'email' => ['required', 'email', 'unique:users'],
+            'password' => ['required', 'min:8', 'max:256'],
+            'confirm_password' => ['required', 'same:password'],
+            'terms' => ['required'],
         ]);
 
         $this->_userRepository->create($data);
 
-        return redirect()->route("auth.index")->with(
-            Alert::success("Cadastro realizado com sucesso.")
+        return redirect()->route('auth.index')->with(
+            Alert::success('Cadastro realizado com sucesso.')
         );
     }
 
@@ -68,8 +67,9 @@ class AuthController extends Controller
         if (Auth::check()) {
             Auth::logout();
         }
-        return redirect()->route("auth.index")->with(
-            Alert::success("Volte sempre.")
+
+        return redirect()->route('auth.index')->with(
+            Alert::success('Volte sempre.')
         );
     }
 }

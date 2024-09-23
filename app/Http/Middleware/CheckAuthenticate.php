@@ -16,9 +16,10 @@ class CheckAuthenticate
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check()) {
-            return redirect()->route("auth.index");
+        if (! Auth::check()) {
+            return redirect()->route('auth.index');
         }
+
         return $next($request);
     }
 }

@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('files', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("user_id")->references("id")->on("users");
-            $table->morphs("fileable");
-            $table->string("type");
-            $table->string("path");
-            $table->unsignedBigInteger("size");
-            $table->text("description")->nullable();
+            $table->foreignId('user_id')->references('id')->on('users');
+            $table->morphs('fileable');
+            $table->enum('type', ['image', 'pdf', 'excel']);
+            $table->string('path');
+            $table->unsignedBigInteger('size');
+            $table->text('description')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

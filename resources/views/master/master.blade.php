@@ -565,6 +565,29 @@
                     </ul>
                 </li>
                 <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><span class="material-symbols-outlined">
+                                account_balance
+                            </span>
+                        </div>
+                        <div class="menu-title">Despesas</div>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="{{ route('expenses.create') }}">
+                                <span class="material-symbols-outlined">arrow_right</span>
+                                Criar
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('expenses.index') }}">
+                                <span class="material-symbols-outlined">arrow_right</span>
+                                Ver tudo
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
                     <a href="{{ route('movements.index') }}" class="">
                         <div class="parent-icon"><span class="material-symbols-outlined">
                                 account_balance
@@ -868,6 +891,7 @@
         </div>
     </div>
 
+    @yield('modals')
 
     <!--start theme customization-->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="ThemeCustomizer" aria-labelledby="ThemeCustomizerLable">

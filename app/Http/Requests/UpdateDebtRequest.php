@@ -24,16 +24,16 @@ class UpdateDebtRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "identifier_id" => [
-                "required",
-                Rule::exists("identifiers", "id")
-                    ->where("user_id", auth()->id())
+            'identifier_id' => [
+                'required',
+                Rule::exists('identifiers', 'id')
+                    ->where('user_id', auth()->id()),
             ],
-            "title" => ["required_without:identifier_id", "nullable", "string", "between:2,256"],
-            "description" => ["nullable"],
-            "amount" => ["required", new Amount],
-            "installments" => ["nullable", "integer", "min:1"],
-            "due_date" => ["nullable", "date"],
+            'title' => ['required_without:identifier_id', 'nullable', 'string', 'between:2,256'],
+            'description' => ['nullable'],
+            'amount' => ['required', new Amount],
+            'installments' => ['nullable', 'integer', 'min:1'],
+            'due_date' => ['nullable', 'date'],
         ];
     }
 }

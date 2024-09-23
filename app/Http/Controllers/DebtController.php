@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\MovementTypeEnum;
 use App\Helpers\Alert;
 use App\Http\Requests\StoreDebtRequest;
 use App\Http\Requests\UpdateDebtRequest;
 use App\Models\Debt;
-use App\Models\Identifier;
-use App\Models\Movement;
 use App\Pipes\Debt\FilterByTextPipe;
 use App\Pipes\Debt\OrderByPipe;
 use App\Pipes\Debt\StatusPipe;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -28,16 +26,16 @@ class DebtController extends Controller
             ->through([
                 FilterByTextPipe::class,
                 OrderByPipe::class,
-                StatusPipe::class
+                StatusPipe::class,
             ])
             ->thenReturn()
-            ->select("debts.*")
-            ->with("identifier")
-            ->withSum("movements", "amount")
+            ->select('debts.*')
+            ->with('identifier')
+            ->withSum('movements', 'amount')
             ->paginate()
             ->withQueryString();
 
-        return view("debts.index", compact("debts"));
+        return view('debts.index', compact('debts'));
     }
 
     /**
@@ -45,9 +43,9 @@ class DebtController extends Controller
      */
     public function create()
     {
-        $identifiers = auth()->user()->identifiers()->orderBy('name')->orderBy("id")->get();
+        $identifiers = auth()->user()->identifiers()->orderBy('name')->orderBy('id')->get();
 
-        return view("debts.create", compact("identifiers"));
+        return view('debts.create', compact('identifiers'));
     }
 
     /**
@@ -57,13 +55,22 @@ class DebtController extends Controller
     {
         $debt = new Debt([
             ...$request->validated(),
-            "amount" => RealToFloatParser::parse($request->input('amount'))
+            'amount' => RealToFloatParser::parse($request->input('amount')),
         ]);
         $debt->user_id = auth()->id();
         $debt->save();
 
-        return redirect()->route("debts.index")->with(
-            Alert::success("Dívida criada com sucesso.")
+        if ($request->input('to_balance')) {
+            $debt->movements()->create([
+                'identifier_id' => $debt->identifier_id,
+                'user_id' => $debt->user_id,
+                'type' => MovementTypeEnum::IN->value,
+                'amount' => $debt->amount,
+            ]);
+        }
+
+        return redirect()->route('debts.index')->with(
+            Alert::success('Dívida criada com sucesso.')
         );
     }
 
@@ -79,16 +86,16 @@ class DebtController extends Controller
      */
     public function edit(Debt $debt)
     {
-        if (Gate::denies("debt-edit", $debt)) {
+        if (Gate::denies('is-owner', $debt)) {
             abort(403);
         }
 
         $identifiers = auth()->user()->identifiers()
-            ->orderBy("name")
-            ->orderBy("id")
+            ->orderBy('name')
+            ->orderBy('id')
             ->get();
 
-        return view("debts.edit", compact("debt", "identifiers"));
+        return view('debts.edit', compact('debt', 'identifiers'));
     }
 
     /**
@@ -96,21 +103,22 @@ class DebtController extends Controller
      */
     public function update(UpdateDebtRequest $request, Debt $debt)
     {
-        if (Gate::denies("debt-edit", $debt))
+        if (Gate::denies('is-owner', $debt)) {
             abort(403);
+        }
 
         DB::beginTransaction();
         $debt->fill([
             ...$request->validated(),
-            "amount" => RealToFloatParser::parse($request->input("amount"))
+            'amount' => RealToFloatParser::parse($request->input('amount')),
         ])->save();
         $debt->movements()->update([
-            "identifier_id" => $request->input('identifier_id')
+            'identifier_id' => $request->input('identifier_id'),
         ]);
         DB::commit();
 
-        return redirect()->route("debts.edit", $debt)
-            ->with(Alert::success("Dívida atualizada com sucesso."));
+        return redirect()->route('debts.edit', $debt)
+            ->with(Alert::success('Dívida atualizada com sucesso.'));
     }
 
     /**
@@ -118,12 +126,14 @@ class DebtController extends Controller
      */
     public function destroy(Debt $debt)
     {
-        if (Gate::denies("debt-edit", $debt))
+        if (Gate::denies('is-owner', $debt)) {
             abort(403);
+        }
 
         $debt->delete();
+        $debt->movements()->delete();
 
-        return redirect()->route("debts.index")
-            ->with(Alert::success("Dívida deletada com sucesso."));
+        return redirect()->route('debts.index')
+            ->with(Alert::success('Dívida deletada com sucesso.'));
     }
 }

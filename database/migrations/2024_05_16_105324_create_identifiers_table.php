@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('identifiers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("user_id")->references("id")->on("users");
-            $table->string("name");
-            $table->string("phone")->nullable();
-            $table->string("avatar")->nullable();
-            $table->text("description")->nullable();
-            $table->boolean("status")->default(1);
+            $table->foreignId('user_id')->references('id')->on('users');
+            $table->string('name');
+            $table->string('phone')->nullable();
+            $table->string('avatar')->nullable();
+            $table->text('description')->nullable();
+            $table->boolean('status')->default(1);
             $table->timestamps();
             $table->softDeletes();
         });

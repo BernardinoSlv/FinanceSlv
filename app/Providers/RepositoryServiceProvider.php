@@ -2,12 +2,11 @@
 
 namespace App\Providers;
 
-use App\Models\QuickLeave;
 use App\Repositories\Contracts\DebtorRepositoryContract;
 use App\Repositories\Contracts\DebtRepositoryContract;
-use App\Repositories\Contracts\IdentifierRepositoryContract;
 use App\Repositories\Contracts\EntryRepositoryContract;
 use App\Repositories\Contracts\ExpenseRepositoryContract;
+use App\Repositories\Contracts\IdentifierRepositoryContract;
 use App\Repositories\Contracts\InvestimentRepositoryContract;
 use App\Repositories\Contracts\LeaveRepositoryContract;
 use App\Repositories\Contracts\MovementRepositoryContract;
@@ -17,9 +16,9 @@ use App\Repositories\Contracts\QuickLeaveRepositoryContract;
 use App\Repositories\Contracts\UserRepositoryContract;
 use App\Repositories\DebtorRepository;
 use App\Repositories\DebtRepository;
-use App\Repositories\IdentifierRepository;
 use App\Repositories\EntryRepository;
 use App\Repositories\ExpenseRepository;
+use App\Repositories\IdentifierRepository;
 use App\Repositories\InvestimentRepository;
 use App\Repositories\LeaveRepository;
 use App\Repositories\MovementRepository;

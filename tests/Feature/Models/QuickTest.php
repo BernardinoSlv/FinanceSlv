@@ -7,7 +7,6 @@ use App\Models\Movement;
 use App\Models\Quick;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class QuickTest extends TestCase
@@ -22,8 +21,8 @@ class QuickTest extends TestCase
         User::factory(2)->create();
 
         $user = User::factory()->create();
-        $quick =  Quick::factory()->create([
-            "user_id" => $user
+        $quick = Quick::factory()->create([
+            'user_id' => $user,
         ]);
 
         $this->assertEquals($user->id, $quick->user->id);
@@ -37,8 +36,8 @@ class QuickTest extends TestCase
         User::factory(2)->create();
 
         $user = User::factory()->trashed()->create();
-        $quick =  Quick::factory()->create([
-            "user_id" => $user
+        $quick = Quick::factory()->create([
+            'user_id' => $user,
         ]);
 
         $this->assertSoftDeleted($quick->user);
@@ -53,7 +52,7 @@ class QuickTest extends TestCase
         Identifier::factory(2)->create();
 
         $identifier = Identifier::factory()->create();
-        $quick = Quick::factory()->create(["identifier_id" => $identifier]);
+        $quick = Quick::factory()->create(['identifier_id' => $identifier]);
 
         $this->assertEquals($identifier->id, $quick->identifier->id);
     }
@@ -66,7 +65,7 @@ class QuickTest extends TestCase
         Identifier::factory(2)->create();
 
         $identifier = Identifier::factory()->trashed()->create();
-        $quick = Quick::factory()->create(["identifier_id" => $identifier]);
+        $quick = Quick::factory()->create(['identifier_id' => $identifier]);
 
         $this->assertSoftDeleted($quick->identifier);
         $this->assertEquals($identifier->id, $quick->identifier->id);
@@ -78,8 +77,8 @@ class QuickTest extends TestCase
     public function test_movement_method_without_movement(): void
     {
         Movement::factory(2)->create([
-            "movementable_type" => Quick::class,
-            "movementable_id" => Quick::factory()->create()
+            'movementable_type' => Quick::class,
+            'movementable_id' => Quick::factory()->create(),
         ]);
 
         $quick = Quick::factory()->create();
@@ -93,14 +92,14 @@ class QuickTest extends TestCase
     public function test_movement_method(): void
     {
         Movement::factory(2)->create([
-            "movementable_type" => Quick::class,
-            "movementable_id" => Quick::factory()->create()
+            'movementable_type' => Quick::class,
+            'movementable_id' => Quick::factory()->create(),
         ]);
 
         $quick = Quick::factory()->create();
         $movement = Movement::factory()->create([
-            "movementable_type" => Quick::class,
-            "movementable_id" => $quick
+            'movementable_type' => Quick::class,
+            'movementable_id' => $quick,
         ]);
 
         $this->assertInstanceOf(Movement::class, $quick->movement);

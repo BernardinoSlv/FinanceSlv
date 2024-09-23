@@ -4,12 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Enums\MovementTypeEnum;
 use App\Models\Debt;
-use App\Models\Identifier;
-use App\Models\Movement;
-use App\Models\Quick;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -20,72 +16,86 @@ class DashboardController extends Controller
         $user = auth()->user();
 
         $totalEntry = (float) $user->movements()
-            ->where("type", MovementTypeEnum::IN->value)
+            ->where('type', MovementTypeEnum::IN->value)
             ->sum('amount');
         $totalExit = (float) $user->movements()
-            ->where("type", MovementTypeEnum::OUT->value)
+            ->where('type', MovementTypeEnum::OUT->value)
+            ->whereNotNull("closed_date")
             ->sum('amount');
-        $totalDebts = (float) $user->debts()->sum("debts.amount") - $user->movements()->where("movementable_type", Debt::class)
-            ->sum("movements.amount");
+        $totalDebts = (float) $user->debts()->sum('debts.amount') - $user->movements()->where([
+            'movementable_type' => Debt::class,
+            "type" => MovementTypeEnum::OUT->value
+        ])
+            ->sum('movements.amount');
+        $totalInOpen = (float) $user->movements()->whereNull("closed_date")->sum(DB::raw("amount + fees_amount"));
 
         // graficos
         $dataChart1 = $user->movements()
             ->select(DB::raw('
-                date_format(movements.created_at, "%m/%Y") as period,
-                sum(movements.amount) as amount'))
-            ->groupBy(DB::raw('date_format(movements.created_at, "%m/%Y")'))
-            ->orderBy(DB::raw('date_format(movements.created_at, "%m/%Y")'))
-            ->where("movements.type", MovementTypeEnum::IN->value)
+            date_format(closed_date, "%y-%m") as period,
+            sum(
+                case
+                    when movements.type = "in" then amount
+                    else 0
+                end
+            ) as entry_amount,
+            sum(
+                case
+                    when movements.type = "out" then amount
+                    else 0
+                end
+            ) as exit_amount'))
+            ->groupBy("period")
+            ->orderBy("period")
+            ->whereNotNull("closed_date")
             ->get()
-            ->map(
-                fn ($movementGroup) => ["period" => $movementGroup->period, "amount" => $movementGroup->amount]
-            )
             ->toArray();
 
         $topIdendifiersEntry = $user->identifiers()
-            ->select("identifiers.*")
+            ->select('identifiers.*')
             ->withSum(
-                ["movements" => function (Builder $query) {
-                    $query->where("movements.type", MovementTypeEnum::IN->value);
+                ['movements' => function (Builder $query) {
+                    $query->where('movements.type', MovementTypeEnum::IN->value);
                 }],
-                "amount"
+                'amount'
             )
-            ->orderBy("movements_sum_amount", "desc")
+            ->orderBy('movements_sum_amount', 'desc')
             ->limit(5)
             ->get();
         $topIdendifiersExit = $user->identifiers()
-            ->select("identifiers.*")
+            ->select('identifiers.*')
             ->withSum(
-                ["movements" => function (Builder $query) {
-                    $query->where("movements.type", MovementTypeEnum::OUT->value);
+                ['movements' => function (Builder $query) {
+                    $query->where('movements.type', MovementTypeEnum::OUT->value);
                 }],
-                "amount"
+                'amount'
             )
-            ->orderBy("movements_sum_amount", "desc")
+            ->orderBy('movements_sum_amount', 'desc')
             ->limit(5)
             ->get();
         $topDebts = $user->debts()
-            ->select("debts.*")
-            ->withSum(["movements" => function (Builder $query) {
-                $query->where("movements.type", MovementTypeEnum::OUT->value);
-            }], "amount")
-            ->orderBy(DB::raw("debts.amount - (case
+            ->select('debts.*')
+            ->withSum(['movements' => function (Builder $query) {
+                $query->where('movements.type', MovementTypeEnum::OUT->value);
+            }], 'amount')
+            ->orderBy(DB::raw('debts.amount - (case
                 when movements_sum_amount is null then 0
                 else movements_sum_amount
-                    end)"), "DESC")
-            ->orderBy("debts.id", "ASC")
-            ->with("identifier")
+                    end)'), 'DESC')
+            ->orderBy('debts.id', 'ASC')
+            ->with('identifier')
             ->limit(5)
             ->get();
 
-        return view("dashboard.index", compact(
-            "totalEntry",
-            "totalExit",
-            "totalDebts",
-            "dataChart1",
-            "topIdendifiersEntry",
-            "topIdendifiersExit",
-            "topDebts"
+        return view('dashboard.index', compact(
+            'totalInOpen',
+            'totalEntry',
+            'totalExit',
+            'totalDebts',
+            'dataChart1',
+            'topIdendifiersEntry',
+            'topIdendifiersExit',
+            'topDebts'
         ));
     }
 }

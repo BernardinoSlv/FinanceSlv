@@ -9,7 +9,6 @@ use App\Http\Requests\UpdateDebtPaymentRequest;
 use App\Models\Debt;
 use App\Models\Movement;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Gate;
 use Src\Parsers\RealToFloatParser;
 
@@ -20,20 +19,20 @@ class DebtPaymentController extends Controller
      */
     public function index(Debt $debt)
     {
-        if (Gate::denies("debt-edit", $debt)) {
+        if (Gate::denies('is-owner', $debt)) {
             abort(403);
         }
 
-        $debt->loadSum(["movements" => fn (Builder $query) => $query->where(
-            "movements.type",
+        $debt->loadSum(['movements' => fn (Builder $query) => $query->where(
+            'movements.type',
             MovementTypeEnum::OUT->value
-        )], "amount");
+        )], 'amount');
         $movements = $debt->movements()
-            ->where("type", MovementTypeEnum::OUT->value)
-            ->orderBy('id', "DESC")
+            ->where('type', MovementTypeEnum::OUT->value)
+            ->orderBy('id', 'DESC')
             ->paginate();
 
-        return view("debts.payments.index", compact("debt", "movements"));
+        return view('debts.payments.index', compact('debt', 'movements'));
     }
 
     /**
@@ -41,11 +40,11 @@ class DebtPaymentController extends Controller
      */
     public function create(Debt $debt)
     {
-        if (Gate::denies("debt-edit", $debt)) {
+        if (Gate::denies('is-owner', $debt)) {
             abort(403);
         }
 
-        return view("debts.payments.create", compact("debt"));
+        return view('debts.payments.create', compact('debt'));
     }
 
     /**
@@ -53,20 +52,20 @@ class DebtPaymentController extends Controller
      */
     public function store(StoreDebtPaymentRequest $request, Debt $debt)
     {
-        if (Gate::denies("debt-edit", $debt)) {
+        if (Gate::denies('is-owner', $debt)) {
             abort(403);
         }
 
         $debt->movements()->create([
             ...$request->validated(),
-            "amount" => RealToFloatParser::parse($request->input("amount")),
-            "user_id" => auth()->id(),
-            "type" => MovementTypeEnum::OUT->value,
-            "identifier_id" => $debt->identifier_id
+            'amount' => RealToFloatParser::parse($request->input('amount')),
+            'user_id' => auth()->id(),
+            'type' => MovementTypeEnum::OUT->value,
+            'identifier_id' => $debt->identifier_id,
         ]);
 
         return response()->json([
-            "error" => false,
+            'error' => false,
         ], 201);
     }
 
@@ -83,11 +82,11 @@ class DebtPaymentController extends Controller
      */
     public function edit(Debt $debt, Movement $movement)
     {
-        if (Gate::denies("debt-edit", $debt) || Gate::denies("movement-edit", $movement)) {
+        if (Gate::denies('is-owner', $debt) || Gate::denies('is-owner', $movement)) {
             abort(403);
         }
 
-        return view("debts.payments.edit", compact("debt", "movement"));
+        return view('debts.payments.edit', compact('debt', 'movement'));
     }
 
     /**
@@ -95,18 +94,18 @@ class DebtPaymentController extends Controller
      */
     public function update(UpdateDebtPaymentRequest $request, Debt $debt, Movement $movement)
     {
-        if (Gate::denies("debt-edit", $debt) || Gate::denies("movement-edit", $movement)) {
+        if (Gate::denies('is-owner', $debt) || Gate::denies('is-owner', $movement)) {
             abort(403);
         }
 
         $movement->fill($request->validated());
         $movement->identifier_id = $debt->identifier_id;
-        $movement->amount = RealToFloatParser::parse($request->input("amount"));
+        $movement->amount = RealToFloatParser::parse($request->input('amount'));
         $movement->save();
 
         return response()->json([
-            "error" => false,
-        ], 200);;
+            'error' => false,
+        ], 200);
     }
 
     /**
@@ -114,14 +113,14 @@ class DebtPaymentController extends Controller
      */
     public function destroy(Debt $debt, Movement $movement)
     {
-        if (Gate::denies("debt-edit", $debt) || Gate::denies("movement-edit", $movement)) {
+        if (Gate::denies('is-owner', $debt) || Gate::denies('is-owner', $movement)) {
             abort(403);
         }
 
         $movement->delete();
 
-        return redirect()->route("debts.payments.index", $debt)->with(
-            Alert::success("Pagamento deletado com sucesso.")
+        return redirect()->route('debts.payments.index', $debt)->with(
+            Alert::success('Pagamento deletado com sucesso.')
         );
     }
 }

@@ -8,7 +8,6 @@ use App\Models\Movement;
 use App\Models\Quick;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class DebtTest extends TestCase
@@ -23,7 +22,7 @@ class DebtTest extends TestCase
         User::factory(2)->create();
 
         $user = User::factory()->create();
-        $debt = Debt::factory()->create(["user_id" => $user->id]);
+        $debt = Debt::factory()->create(['user_id' => $user->id]);
 
         $this->assertEquals($user->id, $debt->user->id);
     }
@@ -36,7 +35,7 @@ class DebtTest extends TestCase
         User::factory(2)->create();
 
         $user = User::factory()->trashed()->create();
-        $debt = Debt::factory()->create(["user_id" => $user->id]);
+        $debt = Debt::factory()->create(['user_id' => $user->id]);
 
         $this->assertEquals($user->id, $debt->user->id);
     }
@@ -46,7 +45,7 @@ class DebtTest extends TestCase
      */
     public function test_movements_method_without_movements(): void
     {
-        Movement::factory(2)->for(Quick::factory(), "movementable")->create();
+        Movement::factory(2)->for(Quick::factory(), 'movementable')->create();
 
         $debt = Debt::factory()->create();
 
@@ -58,16 +57,16 @@ class DebtTest extends TestCase
      */
     public function test_movements_method(): void
     {
-        Movement::factory(2)->for(Quick::factory(), "movementable")->create();
+        Movement::factory(2)->for(Quick::factory(), 'movementable')->create();
 
         $debt = Debt::factory()->create();
         Movement::factory(2)->create([
-            "movementable_type" => Debt::class,
-            "movementable_id" => $debt
+            'movementable_type' => Debt::class,
+            'movementable_id' => $debt,
         ]);
         Movement::factory(2)->trashed()->create([
-            "movementable_type" => Debt::class,
-            "movementable_id" => $debt
+            'movementable_type' => Debt::class,
+            'movementable_id' => $debt,
         ]);
 
         $this->assertCount(2, $debt->movements);

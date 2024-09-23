@@ -18,13 +18,13 @@ class FileFactory extends Factory
     public function definition(): array
     {
         return [
-            "user_id" => User::factory()->create(),
+            'user_id' => User::factory()->create(),
             // "fileable_type" => ,
             // "fileable_id" => ,
-            "type" => "image",
-            "path" => "test.jpg",
-            "size" => 1024,
-            "description" => fake()->text(100),
+            'type' => 'image',
+            'path' => 'test.jpg',
+            'size' => 1024,
+            'description' => fake()->text(100),
         ];
     }
 }
