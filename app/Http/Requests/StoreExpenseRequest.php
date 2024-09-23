@@ -2,12 +2,11 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\MovementTypeEnum;
 use App\Rules\Amount;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateMovementRequest extends FormRequest
+class StoreExpenseRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,8 +24,17 @@ class UpdateMovementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'fees_amount' => ["required_without:status", new Amount],
-            "status" => ["required_without:fees_amount", "nullable", "in:0,1"]
+            'identifier_id' => [
+                'required',
+                Rule::exists('identifiers', 'id')->where('user_id', auth()->id()),
+            ],
+            'title' => [
+                'required',
+                Rule::unique('expenses', 'title')->where('identifier_id', $this->identifier_id),
+            ],
+            'description' => ['nullable'],
+            'amount' => ['required', new Amount],
+            'due_day' => ['required', 'integer', 'min:1', 'max:31'],
         ];
     }
 }

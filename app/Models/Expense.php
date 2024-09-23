@@ -2,27 +2,22 @@
 
 namespace App\Models;
 
-use App\Support\Models\Traits\HasMovements as TraitsHasMovements;
+use App\Support\Models\Traits\HasMovements;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Debt extends Model
+class Expense extends Model
 {
-    use HasFactory, SoftDeletes, TraitsHasMovements;
+    use HasFactory, HasMovements, SoftDeletes;
 
-    protected $fillable = [
+    public $fillable = [
         'identifier_id',
         'title',
         'description',
         'amount',
-        'installments',
-        'due_date',
-    ];
-
-    protected $casts = [
-        'due_date' => 'date',
+        'due_day',
     ];
 
     public function user(): BelongsTo

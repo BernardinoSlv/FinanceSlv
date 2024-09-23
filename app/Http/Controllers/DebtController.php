@@ -86,7 +86,7 @@ class DebtController extends Controller
      */
     public function edit(Debt $debt)
     {
-        if (Gate::denies('debt-edit', $debt)) {
+        if (Gate::denies('is-owner', $debt)) {
             abort(403);
         }
 
@@ -103,7 +103,7 @@ class DebtController extends Controller
      */
     public function update(UpdateDebtRequest $request, Debt $debt)
     {
-        if (Gate::denies('debt-edit', $debt)) {
+        if (Gate::denies('is-owner', $debt)) {
             abort(403);
         }
 
@@ -126,7 +126,7 @@ class DebtController extends Controller
      */
     public function destroy(Debt $debt)
     {
-        if (Gate::denies('debt-edit', $debt)) {
+        if (Gate::denies('is-owner', $debt)) {
             abort(403);
         }
 

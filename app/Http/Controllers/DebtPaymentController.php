@@ -19,7 +19,7 @@ class DebtPaymentController extends Controller
      */
     public function index(Debt $debt)
     {
-        if (Gate::denies('debt-edit', $debt)) {
+        if (Gate::denies('is-owner', $debt)) {
             abort(403);
         }
 
@@ -40,7 +40,7 @@ class DebtPaymentController extends Controller
      */
     public function create(Debt $debt)
     {
-        if (Gate::denies('debt-edit', $debt)) {
+        if (Gate::denies('is-owner', $debt)) {
             abort(403);
         }
 
@@ -52,7 +52,7 @@ class DebtPaymentController extends Controller
      */
     public function store(StoreDebtPaymentRequest $request, Debt $debt)
     {
-        if (Gate::denies('debt-edit', $debt)) {
+        if (Gate::denies('is-owner', $debt)) {
             abort(403);
         }
 
@@ -82,7 +82,7 @@ class DebtPaymentController extends Controller
      */
     public function edit(Debt $debt, Movement $movement)
     {
-        if (Gate::denies('debt-edit', $debt) || Gate::denies('movement-edit', $movement)) {
+        if (Gate::denies('is-owner', $debt) || Gate::denies('is-owner', $movement)) {
             abort(403);
         }
 
@@ -94,7 +94,7 @@ class DebtPaymentController extends Controller
      */
     public function update(UpdateDebtPaymentRequest $request, Debt $debt, Movement $movement)
     {
-        if (Gate::denies('debt-edit', $debt) || Gate::denies('movement-edit', $movement)) {
+        if (Gate::denies('is-owner', $debt) || Gate::denies('is-owner', $movement)) {
             abort(403);
         }
 
@@ -113,7 +113,7 @@ class DebtPaymentController extends Controller
      */
     public function destroy(Debt $debt, Movement $movement)
     {
-        if (Gate::denies('debt-edit', $debt) || Gate::denies('movement-edit', $movement)) {
+        if (Gate::denies('is-owner', $debt) || Gate::denies('is-owner', $movement)) {
             abort(403);
         }
 

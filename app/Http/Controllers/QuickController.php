@@ -50,7 +50,7 @@ class QuickController extends Controller
          * @var User
          */
         $user = auth()->user();
-        $identifiers = $user->identifiers;
+        $identifiers = $user->identifiers()->orderBy('name')->get();
 
         return view('quicks.create', compact('identifiers'));
     }
@@ -88,7 +88,7 @@ class QuickController extends Controller
      */
     public function edit(Quick $quick)
     {
-        if (Gate::denies('quick-edit', $quick)) {
+        if (Gate::denies('is-owner', $quick)) {
             abort(403);
         }
 
@@ -96,7 +96,7 @@ class QuickController extends Controller
          * @var User
          */
         $user = auth()->user();
-        $identifiers = $user->identifiers;
+        $identifiers = $user->identifiers()->orderBy('name')->get();
 
         return view('quicks.edit', compact('quick', 'identifiers'));
     }
@@ -106,7 +106,7 @@ class QuickController extends Controller
      */
     public function update(UpdateQuickRequest $request, Quick $quick)
     {
-        if (Gate::denies('quick-edit', $quick)) {
+        if (Gate::denies('is-owner', $quick)) {
             abort(403);
         }
         DB::beginTransaction();
@@ -133,7 +133,7 @@ class QuickController extends Controller
      */
     public function destroy(Quick $quick)
     {
-        if (Gate::denies('quick-edit', $quick)) {
+        if (Gate::denies('is-owner', $quick)) {
             abort(403);
         }
 

@@ -4,10 +4,13 @@ namespace Tests\Feature\Models;
 
 use App\Models\Identifier;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class IdentifierTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * deve retornar o User
      */

@@ -68,7 +68,7 @@ class IdentifierController extends Controller
      */
     public function edit(Identifier $identifier)
     {
-        if (Gate::denies('identifier-edit', $identifier)) {
+        if (Gate::denies('is-owner', $identifier)) {
             abort(404);
         }
 
@@ -82,7 +82,7 @@ class IdentifierController extends Controller
      */
     public function update(UpdateIdentifierRequest $request, Identifier $identifier)
     {
-        if (Gate::denies('identifier-edit', $identifier)) {
+        if (Gate::denies('is-owner', $identifier)) {
             abort(404);
         }
 
@@ -103,7 +103,7 @@ class IdentifierController extends Controller
      */
     public function destroy(Identifier $identifier)
     {
-        if (Gate::denies('identifier-edit', $identifier)) {
+        if (Gate::denies('is-owner', $identifier)) {
             abort(404);
         }
 

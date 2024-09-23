@@ -4,11 +4,8 @@ namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
 
-use App\Models\Debt;
-use App\Models\Identifier;
-use App\Models\Movement;
-use App\Models\Quick;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -28,20 +25,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::define('quick-edit', function (User $user, Quick $quick): bool {
-            return $user->id === $quick->user_id;
-        });
-
-        Gate::define('identifier-edit', function (User $user, Identifier $identifier): bool {
-            return $user->id === $identifier->user_id;
-        });
-
-        Gate::define('movement-edit', function (User $user, Movement $movement): bool {
-            return $user->id === $movement->user_id;
-        });
-
-        Gate::define('debt-edit', function (User $user, Debt $debt): bool {
-            return $user->id === $debt->user_id;
+        Gate::define('is-owner', function (User $user, Model $record): bool {
+            return $user->id === $record->user_id;
         });
     }
 }

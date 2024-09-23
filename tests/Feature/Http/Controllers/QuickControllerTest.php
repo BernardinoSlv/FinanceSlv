@@ -8,12 +8,15 @@ use App\Models\Movement;
 use App\Models\Quick;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Tests\TestCase;
 
 class QuickControllerTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * deve redirecionar para login
      */

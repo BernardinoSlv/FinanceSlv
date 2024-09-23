@@ -20,10 +20,13 @@ class Movement extends Model
         'movementable_id',
         'type',
         'amount',
+        'effetive_date',
+        'closed_date',
+        'fees_amount',
     ];
 
     public $casts = [
-        'effetive_at' => 'date',
+        'effetive_date' => 'date',
     ];
 
     public function user(): BelongsTo
