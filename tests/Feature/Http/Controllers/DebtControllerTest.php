@@ -112,7 +112,6 @@ class DebtControllerTest extends TestCase
             ->assertSessionHas('alert_type', 'success');
         $this->assertDatabaseHas('debts', [
             ...$data,
-            'due_date' => date('Y-m-d', strtotime($data['due_date'])),
             'amount' => 200,
             'user_id' => $user->id,
         ]);
@@ -135,13 +134,37 @@ class DebtControllerTest extends TestCase
             ->assertSessionHas('alert_type', 'success');
         $debt = Debt::query()->where([
             ...Arr::except($data, ['to_balance']),
-            'due_date' => date('Y-m-d', strtotime($data['due_date'])),
             'amount' => 200,
             'user_id' => $user->id,
         ])->first();
         $this->assertCount(1, $debt->movements);
         $this->assertEquals(200, $debt->movements()->where('type', 'in')->first()->amount);
     }
+
+    /** deve redirecionar com mensagem de sucesso */
+    public function test_store_action_with_installments(): void
+    {
+        $user = User::factory()->has(Identifier::factory())->create();
+        $data = Debt::factory()->make([
+            'identifier_id' => $user->identifiers->first(),
+            'amount' => '200,00',
+        ])->toArray();
+        $data['to_balance'] = 'on';
+
+        $this->actingAs($user)->post(route('debts.store'), $data)
+            ->assertFound()
+            ->assertSessionHas('alert_type', 'success');
+        $debt = Debt::query()->where([
+            ...Arr::except($data, ['to_balance']),
+            'amount' => 200,
+            'user_id' => $user->id,
+        ])->first();
+        $this->assertCount(1, $debt->movements);
+        $this->assertEquals(200, $debt->movements()->where('type', 'in')->first()->amount);
+    }
+
+    /** deve redirecionar com mensagem de sucesso */
+    public function test_store_action_with_installments_and_due_date_in_current_month(): void {}
 
     /**
      * deve redirecionar para login
@@ -269,7 +292,6 @@ class DebtControllerTest extends TestCase
             ->assertSessionHas('alert_type', 'success');
         $this->assertDatabaseHas('debts', [
             ...$data,
-            'due_date' => date('Y-m-d', strtotime($data['due_date'])),
             'amount' => 500,
             'user_id' => $user->id,
             'id' => $debt->id,

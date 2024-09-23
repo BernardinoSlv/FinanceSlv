@@ -32,8 +32,8 @@ class StoreDebtRequest extends FormRequest
             'title' => ['required_without:identifier_id', 'nullable', 'string', 'between:2,256'],
             'description' => ['nullable'],
             'amount' => ['required', new Amount],
-            'installments' => ['nullable', 'integer', 'min:1'],
-            'due_date' => ['nullable', 'date'],
+            'installments' => ['nullable', 'integer', 'min:2'],
+            'due_date' => ['nullable', 'date', "after_or_equal:tomorrow"],
             'to_balance' => ['nullable', 'in:on'],
         ];
     }

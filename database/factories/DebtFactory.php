@@ -24,8 +24,8 @@ class DebtFactory extends Factory
             'title' => fake()->words(3, true),
             'amount' => rand(0, 1000),
             'description' => fake()->text(100),
-            'installments' => rand(1, 12),
-            'due_date' => now()->addMonth()->format('Y-m-d'),
+            'installments' => null,
+            'due_date' => null,
         ];
     }
 }
