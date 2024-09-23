@@ -211,7 +211,14 @@
                                         <x-movement-type :movement="$movement" />
                                     </td>
                                     <td>{{ $movement->movementable->title }}</td>
-                                    <td>R$ {{ number_format($movement->amount, '2', ',', '.') }}</td>
+                                    <td>
+                                        R$ @amount($movement->amount)
+
+                                        @if (floatval($movement->fees_amount))
+                                            <br>
+                                            <span class="badge text-bg-warning">+@amount($movement->fees_amount)</span>
+                                        @endif
+                                    </td>
                                     <td>
                                         <a href="javascript:;">{{ $movement->identifier?->name }}</a>
                                     </td>
@@ -232,7 +239,7 @@
                                             {{ $movement->created_at->format('d/m/Y') }}
                                         @endif
                                         <br>
-                                        @if ($movement->effetive_date?->lt(now()->format('Y-m-d')))
+                                        @if ($movement->effetive_date?->lt(now()->format('Y-m-d')) && !$movement->closed_date)
                                             <div class="badge text-bg-danger">Atrasada</div>
                                         @elseif (!$movement->closed_date)
                                             <div class="badge text-bg-warning">Em aberto</div>
@@ -251,6 +258,9 @@
                                                         <button class="dropdown-item"
                                                             data-config="{{ json_encode([
                                                                 'url' => route('movements.update', $movement),
+                                                                'title' => $movement->title . ' ' . $movement->identifier->name,
+                                                                'amount' => number_format($movement->amount, 2, ','),
+                                                                'fees_amount' => number_format($movement->fees_amount, 2, ','),
                                                             ]) }}"
                                                             data-bs-toggle="modal" data-bs-target="#modal-edit-in-open">
                                                             Atualizar
@@ -288,10 +298,12 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-body">
+                    <div class="mb-3 text-end">
+                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
                     <form action="" method="PUT" data-js-component="form-ajax">
-                        <div class="mb-3 text-end">
-                            <button class="btn-close" data-dismiss="modal"></button>
-                        </div>
+                        @method('PUT')
+
                         <div class="mb-3">
                             <label for="" class="form-label">Título</label>
                             <input type="text" class="form-control" id="modal-input-title" disabled>
@@ -303,7 +315,7 @@
                         <div class="mb-3">
                             <label for="" class="form-label">Juros</label>
                             <input type="text" class="form-control" name="fees_amount" data-js-mask="money"
-                                id="modal-input-fees_amount">
+                                id="modal-input-fees-amount">
                             <div class="invalid-feedback"></div>
                         </div>
                         <div class="mb-3">
@@ -312,6 +324,10 @@
                                 <option value="">Em aberto</option>
                                 <option value="1">Concluído</option>
                             </select>
+                            <div class="form-text">
+                                <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+                                Após fechado não é possível atualizá-la
+                            </div>
                             <div class="invalid-feedback"></div>
                         </div>
                         <div class="text-end">
@@ -332,8 +348,13 @@
 
             modal.addEventListener("show.bs.modal", (event) => {
                 const config = JSON.parse(event.relatedTarget.getAttribute("data-config"));
+                const form = modal.querySelector("form");
 
-                console.log(config);
+                form.setAttribute("action", config.url);
+
+                modal.querySelector("#modal-input-title").value = config.title;
+                modal.querySelector("#modal-input-amount").value = config.amount;
+                modal.querySelector("#modal-input-fees-amount").value = config.fees_amount;
             });
         });
     </script>

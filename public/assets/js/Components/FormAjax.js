@@ -9,18 +9,23 @@ export default class {
       event.preventDefault();
       const body = new FormData(this.elem);
       const headers = new Headers({
-        Accept: "application/json"
+        Accept: "application/json",
+        "X-CSRF-TOKEN": document.querySelector("meta[name='X-CSRF-TOKEN']")
+          .getAttribute("content")
       });
 
       const req = await fetch(url, {headers, body, method: "POST"});
       const resp = await req.json();
 
-      if (req.status === 422) {
+      if (req.ok) {
+        document.location.reload();
+        return;
+      } else if (req.status === 422) {
         const errors = resp.errors;
 
         for (const input of this.elem.elements) {
           const inputName = input.getAttribute("name");
-          const invalidFeedback = this.elem.querySelector(`input[name="${inputName}"] ~ .invalid-feedback`);
+          const invalidFeedback = this.elem.querySelector(`[name="${inputName}"] ~ .invalid-feedback`);
           input.classList.remove("is-invalid");
 
           if (errors[inputName] && invalidFeedback) {
@@ -31,7 +36,8 @@ export default class {
         return;
 
       }
-      document.location.reload();
+
+      alert("Ocorreu um erro inesperado.");
     });
   }
 }

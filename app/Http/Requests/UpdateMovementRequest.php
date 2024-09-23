@@ -26,7 +26,7 @@ class UpdateMovementRequest extends FormRequest
     {
         return [
             'fees_amount' => ["required_without:status", new Amount],
-            "status" => ["required_without:fees_amount", "in:0,1"]
+            "status" => ["required_without:fees_amount", "nullable", "in:0,1"]
         ];
     }
 }

@@ -138,7 +138,7 @@ class MovementControllerTest extends TestCase
             $this->assertDatabaseHas("movements", [
                 "id" => $movement->id,
                 "fees_amount" => 20.00,
-                "closed_date" => now("Y-m-d")
+                "closed_date" => now()->format("Y-m-d")
             ]);
         });
     }

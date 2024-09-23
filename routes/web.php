@@ -1,5 +1,6 @@
 <?php
 
+use App\Console\Commands\CreateMovementToExpense;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DebtController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\IdentifierController;
 use App\Http\Controllers\MovementController;
 use App\Http\Controllers\QuickController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -49,8 +51,8 @@ Route::middleware('checkAuth')->group(function () {
             'update' => 'quicks.update',
             'destroy' => 'quicks.destroy',
         ]);
-    Route::resource('movimentações', MovementController::class)
-        ->parameter('movimentações', 'movement')
+    Route::resource('movimentacoes', MovementController::class)
+        ->parameter('movimentacoes', 'movement')
         ->names([
             'index' => 'movements.index',
             'create' => 'movements.create',
@@ -122,4 +124,9 @@ Route::middleware('checkAuth')->group(function () {
             'update' => 'expenses.update',
             'destroy' => 'expenses.destroy',
         ]);
+});
+
+
+Route::get("cron", function () {
+    Artisan::call("app:cmte");
 });
