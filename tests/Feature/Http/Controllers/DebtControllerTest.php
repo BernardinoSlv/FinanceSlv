@@ -127,15 +127,21 @@ class DebtControllerTest extends TestCase
             'identifier_id' => $user->identifiers->first(),
             'amount' => '200,00',
         ])->toArray();
+        $data["to_balance"] = "on";
 
         $this->actingAs($user)->post(route('debts.store'), $data)
             ->assertFound()
             ->assertSessionHas('alert_type', 'success');
-        $debt = Debt::query()->where([
+        $this->assertNotNull($debt = Debt::query()->where([
             ...$data,
             'amount' => 200,
             'user_id' => $user->id,
-        ])->first();
+            "to_balance" => 1
+        ])->first());
+        $this->assertCount(1, $debt->movements()->where([
+            "type" => "in",
+            "amount" => 200
+        ])->get());
     }
 
     /** deve redirecionar com mensagem de sucesso */

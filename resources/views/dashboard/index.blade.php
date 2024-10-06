@@ -8,7 +8,7 @@
                     <div class="d-flex align-items-center">
                         <div class="">
                             <p class="mb-1 fw-bold">Balanço</p>
-                            <h4 class="mb-0 text-primary">@amount($totalEntry - $totalExit)</h4>
+                            <h4 class="mb-0 text-primary">@amount($balance)</h4>
                         </div>
                         <div class="ms-auto widget-icon bg-primary text-white">
                             <i class="bi bi-calculator"></i>

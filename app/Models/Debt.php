@@ -19,6 +19,7 @@ class Debt extends Model
         'amount',
         'installments',
         'due_date',
+        "to_balance"
     ];
 
     protected $casts = [

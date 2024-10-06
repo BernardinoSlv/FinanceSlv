@@ -32,7 +32,7 @@ class DebtController extends Controller
             ->select('debts.*')
             ->with('identifier')
             ->withSum(
-                ['movements' => fn($query) =>$query->whereNotNull("closed_date")],
+                ['movements as movements_paid_sum_amount' => fn($query) => $query->whereNotNull("closed_date")->where("type", MovementTypeEnum::OUT->value)],
                 "amount"
             )
             ->paginate()
@@ -59,11 +59,12 @@ class DebtController extends Controller
         $debt = new Debt([
             ...$request->validated(),
             'amount' => RealToFloatParser::parse($request->input('amount')),
+            "to_balance" => intval(boolval($request->input("to_balance")))
         ]);
         $debt->user_id = auth()->id();
         $debt->save();
 
-        // obter o saldo para a conta
+        // colocar o saldo na conta
         if ($request->input('to_balance')) {
             $debt->movements()->create([
                 'identifier_id' => $debt->identifier_id,
