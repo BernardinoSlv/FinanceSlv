@@ -127,18 +127,15 @@ class DebtControllerTest extends TestCase
             'identifier_id' => $user->identifiers->first(),
             'amount' => '200,00',
         ])->toArray();
-        $data['to_balance'] = 'on';
 
         $this->actingAs($user)->post(route('debts.store'), $data)
             ->assertFound()
             ->assertSessionHas('alert_type', 'success');
         $debt = Debt::query()->where([
-            ...Arr::except($data, ['to_balance']),
+            ...$data,
             'amount' => 200,
             'user_id' => $user->id,
         ])->first();
-        $this->assertCount(1, $debt->movements);
-        $this->assertEquals(200, $debt->movements()->where('type', 'in')->first()->amount);
     }
 
     /** deve redirecionar com mensagem de sucesso */
@@ -148,23 +145,55 @@ class DebtControllerTest extends TestCase
         $data = Debt::factory()->make([
             'identifier_id' => $user->identifiers->first(),
             'amount' => '200,00',
+            "installments" => 10,
+            "due_date" => now()->addMonth()->format("Y-m-d")
         ])->toArray();
-        $data['to_balance'] = 'on';
 
         $this->actingAs($user)->post(route('debts.store'), $data)
             ->assertFound()
             ->assertSessionHas('alert_type', 'success');
         $debt = Debt::query()->where([
-            ...Arr::except($data, ['to_balance']),
+            ...$data,
+            "due_date" => now()->addMonth()->format("Y-m-d"),
             'amount' => 200,
             'user_id' => $user->id,
         ])->first();
-        $this->assertCount(1, $debt->movements);
-        $this->assertEquals(200, $debt->movements()->where('type', 'in')->first()->amount);
+        $this->assertEquals(10, $debt->installments);
     }
 
     /** deve redirecionar com mensagem de sucesso */
-    public function test_store_action_with_installments_and_due_date_in_current_month(): void {}
+    public function test_store_action_with_installments_and_due_date_in_current_month(): void
+    {
+        $this->travelTo(now()->day(1));
+
+        $user = User::factory()->has(Identifier::factory())->create();
+        $data = Debt::factory()->make([
+            'identifier_id' => $user->identifiers->first(),
+            'amount' => '200,00',
+            "installments" => 10,
+            "due_date" => now()->addDay()->format("Y-m-d")
+        ])->toArray();
+
+        $this->actingAs($user)->post(route('debts.store'), $data)
+            ->assertFound()
+            ->assertSessionHas('alert_type', 'success');
+        $debt = Debt::query()->where([
+            ...$data,
+            "due_date" => now()->addDay()->format("Y-m-d"),
+            'amount' => 200,
+            'user_id' => $user->id,
+        ])->first();
+
+        $this->assertEquals(10, $debt->installments);
+        $this->assertCount(1, $debt->movements()->where([
+            "type" => "out",
+            "amount" => 20,
+            "closed_date" => null,
+            "effetive_date" => now()->day(2)->format("Y-m-d"),
+            "user_id" => $user->id,
+            "identifier_id" => $debt->identifier_id,
+        ])->get());
+    }
 
     /**
      * deve redirecionar para login

@@ -212,11 +212,11 @@
                                     </td>
                                     <td>{{ $movement->movementable->title }}</td>
                                     <td>
-                                        R$ @amount($movement->amount)
+                                        R$ @amount($movement->amount + floatval($movement->fees_amount))
 
                                         @if (floatval($movement->fees_amount))
                                             <br>
-                                            <span class="badge text-bg-warning">+@amount($movement->fees_amount)</span>
+                                            <span class="badge text-bg-warning">@amount($movement->fees_amount) de juros</span>
                                         @endif
                                     </td>
                                     <td>
@@ -228,7 +228,7 @@
                                                 <span class="text-danger fw-bold">
                                                     {{ $movement->effetive_date->format('d/m/Y') }}
                                                 </span>
-                                            @elseif ($movement->effetive_date->gte(now()->format('Y-m-d')))
+                                            @elseif ($movement->effetive_date->gte(now()->format('Y-m-d')) && !$movement->closed_date)
                                                 <span class="text-warning fw-bold">
                                                     {{ $movement->effetive_date->format('d/m/Y') }}
                                                 </span>
