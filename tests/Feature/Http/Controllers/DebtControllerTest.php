@@ -333,6 +333,94 @@ class DebtControllerTest extends TestCase
         ]);
     }
 
+    /** deve redirecionar com mensagem de sucesso */
+    public function test_update_action_to_balance_as_true(): void
+    {
+        $user = User::factory()
+            ->has(Identifier::factory())
+            ->has(Debt::factory())
+            ->create();
+        $debt = $user->debts->first();
+        $data = Debt::factory()->make([
+            'identifier_id' => $user->identifiers->first(),
+            'amount' => '500,00',
+            "to_balance" => "on"
+        ])->toArray();
+
+        $this->actingAs($user)->put(route('debts.update', $debt), $data)
+            ->assertRedirect(route('debts.edit', $debt))
+            ->assertSessionHas('alert_type', 'success');
+        $this->assertNotNull($debt = Debt::query()->where([
+            ...$data,
+            'amount' => 500,
+            'user_id' => $user->id,
+            'id' => $debt->id,
+            "to_balance" => 1
+        ])->first());
+        $this->assertCount(
+            1,
+            $debt->movements()->where([
+                "type" => "in",
+                "amount" => 500,
+                "user_id" => $user->id,
+                "effetive_date" => null
+            ])
+                ->whereNotNull("closed_date")
+                ->get()
+        );
+    }
+
+    /** deve redirecionar com mensagem de sucesso */
+    public function test_update_action_to_balance_as_false(): void
+    {
+        $user = User::factory()
+            ->has(Identifier::factory())
+            ->has(Debt::factory(null, ["to_balance" => 1])
+                ->has(
+                    Movement::factory(null)
+                        ->state(
+                            fn(array $attributes, Debt $debt) => [
+                                "user_id" => $debt->user_id,
+                                "identifier_id" => $debt->identifier_id,
+                                "amount" => $debt->amount,
+                                "type" => "in",
+                                "closed_date" => now(),
+                                "effetive_date" => null
+                            ]
+                        )
+                ))
+            ->create();
+        $debt = $user->debts->first();
+        $data = Debt::factory()->make([
+            'identifier_id' => $user->identifiers->first(),
+            'amount' => '500,00',
+            "to_balance" => ""
+        ])->toArray();
+
+        $this->actingAs($user)->put(route('debts.update', $debt), $data)
+            ->assertRedirect(route('debts.edit', $debt))
+            ->assertSessionHas('alert_type', 'success');
+        $this->assertNotNull($debt = Debt::query()->where([
+            ...$data,
+            'amount' => 500,
+            'user_id' => $user->id,
+            'id' => $debt->id,
+            "to_balance" => 0
+        ])->first());
+        $this->assertCount(
+            0,
+            $debt->movements()->where([
+                "type" => "in",
+            ])
+                ->get()
+        );
+        $this->assertSoftDeleted(
+            $debt->movements()
+                ->withTrashed()->where("type", "in")
+                ->first()
+        );
+    }
+
     /**
      * deve atualizar o identifier_id
      */

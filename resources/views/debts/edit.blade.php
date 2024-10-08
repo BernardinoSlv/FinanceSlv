@@ -46,7 +46,19 @@
                                 <h5 class="mb-2">Valor</h5>
                                 <input type="text" name="amount" value="{{ old('amount', $debt->amount) }}"
                                     class="form-control" data-js-mask="money">
-                                <div class="form-text"><strong>Ex</strong>: 1.599,00</div>
+                                <div class="form-check">
+                                    <label for="to-balance" class="">Vai para o saldo</label>
+                                    <input type="checkbox" id="to-balance" name="to_balance" class="form-check-input"
+                                        @checked(old('to_balance', $debt->to_balance))>
+                                    <div class="d-inline-block px-1 rounded-circle border text-bg-secondary"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-title="Valor da dívida entrará como saldo na conta."
+                                        style="cursor: pointer;">
+                                        <span class="material-symbols-outlined">
+                                            question_mark
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-sm-6">
                                 <h5 class="mb-2">Parcelas <small class="text-muted">(Opcional)</small></h5>
@@ -73,4 +85,12 @@
         </div>
 
     </div><!--end row-->
+@endsection
+
+@section('scripts')
+    <script>
+        window.addEventListener("load", () => {
+            new bootstrap.Tooltip('[data-bs-toggle=tooltip]');
+        });
+    </script>
 @endsection

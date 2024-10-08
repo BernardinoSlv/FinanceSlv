@@ -15,37 +15,17 @@ class DashboardController extends Controller
         /** @var User */
         $user = auth()->user();
 
-        $balance = floatval($user->movements()
-            ->where("type", MovementTypeEnum::IN->value)
-            ->whereNot("movementable_type", Debt::class)
-            ->sum("amount")) - floatval($user->movements()
-            ->where("type", MovementTypeEnum::OUT->value)
-            ->whereNotNull("closed_date")
-            ->whereHasMorph(
-                "movementable",
-                Debt::class,
-                fn(Builder $query) => $query->where("to_balance", 0)
-            )
-            ->sum("amount"));
-
         $totalEntry = (float) $user->movements()
             ->where('type', MovementTypeEnum::IN->value)
-            ->whereNot("movementable_type", Debt::class) // não obter entradas vindo de dívidas
-            ->sum('movements.amount');
+            ->sum('amount');
         $totalExit = (float) $user->movements()
             ->where('type', MovementTypeEnum::OUT->value)
             ->whereNotNull("closed_date")
-            ->whereHasMorph(
-                "movementable",
-                Debt::class,
-                fn(Builder $query) => $query->where("to_balance", 0)
-            )
-            ->sum('movements.amount');
+            ->sum('amount');
         $totalDebts = (float) $user->debts()->sum('debts.amount') - $user->movements()->where([
             'movementable_type' => Debt::class,
             "type" => MovementTypeEnum::OUT->value
         ])
-            ->whereNotNull("closed_date")
             ->sum('movements.amount');
         $totalInOpen = (float) $user->movements()->whereNull("closed_date")->sum(DB::raw("amount + fees_amount"));
 
@@ -108,7 +88,6 @@ class DashboardController extends Controller
             ->get();
 
         return view('dashboard.index', compact(
-            "balance",
             'totalInOpen',
             'totalEntry',
             'totalExit',

@@ -129,7 +129,20 @@ class DebtController extends Controller
         $debt->fill([
             ...$request->validated(),
             'amount' => RealToFloatParser::parse($request->input('amount')),
-        ])->save();
+        ]);
+        if ($debt->isDirty("to_balance")) {
+            if ($debt->to_balance)
+                $debt->movements()->create([
+                    'identifier_id' => $debt->identifier_id,
+                    'user_id' => $debt->user_id,
+                    'type' => MovementTypeEnum::IN->value,
+                    'amount' => $debt->amount,
+                ]);
+            else
+                $debt->movements()->where("type", "in")->delete();
+        }
+
+        $debt->save();
         $debt->movements()->update([
             'identifier_id' => $request->input('identifier_id'),
         ]);
