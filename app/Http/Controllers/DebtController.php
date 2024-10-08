@@ -59,7 +59,6 @@ class DebtController extends Controller
         $debt = new Debt([
             ...$request->validated(),
             'amount' => RealToFloatParser::parse($request->input('amount')),
-            "to_balance" => intval(boolval($request->input("to_balance")))
         ]);
         $debt->user_id = auth()->id();
         $debt->save();
@@ -141,7 +140,6 @@ class DebtController extends Controller
             else
                 $debt->movements()->where("type", "in")->delete();
         }
-
         $debt->save();
         $debt->movements()->update([
             'identifier_id' => $request->input('identifier_id'),

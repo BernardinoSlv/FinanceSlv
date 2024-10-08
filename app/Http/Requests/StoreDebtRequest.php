@@ -44,7 +44,14 @@ class StoreDebtRequest extends FormRequest
                 'date',
                 "after_or_equal:tomorrow"
             ],
-            'to_balance' => ['nullable', 'in:on'],
+            'to_balance' => ['nullable', 'in:0,1'],
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            "to_balance" => intval(boolval($this->to_balance))
+        ]);
     }
 }

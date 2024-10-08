@@ -34,6 +34,14 @@ class UpdateDebtRequest extends FormRequest
             'amount' => ['required', new Amount],
             'installments' => ['nullable', 'integer', 'min:1'],
             'due_date' => ['nullable', 'date'],
+            'to_balance' => ['nullable', 'in:0,1'],
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            "to_balance" => intval(boolval($this->to_balance))
+        ]);
     }
 }
