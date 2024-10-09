@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class DebtControllerTest extends TestCase
@@ -105,6 +106,7 @@ class DebtControllerTest extends TestCase
         $data = Debt::factory()->make([
             'identifier_id' => $user->identifiers->first(),
             'amount' => '200,00',
+            "due_date" => now()->addMonth()->format("Y-m-d")
         ])->toArray();
 
         $this->actingAs($user)->post(route('debts.store'), $data)
@@ -114,6 +116,7 @@ class DebtControllerTest extends TestCase
             ...$data,
             'amount' => 200,
             'user_id' => $user->id,
+            'due_date' => now()->addMonth()->format("Y-m-d")
         ]);
     }
 

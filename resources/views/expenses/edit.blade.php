@@ -45,7 +45,19 @@
                             <div class="col-sm-6">
                                 <h5 class="mb-2">Valor</h5>
                                 <input type="text" name="amount" value="{{ old('amount', $expense->amount) }}"
-                                    class="form-control mb-1" data-js-mask="money">
+                                    class="form-control mb-1" @disabled(old('is_variable', $expense->is_variable)) data-js-mask="money">
+                                <div class="form-check">
+                                    <label for="is-variable" class="">Valor indefinido</label>
+                                    <input type="checkbox" id="is-variable" name="is_variable" class="form-check-input"
+                                        @checked(old('is_variable', $expense->is_variable))>
+                                    <div class="d-inline-block px-1 rounded-circle border text-bg-secondary"
+                                        data-bs-toggle="tooltip" data-bs-title="todo mês tem um valor diferente."
+                                        style="cursor: pointer;">
+                                        <span class="material-symbols-outlined">
+                                            question_mark
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-sm-6">
                                 <h5 class="mb-2">Dia de vencimento</h5>
@@ -67,4 +79,24 @@
         </div>
 
     </div><!--end row-->
+@endsection
+
+@section('scripts')
+    <script>
+        window.addEventListener("load", () => {
+            new bootstrap.Tooltip('[data-bs-toggle=tooltip]');
+
+            const checkboxIsVariable = document.querySelector("#is-variable");
+            const inputAmount = document.querySelector("input[name=amount]");
+
+            checkboxIsVariable.addEventListener("change", () => {
+                if (checkboxIsVariable.checked) {
+                    inputAmount.value = "";
+                    inputAmount.setAttribute("disabled", "");
+                } else {
+                    inputAmount.removeAttribute("disabled");
+                }
+            });
+        });
+    </script>
 @endsection

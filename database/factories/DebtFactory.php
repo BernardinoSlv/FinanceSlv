@@ -24,7 +24,7 @@ class DebtFactory extends Factory
             'title' => fake()->words(3, true),
             'amount' => rand(0, 1000),
             'description' => fake()->text(100),
-            'installments' => null,
+            'installments' => 1,
             'due_date' => null,
         ];
     }

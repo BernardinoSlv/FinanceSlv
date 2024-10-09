@@ -100,8 +100,10 @@ class MovementController extends Controller
             ], 400);
         $movement->fill([
             "fees_amount" => intval($request->fees_amount) ?? null,
-            "closed_date" => intval($request->status) ? now() : null
+            "closed_date" => intval($request->status) ? now() : null,
         ]);
+        if ($movement->movementable->is_variable)
+            $movement->amount = RealToFloatParser::parse($request->input("amount"));
         $movement->save();
 
         return response()->json([

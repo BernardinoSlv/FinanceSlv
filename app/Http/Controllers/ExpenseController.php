@@ -42,7 +42,7 @@ class ExpenseController extends Controller
     {
         $expense = auth()->user()->expenses()->create([
             ...$request->validated(),
-            'amount' => RealToFloatParser::parse($request->amount),
+            'amount' => $request->is_variable ? 0 : RealToFloatParser::parse($request->amount),
         ]);
 
         if (now()->day < $expense->due_day) {

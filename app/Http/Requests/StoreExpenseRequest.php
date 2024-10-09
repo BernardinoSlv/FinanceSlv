@@ -33,8 +33,16 @@ class StoreExpenseRequest extends FormRequest
                 Rule::unique('expenses', 'title')->where('identifier_id', $this->identifier_id),
             ],
             'description' => ['nullable'],
-            'amount' => ['required', new Amount],
+            'amount' => [Rule::requiredIf(!$this->is_variable), new Amount],
             'due_day' => ['required', 'integer', 'min:1', 'max:31'],
+            "is_variable" => ["nullable", "in:0,1"]
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            "is_variable" => intval(boolval($this->is_variable))
+        ]);
     }
 }

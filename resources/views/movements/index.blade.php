@@ -261,6 +261,7 @@
                                                                 'title' => $movement->title . ' ' . $movement->identifier->name,
                                                                 'amount' => number_format($movement->amount, 2, ','),
                                                                 'fees_amount' => number_format($movement->fees_amount, 2, ','),
+                                                                'is_variable' => $movement->movementable->is_variable,
                                                             ]) }}"
                                                             data-bs-toggle="modal" data-bs-target="#modal-edit-in-open">
                                                             Atualizar
@@ -310,7 +311,8 @@
                         </div>
                         <div class="mb-3">
                             <label for="" class="form-label">Valor</label>
-                            <input type="text" class="form-control" id="modal-input-amount" disabled>
+                            <input type="text" name="amount" class="form-control" id="modal-input-amount" data-js-mask="money" disabled>
+                            <div class="invalid-feedback"></div>
                         </div>
                         <div class="mb-3">
                             <label for="" class="form-label">Juros</label>
@@ -349,12 +351,16 @@
             modal.addEventListener("show.bs.modal", (event) => {
                 const config = JSON.parse(event.relatedTarget.getAttribute("data-config"));
                 const form = modal.querySelector("form");
+                const inputAmount = modal.querySelector("#modal-input-amount");
 
                 form.setAttribute("action", config.url);
-
                 modal.querySelector("#modal-input-title").value = config.title;
-                modal.querySelector("#modal-input-amount").value = config.amount;
+                inputAmount.setAttribute("disabled", "");
+                inputAmount.value = config.amount;
                 modal.querySelector("#modal-input-fees-amount").value = config.fees_amount;
+
+                if (config.is_variable)
+                    inputAmount.removeAttribute("disabled");
             });
         });
     </script>

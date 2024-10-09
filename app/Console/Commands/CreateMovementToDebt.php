@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 class CreateMovementToDebt extends Command
 {
@@ -36,16 +37,28 @@ class CreateMovementToDebt extends Command
                         ->whereMonth('effetive_date', now()->month);
                 })
                     ->where('due_date', '>=', now())
-                    ->withSum("movements", "amount");
+                    ->withCount([
+                        "movements" => fn(Builder $query) => $query->withTrashed()
+                            ->where("movements.type", "out")
+                    ])
+                    ->having("movements_count", "<", DB::raw("debts.installments"));
             })
             ->whereHas('debts', function (Builder $query) {
                 $query->whereDoesntHave('movements', function (Builder $query) {
                     $query->withTrashed()->whereYear('effetive_date', now()->year)
                         ->whereMonth('effetive_date', now()->month);
                 })
-                    ->where('due_date', '>=', now());
+                    ->where('due_date', '>=', now())
+                    ->withCount([
+                        "movements" => fn(Builder $query) => $query->withTrashed()
+                            ->where("movements.type", "out")
+                    ])
+                    ->having("movements_count", "<", DB::raw("debts.installments"));
             })
             ->get();
+
+            // if (config("this"))
+            //     dd($users);
 
         foreach ($users as $user) {
             foreach ($user->debts as $debt) {
@@ -55,7 +68,7 @@ class CreateMovementToDebt extends Command
                     'type' => MovementTypeEnum::OUT->value,
                     'effetive_date' => now()->day($debt->due_date->day),
                     'closed_date' => null,
-                    'amount' => ($debt->amount + floatval($debt->movements_sum_amount)) / $debt->installments,
+                    'amount' => floatval($debt->amount) / intval($debt->installments),
                     'fees_amount' => 0,
                 ]);
             }

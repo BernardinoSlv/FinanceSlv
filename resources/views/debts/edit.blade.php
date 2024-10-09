@@ -63,7 +63,8 @@
                             <div class="col-sm-6">
                                 <h5 class="mb-2">Parcelas <small class="text-muted">(Opcional)</small></h5>
                                 <input type="number" name="installments"
-                                    value="{{ old('installments', $debt->installments) }}" class="form-control">
+                                    value="{{ old('installments', $debt->installments) }}" placeholder="Padrão: 1"
+                                    class="form-control">
                             </div>
                             <div class="col-sm-6">
                                 <h5 class="mb-2">Data de vencimento</h5>

@@ -143,6 +143,78 @@ class MovementControllerTest extends TestCase
         });
     }
 
+    /** deve ter status 200 */
+    public function test_update_action_expense_is_variable(): void
+    {
+        $this->travelBack();
+
+        $this->freezeTime(function (Carbon $time): void {
+            $user = User::factory()
+                ->create();
+            Expense::factory()
+                ->has(Movement::factory(null, [
+                    "closed_date" => null,
+                    "user_id" => $user,
+                    "amount" => 0
+                ]))
+                ->create(["user_id" => $user, "is_variable" => 1]);
+            $movement = $user->expenses()->first()->movements->first();
+            $data = [
+                "fees_amount" => "20,00",
+                "status" => 1,
+                "amount" => "100,00"
+            ];
+
+            $this->actingAs($user)->putJson(route("movements.update", $movement), $data)
+                ->assertOk()
+                ->assertJson(
+                    fn(AssertableJson $json) => $json->has("message")
+                );
+            $this->assertDatabaseHas("movements", [
+                "id" => $movement->id,
+                "amount" => 100,
+                "fees_amount" => 20.00,
+                "closed_date" => now()->format("Y-m-d")
+            ]);
+        });
+    }
+
+    /** deve ter status 200 */
+    public function test_update_action_expense_is_not_variable(): void
+    {
+        $this->travelBack();
+
+        $this->freezeTime(function (Carbon $time): void {
+            $user = User::factory()
+                ->create();
+            Expense::factory()
+                ->has(Movement::factory(null, [
+                    "closed_date" => null,
+                    "user_id" => $user,
+                    "amount" => 30
+                ]))
+                ->create(["user_id" => $user, "is_variable" => 0]);
+            $movement = $user->expenses()->first()->movements->first();
+            $data = [
+                "fees_amount" => "20,00",
+                "status" => 1,
+                "amount" => "100,00"
+            ];
+
+            $this->actingAs($user)->putJson(route("movements.update", $movement), $data)
+                ->assertOk()
+                ->assertJson(
+                    fn(AssertableJson $json) => $json->has("message")
+                );
+            $this->assertDatabaseHas("movements", [
+                "id" => $movement->id,
+                "amount" => 30,
+                "fees_amount" => 20.00,
+                "closed_date" => now()->format("Y-m-d")
+            ]);
+        });
+    }
+
     /**
      * deve redirecionar para login
      */

@@ -64,7 +64,6 @@ class ExpenseControllerTest extends TestCase
             ->assertSessionHasErrors([
                 'identifier_id',
                 'title',
-                'amount',
                 'due_day',
             ])
             ->assertSessionDoesntHaveErrors([
@@ -86,7 +85,6 @@ class ExpenseControllerTest extends TestCase
             ->assertFound()
             ->assertSessionHasErrors([
                 'identifier_id',
-
             ])
             ->assertSessionDoesntHaveErrors([
                 'title',
@@ -151,6 +149,32 @@ class ExpenseControllerTest extends TestCase
             'fees_amount' => 0,
             'type' => 'out',
         ])->get());
+    }
+
+    /** deve redirecionar com mensagem de sucesso. */
+    public function test_store_action_with_is_variable_field_as_true(): void
+    {
+        // travando o dia no meio do mês pois será colocado due_day antes do dia
+        $this->travelTo(now()->day(15));
+
+        $user = User::factory()
+            ->has(Identifier::factory())->create();
+        $data = Expense::factory()->make([
+            'amount' => '200,00',
+            'identifier_id' => $user->identifiers->get(0),
+            'due_day' => 1,
+            "is_variable" => "on"
+        ])->toArray();
+
+        $this->actingAs($user)->post(route('expenses.store'), $data)
+            ->assertRedirect(route('expenses.index'))
+            ->assertSessionHas('alert_type', 'success');
+        $this->assertNotNull($expense = Expense::query()->where([
+            ...Arr::except($data, 'user_id'),
+            'amount' => 0,
+            "is_variable" => 1
+        ])->first());
+        $this->assertCount(0, $expense->movements);
     }
 
     /**

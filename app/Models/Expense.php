@@ -18,6 +18,7 @@ class Expense extends Model
         'description',
         'amount',
         'due_day',
+        "is_variable"
     ];
 
     public function user(): BelongsTo

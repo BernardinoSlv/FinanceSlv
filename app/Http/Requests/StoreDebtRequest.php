@@ -33,13 +33,12 @@ class StoreDebtRequest extends FormRequest
             'description' => ['nullable'],
             'amount' => ['required', new Amount],
             'installments' => [
-                "required_with:due_date",
                 "nullable",
                 'integer',
-                'min:2'
+                'min:1'
             ],
             'due_date' => [
-                "required_with:installments",
+                Rule::requiredIf(intval($this->installments) > 1),
                 "nullable",
                 'date',
                 "after_or_equal:tomorrow"
