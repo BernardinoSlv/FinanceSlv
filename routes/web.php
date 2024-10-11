@@ -8,6 +8,7 @@ use App\Http\Controllers\DebtPaymentController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\IdentifierController;
 use App\Http\Controllers\MovementController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\QuickController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -123,6 +124,19 @@ Route::middleware('checkAuth')->group(function () {
             'edit' => 'expenses.edit',
             'update' => 'expenses.update',
             'destroy' => 'expenses.destroy',
+        ]);
+
+    // projects
+    Route::resource('projetos', ProjectController::class)
+        ->parameter('projetos', 'project')
+        ->names([
+            'index' => 'projects.index',
+            'create' => 'projects.create',
+            'store' => 'projects.store',
+            'show' => 'projects.show',
+            'edit' => 'projects.edit',
+            'update' => 'projects.update',
+            'destroy' => 'projects.destroy',
         ]);
 });
 
