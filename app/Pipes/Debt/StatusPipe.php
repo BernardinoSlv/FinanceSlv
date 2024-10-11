@@ -20,6 +20,8 @@ class StatusPipe implements PipeContract
                     select sum(movements.amount) from movements
                     where movements.movementable_type = "App\\\\Models\\\\Debt"
                     and movements.movementable_id = debts.id
+                    and movements.type = "out"
+                    and movements.deleted_at is null
                 )'), '>=', DB::raw('debts.amount'));
                 break;
             case 'paying':
@@ -28,11 +30,15 @@ class StatusPipe implements PipeContract
                         select sum(movements.amount) from movements
                         where movements.movementable_type = "App\\\\Models\\\\Debt"
                         and movements.movementable_id = debts.id
+                        and movements.type = "out"
+                        and movements.deleted_at is null
                     )'), '<', DB::raw('debts.amount'))
                     ->where(DB::raw('(
                         select sum(movements.amount) from movements
                         where movements.movementable_type = "App\\\\Models\\\\Debt"
                         and movements.movementable_id = debts.id
+                        and movements.type = "out"
+                        and movements.deleted_at is null
                     )'), '!=', 0);
                 break;
             case 'no-paying':
@@ -40,7 +46,9 @@ class StatusPipe implements PipeContract
                     select sum(movements.amount) from movements
                     where movements.movementable_type = "App\\\\Models\\\\Debt"
                     and movements.movementable_id = debts.id
-                )'), '=', null);
+                    and movements.type = "out"
+                    and movements.deleted_at is null
+                    )'), '=', null);
                 break;
         }
 

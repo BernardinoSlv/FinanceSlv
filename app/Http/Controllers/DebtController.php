@@ -31,7 +31,10 @@ class DebtController extends Controller
             ->thenReturn()
             ->select('debts.*')
             ->with('identifier')
-            ->withSum('movements', 'amount')
+            ->withSum(
+                ['movements as movements_paid_sum_amount' => fn($query) => $query->whereNotNull("closed_date")->where("type", MovementTypeEnum::OUT->value)],
+                "amount"
+            )
             ->paginate()
             ->withQueryString();
 
@@ -60,12 +63,28 @@ class DebtController extends Controller
         $debt->user_id = auth()->id();
         $debt->save();
 
+        // colocar o saldo na conta
         if ($request->input('to_balance')) {
             $debt->movements()->create([
                 'identifier_id' => $debt->identifier_id,
                 'user_id' => $debt->user_id,
                 'type' => MovementTypeEnum::IN->value,
                 'amount' => $debt->amount,
+            ]);
+        }
+
+        // verifica se o primeiro vencimento ocorre nesse mês
+        if (
+            $request->date("due_date") &&
+            ($dueDate = $request->date("due_date"))->month === now()->month
+        ) {
+            $debt->movements()->create([
+                "type" => MovementTypeEnum::OUT->value,
+                "closed_date" => null,
+                "effetive_date" => $debt->due_date->format("Y-m-d"),
+                "amount" => $debt->amount / $debt->installments,
+                "user_id" => auth()->id(),
+                "identifier_id" => $debt->identifier_id
             ]);
         }
 
@@ -77,9 +96,7 @@ class DebtController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Debt $debt)
-    {
-    }
+    public function show(Debt $debt) {}
 
     /**
      * Show the form for editing the specified resource.
@@ -111,7 +128,19 @@ class DebtController extends Controller
         $debt->fill([
             ...$request->validated(),
             'amount' => RealToFloatParser::parse($request->input('amount')),
-        ])->save();
+        ]);
+        if ($debt->isDirty("to_balance")) {
+            if ($debt->to_balance)
+                $debt->movements()->create([
+                    'identifier_id' => $debt->identifier_id,
+                    'user_id' => $debt->user_id,
+                    'type' => MovementTypeEnum::IN->value,
+                    'amount' => $debt->amount,
+                ]);
+            else
+                $debt->movements()->where("type", "in")->delete();
+        }
+        $debt->save();
         $debt->movements()->update([
             'identifier_id' => $request->input('identifier_id'),
         ]);

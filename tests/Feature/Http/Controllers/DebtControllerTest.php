@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class DebtControllerTest extends TestCase
@@ -105,6 +106,7 @@ class DebtControllerTest extends TestCase
         $data = Debt::factory()->make([
             'identifier_id' => $user->identifiers->first(),
             'amount' => '200,00',
+            "due_date" => now()->addMonth()->format("Y-m-d")
         ])->toArray();
 
         $this->actingAs($user)->post(route('debts.store'), $data)
@@ -112,9 +114,9 @@ class DebtControllerTest extends TestCase
             ->assertSessionHas('alert_type', 'success');
         $this->assertDatabaseHas('debts', [
             ...$data,
-            'due_date' => date('Y-m-d', strtotime($data['due_date'])),
             'amount' => 200,
             'user_id' => $user->id,
+            'due_date' => now()->addMonth()->format("Y-m-d")
         ]);
     }
 
@@ -128,19 +130,78 @@ class DebtControllerTest extends TestCase
             'identifier_id' => $user->identifiers->first(),
             'amount' => '200,00',
         ])->toArray();
-        $data['to_balance'] = 'on';
+        $data["to_balance"] = "on";
+
+        $this->actingAs($user)->post(route('debts.store'), $data)
+            ->assertFound()
+            ->assertSessionHas('alert_type', 'success');
+        $this->assertNotNull($debt = Debt::query()->where([
+            ...$data,
+            'amount' => 200,
+            'user_id' => $user->id,
+            "to_balance" => 1
+        ])->first());
+        $this->assertCount(1, $debt->movements()->where([
+            "type" => "in",
+            "amount" => 200
+        ])->get());
+    }
+
+    /** deve redirecionar com mensagem de sucesso */
+    public function test_store_action_with_installments(): void
+    {
+        $user = User::factory()->has(Identifier::factory())->create();
+        $data = Debt::factory()->make([
+            'identifier_id' => $user->identifiers->first(),
+            'amount' => '200,00',
+            "installments" => 10,
+            "due_date" => now()->addMonth()->format("Y-m-d")
+        ])->toArray();
 
         $this->actingAs($user)->post(route('debts.store'), $data)
             ->assertFound()
             ->assertSessionHas('alert_type', 'success');
         $debt = Debt::query()->where([
-            ...Arr::except($data, ['to_balance']),
-            'due_date' => date('Y-m-d', strtotime($data['due_date'])),
+            ...$data,
+            "due_date" => now()->addMonth()->format("Y-m-d"),
             'amount' => 200,
             'user_id' => $user->id,
         ])->first();
-        $this->assertCount(1, $debt->movements);
-        $this->assertEquals(200, $debt->movements()->where('type', 'in')->first()->amount);
+        $this->assertEquals(10, $debt->installments);
+    }
+
+    /** deve redirecionar com mensagem de sucesso */
+    public function test_store_action_with_installments_and_due_date_in_current_month(): void
+    {
+        $this->travelTo(now()->day(1));
+
+        $user = User::factory()->has(Identifier::factory())->create();
+        $data = Debt::factory()->make([
+            'identifier_id' => $user->identifiers->first(),
+            'amount' => '200,00',
+            "installments" => 10,
+            "due_date" => now()->addDay()->format("Y-m-d")
+        ])->toArray();
+
+        $this->actingAs($user)->post(route('debts.store'), $data)
+            ->assertFound()
+            ->assertSessionHas('alert_type', 'success');
+        $debt = Debt::query()->where([
+            ...$data,
+            "due_date" => now()->addDay()->format("Y-m-d"),
+            'amount' => 200,
+            'user_id' => $user->id,
+        ])->first();
+
+        $this->assertEquals(10, $debt->installments);
+        $this->assertCount(1, $debt->movements()->where([
+            "type" => "out",
+            "amount" => 20,
+            "closed_date" => null,
+            "effetive_date" => now()->day(2)->format("Y-m-d"),
+            "user_id" => $user->id,
+            "identifier_id" => $debt->identifier_id,
+        ])->get());
     }
 
     /**
@@ -269,11 +330,98 @@ class DebtControllerTest extends TestCase
             ->assertSessionHas('alert_type', 'success');
         $this->assertDatabaseHas('debts', [
             ...$data,
-            'due_date' => date('Y-m-d', strtotime($data['due_date'])),
             'amount' => 500,
             'user_id' => $user->id,
             'id' => $debt->id,
         ]);
+    }
+
+    /** deve redirecionar com mensagem de sucesso */
+    public function test_update_action_to_balance_as_true(): void
+    {
+        $user = User::factory()
+            ->has(Identifier::factory())
+            ->has(Debt::factory())
+            ->create();
+        $debt = $user->debts->first();
+        $data = Debt::factory()->make([
+            'identifier_id' => $user->identifiers->first(),
+            'amount' => '500,00',
+            "to_balance" => "on"
+        ])->toArray();
+
+        $this->actingAs($user)->put(route('debts.update', $debt), $data)
+            ->assertRedirect(route('debts.edit', $debt))
+            ->assertSessionHas('alert_type', 'success');
+        $this->assertNotNull($debt = Debt::query()->where([
+            ...$data,
+            'amount' => 500,
+            'user_id' => $user->id,
+            'id' => $debt->id,
+            "to_balance" => 1
+        ])->first());
+        $this->assertCount(
+            1,
+            $debt->movements()->where([
+                "type" => "in",
+                "amount" => 500,
+                "user_id" => $user->id,
+                "effetive_date" => null
+            ])
+                ->whereNotNull("closed_date")
+                ->get()
+        );
+    }
+
+    /** deve redirecionar com mensagem de sucesso */
+    public function test_update_action_to_balance_as_false(): void
+    {
+        $user = User::factory()
+            ->has(Identifier::factory())
+            ->has(Debt::factory(null, ["to_balance" => 1])
+                ->has(
+                    Movement::factory(null)
+                        ->state(
+                            fn(array $attributes, Debt $debt) => [
+                                "user_id" => $debt->user_id,
+                                "identifier_id" => $debt->identifier_id,
+                                "amount" => $debt->amount,
+                                "type" => "in",
+                                "closed_date" => now(),
+                                "effetive_date" => null
+                            ]
+                        )
+                ))
+            ->create();
+        $debt = $user->debts->first();
+        $data = Debt::factory()->make([
+            'identifier_id' => $user->identifiers->first(),
+            'amount' => '500,00',
+            "to_balance" => ""
+        ])->toArray();
+
+        $this->actingAs($user)->put(route('debts.update', $debt), $data)
+            ->assertRedirect(route('debts.edit', $debt))
+            ->assertSessionHas('alert_type', 'success');
+        $this->assertNotNull($debt = Debt::query()->where([
+            ...$data,
+            'amount' => 500,
+            'user_id' => $user->id,
+            'id' => $debt->id,
+            "to_balance" => 0
+        ])->first());
+        $this->assertCount(
+            0,
+            $debt->movements()->where([
+                "type" => "in",
+            ])
+                ->get()
+        );
+        $this->assertSoftDeleted(
+            $debt->movements()
+                ->withTrashed()->where("type", "in")
+                ->first()
+        );
     }
 
     /**

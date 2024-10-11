@@ -26,7 +26,11 @@ class UpdateMovementRequest extends FormRequest
     {
         return [
             'fees_amount' => ["required_without:status", new Amount],
-            "status" => ["required_without:fees_amount", "nullable", "in:0,1"]
+            "status" => ["required_without:fees_amount", "nullable", "in:0,1"],
+            "amount" => [
+                Rule::requiredIf($this->movement->movementable->is_variable),
+                new Amount
+            ]
         ];
     }
 }

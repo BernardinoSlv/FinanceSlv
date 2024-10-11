@@ -96,6 +96,7 @@ class CreateMovementToExpenseTest extends TestCase
 
         $expenses = Expense::factory(2)
             ->has(Movement::factory()
+                ->trashed()
                 ->state([
                     'closed_date' => now()->subDay(),
                     'fees_amount' => 0,
@@ -108,7 +109,7 @@ class CreateMovementToExpenseTest extends TestCase
                 'amount' => 500,
             ]);
         foreach ($expenses as $expense) {
-            $movement = $expense->movements->first();
+            $movement = $expense->movements()->withTrashed()->first();
             $movement->user_id = $expense->user_id;
             $movement->identifier_id = $expense->identifier_id;
             $movement->save();
@@ -119,7 +120,7 @@ class CreateMovementToExpenseTest extends TestCase
         $this->assertDatabaseCount('movements', 2);
         $this->assertCount(
             2,
-            Movement::query()->where([
+            Movement::withTrashed()->where([
                 'movementable_type' => Expense::class,
                 'type' => 'out',
                 'effetive_date' => now()->subDay()->format('Y-m-d'),

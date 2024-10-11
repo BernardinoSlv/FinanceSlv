@@ -203,7 +203,7 @@
                                     <td>{{ $debt->title }}</td>
                                     <td>R$ {{ number_format($debt->amount, 2, ',', '.') }}</td>
                                     <td>
-                                        R$ {{ number_format($debt->movements_sum_amount, 2, ',', '.') }}
+                                        R$ {{ number_format($debt->movements_paid_sum_amount, 2, ',', '.') }}
                                         <br>
 
                                         <div class="progress" style="height: 5px;">
@@ -211,13 +211,13 @@
                                                 'progress-bar',
                                                 'progress-bar-animated',
                                                 'bg-success' =>
-                                                    floatval($debt->movements_sum_amount) >= floatval($debt->amount),
+                                                    floatval($debt->movements_paid_sum_amount) >= floatval($debt->amount),
                                             ]) role="progressbar"
-                                                style="width: {{ intval((100 / $debt->amount) * intval($debt->movements_sum_amount)) }}%;"
+                                                style="width: {{ intval((100 / $debt->amount) * intval($debt->movements_paid_sum_amount)) }}%;"
                                                 aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
                                         </div>
                                         <div class="text-end fw-bold">
-                                            {{ intval((100 / $debt->amount) * intval($debt->movements_sum_amount)) }}%
+                                            {{ intval((100 / $debt->amount) * intval($debt->movements_paid_sum_amount)) }}%
                                         </div>
                                     </td>
                                     <td>{{ $debt->installments }}</td>

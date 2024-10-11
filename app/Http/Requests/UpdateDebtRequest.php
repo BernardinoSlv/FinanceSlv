@@ -32,8 +32,25 @@ class UpdateDebtRequest extends FormRequest
             'title' => ['required_without:identifier_id', 'nullable', 'string', 'between:2,256'],
             'description' => ['nullable'],
             'amount' => ['required', new Amount],
-            'installments' => ['nullable', 'integer', 'min:1'],
-            'due_date' => ['nullable', 'date'],
+            'installments' => [
+                "nullable",
+                'integer',
+                'min:1'
+            ],
+            'due_date' => [
+                Rule::requiredIf(intval($this->installments) > 1),
+                "nullable",
+                'date',
+                "after_or_equal:tomorrow"
+            ],
+            'to_balance' => ['nullable', 'in:0,1'],
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            "to_balance" => intval(boolval($this->to_balance))
+        ]);
     }
 }
