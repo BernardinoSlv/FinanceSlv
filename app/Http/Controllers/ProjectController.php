@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Alert;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ProjectController extends Controller
 {
@@ -12,7 +14,9 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        //
+        $projects = auth()->user()->projects()->paginate();
+
+        return view("projects.index", compact("projects"));
     }
 
     /**
@@ -28,7 +32,20 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $attributes =  $request->validate([
+            "name" => [
+                "required",
+                "max:255",
+                Rule::unique("projects", "name")->where("user_id", auth()->id())
+            ],
+            "description" => ["nullable"]
+        ]);
+        $project = auth()->user()->projects()->create($attributes);
+        Alert::flashSuccess("Projeto criado com sucesso.");
+
+        return response()->json([
+            "message" => "Projeto criado com sucesso."
+        ], 201);
     }
 
     /**

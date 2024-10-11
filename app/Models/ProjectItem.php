@@ -20,4 +20,9 @@ class ProjectItem extends Model
     {
         return $this->belongsTo(Debt::class, "debt_id", "id")->withTrashed();
     }
+
+    public function identifier(): BelongsTo
+    {
+        return $this->belongsTo(Identifier::class, "identifier_id", "id")->withTrashed();
+    }
 }

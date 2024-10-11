@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('project_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId("project_id")->references("id")->on("projects");
+            $table->foreignId("identifier_id")->nullable()->references("id")->on("identifiers");
             $table->foreignId("debt_id")->nullable()->references("id")->on("debts");
             $table->string("name");
             $table->decimal("amount")->default(0);
