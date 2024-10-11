@@ -163,7 +163,7 @@ class CreateMovementToDebtTest extends TestCase
                 "installments" => 10
             ]);
         foreach ($debts as $debt) {
-            $movement = $debt->movements()->update([
+            $debt->movements()->update([
                 "user_id" => $debt->user_id,
                 "identifier_id" => $debt->identifier_id
             ]);
@@ -187,7 +187,6 @@ class CreateMovementToDebtTest extends TestCase
     {
         $this->travelTo(now()->day(10));
 
-        config()->set("this", true);
         $debts = Debt::factory(2)
             ->has(
                 Movement::factory(9)
@@ -212,7 +211,7 @@ class CreateMovementToDebtTest extends TestCase
                 "installments" => 10
             ]);
         foreach ($debts as $debt) {
-            $movement = $debt->movements()->update([
+            $debt->movements()->update([
                 "user_id" => $debt->user_id,
                 "identifier_id" => $debt->identifier_id
             ]);

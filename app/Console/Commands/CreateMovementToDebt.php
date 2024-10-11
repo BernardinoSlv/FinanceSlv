@@ -36,7 +36,7 @@ class CreateMovementToDebt extends Command
                     $query->withTrashed()->whereYear('effetive_date', now()->year)
                         ->whereMonth('effetive_date', now()->month);
                 })
-                    ->where('due_date', '>=', now())
+                    ->whereDay('due_date', '>=', now()->day)
                     ->withCount([
                         "movements" => fn(Builder $query) => $query->withTrashed()
                             ->where("movements.type", "out")
@@ -48,7 +48,7 @@ class CreateMovementToDebt extends Command
                     $query->withTrashed()->whereYear('effetive_date', now()->year)
                         ->whereMonth('effetive_date', now()->month);
                 })
-                    ->where('due_date', '>=', now())
+                    ->whereDay('due_date', '>=', now()->day)
                     ->withCount([
                         "movements" => fn(Builder $query) => $query->withTrashed()
                             ->where("movements.type", "out")
@@ -56,9 +56,6 @@ class CreateMovementToDebt extends Command
                     ->having("movements_count", "<", DB::raw("debts.installments"));
             })
             ->get();
-
-            // if (config("this"))
-            //     dd($users);
 
         foreach ($users as $user) {
             foreach ($user->debts as $debt) {
