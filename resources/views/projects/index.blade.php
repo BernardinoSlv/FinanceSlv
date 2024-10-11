@@ -169,38 +169,25 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($projects as $quick)
+                            @foreach ($projects as $project)
                                 <tr>
                                     <td>
-                                        <strong>{{ $quick->id }}</strong>
+                                        <strong>{{ $project->id }}</strong>
                                     </td>
-                                    <td>{{ $quick->name }}</td>
+                                    <td>{{ $project->name }}</td>
                                     <td>
-                                        {{ $quick->created_at->format('d/m/Y H:i') }}
+                                        {{ $project->created_at->format('d/m/Y H:i') }}
                                     </td>
                                     <td>
-                                        <div class="dropdown">
-                                            <button
-                                                class="btn btn-sm btn-light border dropdown-toggle dropdown-toggle-nocaret"
-                                                type="button" data-bs-toggle="dropdown">
-                                                <i class="bi bi-three-dots"></i>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li>
-                                                    <a class="dropdown-item"
-                                                        href="{{ route('projects.edit', $quick) }}">Editar</a>
-                                                </li>
-                                                <li>
-                                                    <form action="{{ route('projects.destroy', $quick) }}" method="POST"
-                                                        onsubmit="return confirm('O registro será deletado permanentemente!')">
-                                                        @method('DELETE')
-                                                        @csrf
-
-                                                        <button type="submit" class="dropdown-item">Remover</button>
-                                                    </form>
-                                                </li>
-                                            </ul>
-                                        </div>
+                                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#modal-edit"
+                                            data-config="{{ json_encode([
+                                                'name' => $project->name,
+                                                'description' => $project->description,
+                                                'action' => route('projects.update', $project),
+                                            ]) }}">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -216,6 +203,7 @@
 @endsection
 
 @section('modals')
+    {{-- modal create --}}
     <div class="modal" id="modal-create">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -242,4 +230,49 @@
             </div>
         </div>
     </div>
+
+    {{-- modal edit --}}
+    <div class="modal" id="modal-edit">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="text-end mb-4">
+                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="" data-js-component="form-ajax" method="POST">
+                        @method('PUT')
+                        @csrf
+                        <div class="mb-3">
+                            <label for="" class="form-label fw-bold">Nome</label>
+                            <input type="text" name="name" class="form-control">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label fw-bold">Descrição</label>
+                            <textarea name="description" class="form-control"></textarea>
+                        </div>
+                        <div class="text-end">
+                            <button class="btn btn-primary">Enviar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('scripts')
+    <script>
+        window.addEventListener("load", () => {
+            const modalEdit = document.querySelector("#modal-edit");
+
+            modalEdit.addEventListener("show.bs.modal", (event) => {
+                config = JSON.parse(event.relatedTarget.getAttribute("data-config"));
+
+                modalEdit.querySelector("form").setAttribute("action", config.action);
+                modalEdit.querySelector('input[name=name]').value = config.name;
+                modalEdit.querySelector('textarea[name=description]').textContent = config.description;
+            });
+        });
+    </script>
 @endsection
