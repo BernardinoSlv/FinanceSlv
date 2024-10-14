@@ -96,6 +96,12 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        //
+        if (Gate::denies("is-owner", $project))
+            abort(403);
+        $project->delete();
+
+        return redirect()->route("projects.index")->with(
+            Alert::success("Projeto deletado.")
+        );
     }
 }

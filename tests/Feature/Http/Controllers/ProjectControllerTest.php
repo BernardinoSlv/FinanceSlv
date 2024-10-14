@@ -175,4 +175,26 @@ class ProjectControllerTest extends TestCase
             "id" => $project->id
         ])->first());
     }
+
+    /** deve ter status 403 */
+    public function test_destroy_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $project = Project::factory()->create();
+
+        $this->actingAs($user)->delete(route("projects.destroy", $project))
+            ->assertForbidden();
+    }
+
+    /** deve redirecionar com mensagem de sucesso */
+    public function test_destroy_action(): void
+    {
+        $user = User::factory()->create();
+        $project = Project::factory()->for($user)->create();
+
+        $this->actingAs($user)->delete(route("projects.destroy", $project))
+            ->assertRedirect(route("projects.index"))
+            ->assertSessionHas("alert_type", "success");
+        $this->assertSoftDeleted($project);
+    }
 }
