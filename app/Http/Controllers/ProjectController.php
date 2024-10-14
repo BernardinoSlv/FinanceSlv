@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Alert;
 use App\Models\Project;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ProjectController extends Controller
 {
@@ -30,7 +33,7 @@ class ProjectController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $attributes =  $request->validate([
             "name" => [
@@ -51,10 +54,7 @@ class ProjectController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Project $project)
-    {
-        //
-    }
+    public function show(Project $project) {}
 
     /**
      * Show the form for editing the specified resource.
@@ -69,7 +69,26 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
-        //
+        if (Gate::denies("is-owner", $project))
+            throw new HttpException(403, "Não autorizado.");
+
+        $attributes =  $request->validate([
+            "name" => [
+                "required",
+                "max:255",
+                Rule::unique("projects", "name")->where("user_id", auth()->id())
+                    ->ignore($project->id)
+            ],
+            "description" => ["nullable"]
+        ]);
+
+        $project->fill($attributes);
+        $project->save();
+        Alert::flashSuccess("Projeto atualizado.");
+
+        return response()->json([
+            "message" => "Projeto atualizado."
+        ]);
     }
 
     /**

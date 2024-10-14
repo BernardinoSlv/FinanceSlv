@@ -97,4 +97,82 @@ class ProjectControllerTest extends TestCase
             "user_id" => $user->id
         ])->first());
     }
+
+    /** deve ter erro de validação */
+    public function test_update_action_without_data(): void
+    {
+        $user = User::factory()->create();
+        $project = Project::factory()->for($user)->create();
+
+        $this->actingAs($user)->putJson(route("projects.update", $project))
+            ->assertJsonValidationErrors(["name"])
+            ->assertJsonMissingValidationErrors(["description"]);
+    }
+
+    /** deve ter erro de validação  */
+    public function test_update_action_duplicated_name(): void
+    {
+        $user = User::factory()->create();
+        $project = Project::factory()->for($user)->create();
+        $data = Project::factory()->make([
+            "name" => Project::factory()->for($user)->create()->name
+        ])->toArray();
+
+        $this->actingAs($user)->putJson(route("projects.update", $project), $data)
+            ->assertJsonValidationErrors(["name"])
+            ->assertJsonMissingValidationErrors(["description"]);
+    }
+
+    /** deve ter status 403 */
+    public function test_update_action_is_not_owner(): void
+    {
+        $user = User::factory()->create();
+        $project = Project::factory()->create();
+        $data = Project::factory()->make()->toArray();
+
+        $this->actingAs($user)->putJson(route("projects.update", $project), $data)
+            ->assertForbidden();
+    }
+
+    /** deve ter status 200 */
+    public function test_update_action(): void
+    {
+        $user = User::factory()->create();
+        $project = Project::factory()->for($user)->create();
+        $data = Project::factory()->make()->toArray();
+
+        $this->actingAs($user)->putJson(route("projects.update", $project), $data)
+            ->assertOk()
+            ->assertJson([
+                "message" => "Projeto atualizado."
+            ])
+            ->assertSessionHas("alert_type", "success");
+        $this->assertNotNull($updatedProject = Project::query()->where([
+            ...Arr::only($data, ["name", "description"]),
+            "user_id" => $user->id,
+            "id" => $project->id
+        ])->first());
+    }
+
+    /** deve ter status 200 */
+    public function test_update_action_same_name_that_another_user(): void
+    {
+        $user = User::factory()->create();
+        $project = Project::factory()->for($user)->create();
+        $data = Project::factory()->make([
+            "name" => $project->name
+        ])->toArray();
+
+        $this->actingAs($user)->putJson(route("projects.update", $project), $data)
+            ->assertOk()
+            ->assertJson([
+                "message" => "Projeto atualizado."
+            ])
+            ->assertSessionHas("alert_type", "success");
+        $this->assertNotNull($updatedProject = Project::query()->where([
+            ...Arr::only($data, ["name", "description"]),
+            "user_id" => $user->id,
+            "id" => $project->id
+        ])->first());
+    }
 }
