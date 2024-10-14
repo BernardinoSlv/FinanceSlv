@@ -11,6 +11,15 @@ class ProjectItem extends Model
 {
     use HasFactory, HasMovements;
 
+    protected $fillable = [
+        "identifier_id",
+        "debt_id",
+        "name",
+        "amount",
+        "complete",
+        "description",
+    ];
+
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class, "project_id", "id")->withTrashed();

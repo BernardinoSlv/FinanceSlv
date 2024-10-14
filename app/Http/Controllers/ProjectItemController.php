@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Alert;
 use App\Models\Project;
 use App\Models\ProjectItem;
+use App\Rules\Amount;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
+use Src\Parsers\RealToFloatParser;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ProjectItemController extends Controller
 {
@@ -34,9 +40,35 @@ class ProjectItemController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, Project $project): JsonResponse
     {
-        //
+        if (Gate::denies("is-owner", $project))
+            throw new HttpException(403, "Não autorizado.");
+
+        $attributes = $request->validate([
+            "name" => [
+                "required",
+                "max:255",
+                Rule::unique("project_items", "name")->where("project_id", $project->id)
+            ],
+            "identifier_id" => [
+                "nullable",
+                Rule::exists("identifiers", "id")->where("user_id", auth()->id())
+            ],
+            "amount" => ["nullable", new Amount],
+            "description" => ["nullable"]
+        ]);
+
+        $projectItem = $project->items()->create([
+            ...$attributes,
+            "amount" => RealToFloatParser::parse($request->amount),
+            "complete" => 0
+        ]);
+        Alert::flashSuccess("Item criado.");
+
+        return response()->json([
+            "message" => "Item criado."
+        ], 201);
     }
 
     /**
