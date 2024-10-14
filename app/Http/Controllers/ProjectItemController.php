@@ -2,17 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Project;
 use App\Models\ProjectItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class ProjectItemController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Project $project)
     {
-        //
+        if (Gate::denies("is-owner", $project))
+            abort(403);
+
+        $projectItems = $project->items()->with("identifier")->paginate();
+        $identifiers = auth()->user()->identifiers;
+
+        return view("projects.items.index", compact("project", "projectItems", "identifiers"));
     }
 
     /**

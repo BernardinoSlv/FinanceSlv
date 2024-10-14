@@ -6,7 +6,8 @@
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 p-0">
-                    <li class="breadcrumb-item active" aria-current="page">Projetos</li>
+                    <li class="breadcrumb-item">Projeto {{ $project->id }}</li>
+                    <li class="breadcrumb-item active" aria-current="page">Itens</li>
                 </ol>
             </nav>
         </div>
@@ -16,8 +17,8 @@
     @include('includes.alerts')
 
     <div class="product-count d-flex align-items-center gap-3 gap-lg-4 mb-4 fw-bold flex-wrap font-text1">
-        <a href="{{ route('projects.index') }}"><span class="me-1">All</span><span
-                class="text-secondary">({{ $projects->total() }})</span></a>
+        <a href="{{ route('projects.items.index', $project) }}"><span class="me-1">All</span><span
+                class="text-secondary">({{ $projectItems->total() }})</span></a>
         {{-- <a href="javascript:;"><span class="me-1">Published</span><span class="text-secondary">(56242)</span></a>
         <a href="javascript:;"><span class="me-1">Drafts</span><span class="text-secondary">(17)</span></a>
         <a href="javascript:;"><span class="me-1">On Discount</span><span class="text-secondary">(88754)</span></a> --}}
@@ -164,35 +165,50 @@
                             <tr>
                                 <th>#</th>
                                 <th>Nome</th>
-                                <th>Data</th>
+                                <th>Valor</th>
+                                <th>Identificador</th>
+                                <th>Status</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($projects as $project)
+                            @foreach ($projectItems as $projectItem)
                                 <tr>
                                     <td>
-                                        <strong>{{ $project->id }}</strong>
+                                        <strong>{{ $projectItem->id }}</strong>
                                     </td>
-                                    <td>{{ $project->name }}</td>
+                                    <td>{{ $projectItem->name }}</td>
                                     <td>
-                                        {{ $project->created_at->format('d/m/Y H:i') }}
+                                        @if ($projectItem->amount)
+                                            @amount($projectItem->amount)
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($projectItem->complete)
+                                            <p class="text-bg-success">Completo</p>
+                                        @else
+                                            <p class="text-bg-dark">Incompleto</p>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <a href="#">
+                                            {{ $projectItem->identifier?->name }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {{ $projectItem->created_at->format('d/m/Y H:i') }}
                                     </td>
                                     <td class="d-flex gap-1 justify-content-end">
-                                        <a href="{{ route('projects.items.index', $project) }}"
-                                            class="btn btn-secondary btn-sm">
-                                            <i class="bi bi-diagram-3-fill"></i>
-                                        </a>
                                         <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
                                             data-bs-target="#modal-edit"
                                             data-config="{{ json_encode([
-                                                'name' => $project->name,
-                                                'description' => $project->description,
-                                                'action' => route('projects.update', $project),
+                                                'name' => $projectItem->name,
+                                                'description' => $projectItem->description,
+                                                'action' => route('projects.update', $projectItem),
                                             ]) }}">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
-                                        <form action="{{ route('projects.destroy', $project) }}" method="POST">
+                                        <form action="{{ route('projects.destroy', $projectItem) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
 
@@ -210,7 +226,7 @@
             </div>
         </div>
         <div class="card-footer">
-            <x-pagination :paginator="$projects" />
+            <x-pagination :paginator="$projectItems" />
         </div>
     </div>
 @endsection
@@ -224,11 +240,28 @@
                     <div class="text-end mb-4">
                         <button class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <form action="{{ route('projects.store') }}" data-js-component="form-ajax" method="POST">
+                    <form action="{{ route('projects.items.store', $project) }}" data-js-component="form-ajax"
+                        method="POST">
                         @csrf
                         <div class="mb-3">
                             <label for="" class="form-label fw-bold">Nome</label>
                             <input type="text" name="name" class="form-control">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label fw-bold">Valor <small>(opcional)</small></label>
+                            <input type="text" name="amount" class="form-control" data-js-mask="money">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label fw-bold">Identificador
+                                <small>(opcional)</small></label>
+                            <select name="identifier_id" class="form-control">
+                                <option value=""></option>
+                                @foreach ($identifiers as $identifier)
+                                    <option value="{{ $identifier->id }}">{{ $identifier->name }}</option>
+                                @endforeach
+                            </select>
                             <div class="invalid-feedback"></div>
                         </div>
                         <div class="mb-3">
