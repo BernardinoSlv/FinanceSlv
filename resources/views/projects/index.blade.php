@@ -178,7 +178,7 @@
                                     <td>
                                         {{ $project->created_at->format('d/m/Y H:i') }}
                                     </td>
-                                    <td>
+                                    <td class="d-flex gap-1 justify-content-end">
                                         <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
                                             data-bs-target="#modal-edit"
                                             data-config="{{ json_encode([
@@ -188,6 +188,15 @@
                                             ]) }}">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
+                                        <form action="{{ route('projects.destroy', $project) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+
+                                            <button class="btn btn-danger btn-sm" type="submit"
+                                                onclick="return confirm('Tem certeza que deseja deletar?')">
+                                                <i class="bi bi-trash-fill"></i>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             @endforeach
