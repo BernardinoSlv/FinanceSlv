@@ -178,29 +178,31 @@
                                     <td>
                                         {{ $project->created_at->format('d/m/Y H:i') }}
                                     </td>
-                                    <td class="d-flex gap-1 justify-content-end">
-                                        <a href="{{ route('projects.items.index', $project) }}"
-                                            class="btn btn-secondary btn-sm">
-                                            <i class="bi bi-diagram-3-fill"></i>
-                                        </a>
-                                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#modal-edit"
-                                            data-config="{{ json_encode([
-                                                'name' => $project->name,
-                                                'description' => $project->description,
-                                                'action' => route('projects.update', $project),
-                                            ]) }}">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </button>
-                                        <form action="{{ route('projects.destroy', $project) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button class="btn btn-danger btn-sm" type="submit"
-                                                onclick="return confirm('Tem certeza que deseja deletar?')">
-                                                <i class="bi bi-trash-fill"></i>
+                                    <td>
+                                        <div class="d-flex gap-1 justify-content-end">
+                                            <a href="{{ route('projects.items.index', $project) }}"
+                                                class="btn btn-secondary btn-sm">
+                                                <i class="bi bi-diagram-3-fill"></i>
+                                            </a>
+                                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#modal-edit"
+                                                data-config="{{ json_encode([
+                                                    'name' => $project->name,
+                                                    'description' => $project->description,
+                                                    'action' => route('projects.update', $project),
+                                                ]) }}">
+                                                <i class="bi bi-pencil-square"></i>
                                             </button>
-                                        </form>
+                                            <form action="{{ route('projects.destroy', $project) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+
+                                                <button class="btn btn-danger btn-sm" type="submit"
+                                                    onclick="return confirm('Tem certeza que deseja deletar?')">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach

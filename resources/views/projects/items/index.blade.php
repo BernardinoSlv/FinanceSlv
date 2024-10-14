@@ -6,7 +6,11 @@
         <div class="ps-3">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 p-0">
-                    <li class="breadcrumb-item">Projeto {{ $project->id }}</li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ route('projects.index') }}">
+                            Projetos
+                        </a>
+                    </li>
                     <li class="breadcrumb-item active" aria-current="page">Itens</li>
                 </ol>
             </nav>
@@ -184,39 +188,38 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if ($projectItem->complete)
-                                            <p class="text-bg-success">Completo</p>
-                                        @else
-                                            <p class="text-bg-dark">Incompleto</p>
-                                        @endif
-                                    </td>
-                                    <td>
                                         <a href="#">
                                             {{ $projectItem->identifier?->name }}
                                         </a>
                                     </td>
                                     <td>
-                                        {{ $projectItem->created_at->format('d/m/Y H:i') }}
+                                        @if ($projectItem->complete)
+                                            <p class="badge text-bg-success">Completo</p>
+                                        @else
+                                            <p class="badge text-bg-warning">Incompleto</p>
+                                        @endif
                                     </td>
-                                    <td class="d-flex gap-1 justify-content-end">
-                                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#modal-edit"
-                                            data-config="{{ json_encode([
-                                                'name' => $projectItem->name,
-                                                'description' => $projectItem->description,
-                                                'action' => route('projects.update', $projectItem),
-                                            ]) }}">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </button>
-                                        <form action="{{ route('projects.destroy', $projectItem) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button class="btn btn-danger btn-sm" type="submit"
-                                                onclick="return confirm('Tem certeza que deseja deletar?')">
-                                                <i class="bi bi-trash-fill"></i>
+                                    <td>
+                                        <div class="d-flex gap-1 justify-content-end">
+                                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#modal-edit"
+                                                data-config="{{ json_encode([
+                                                    'name' => $projectItem->name,
+                                                    'description' => $projectItem->description,
+                                                    'action' => route('projects.update', $projectItem),
+                                                ]) }}">
+                                                <i class="bi bi-pencil-square"></i>
                                             </button>
-                                        </form>
+                                            <form action="{{ route('projects.destroy', $projectItem) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+
+                                                <button class="btn btn-danger btn-sm" type="submit"
+                                                    onclick="return confirm('Tem certeza que deseja deletar?')">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
