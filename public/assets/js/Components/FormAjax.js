@@ -15,10 +15,11 @@ export default class {
       });
 
       const req = await fetch(url, {headers, body, method: "POST"});
+      let resp = {};
       try {
-        const resp = await req.json();
+        resp = await req.json();
       } catch ($e) {
-        const resp = {};
+        resp = {};
       }
 
       if (req.ok) {

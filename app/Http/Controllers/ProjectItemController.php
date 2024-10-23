@@ -6,6 +6,7 @@ use App\Helpers\Alert;
 use App\Models\Project;
 use App\Models\ProjectItem;
 use App\Rules\Amount;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -23,10 +24,10 @@ class ProjectItemController extends Controller
         if (Gate::denies("is-owner", $project))
             abort(403);
 
-        $projectItems = $project->items()->with("identifier")->paginate();
-        $identifiers = auth()->user()->identifiers;
+        $projectItems = $project->projectItems()
+            ->paginate();
 
-        return view("projects.items.index", compact("project", "projectItems", "identifiers"));
+        return view("projects.items.index", compact("project", "projectItems"));
     }
 
     /**
@@ -51,17 +52,11 @@ class ProjectItemController extends Controller
                 "max:255",
                 Rule::unique("project_items", "name")->where("project_id", $project->id)
             ],
-            "identifier_id" => [
-                "nullable",
-                Rule::exists("identifiers", "id")->where("user_id", auth()->id())
-            ],
-            "amount" => ["nullable", new Amount],
             "description" => ["nullable"]
         ]);
 
-        $projectItem = $project->items()->create([
+        $projectItem = $project->projectItems()->create([
             ...$attributes,
-            "amount" => RealToFloatParser::parse($request->amount),
             "complete" => 0
         ]);
         Alert::flashSuccess("Item criado.");
@@ -90,9 +85,33 @@ class ProjectItemController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, ProjectItem $projectItem)
+    public function update(Request $request, Project $project, ProjectItem $projectItem)
     {
-        //
+        if (Gate::denies("is-owner", $project))
+            throw new HttpException(403, "Não autorizado.");
+
+        $attributes = $request->validate([
+            "name" => [
+                "required",
+                "max:255",
+                Rule::unique("project_items", "name")->where("project_id", $project->id)
+                    ->ignore($projectItem->id)
+            ],
+            "description" => ["nullable"],
+            "complete" => ["nullable", "in:on,1"]
+        ]);
+
+        $projectItem->fill([
+            ...$attributes,
+            "complete" => (int) boolval($request->complete)
+        ]);
+        $projectItem->save();
+
+        Alert::flashSuccess("Item atualizado.");
+
+        return response()->json([
+            "message" => "Item atualizado."
+        ]);
     }
 
     /**

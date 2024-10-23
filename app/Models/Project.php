@@ -22,7 +22,7 @@ class Project extends Model
         return $this->belongsTo(User::class, "user_id", "id");
     }
 
-    public function items(): HasMany
+    public function projectItems(): HasMany
     {
         return $this->hasMany(ProjectItem::class, "project_id", "id");
     }

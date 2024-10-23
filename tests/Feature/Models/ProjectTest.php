@@ -27,17 +27,17 @@ class ProjectTest extends TestCase
     }
 
     /** deve retornar uma coleção vazia */
-    public function test_items_relation_without_items(): void
+    public function test_project_items_relation_without_items(): void
     {
         ProjectItem::factory(2)->create();
 
         $project = Project::factory()->create();
 
-        $this->assertCount(0, $project->items);
+        $this->assertCount(0, $project->projectItems);
     }
 
     /** deve retorn 2 ProjectItem */
-    public function test_items_relation(): void
+    public function test_project_items_relation(): void
     {
         ProjectItem::factory(2)->create();
 
@@ -46,6 +46,6 @@ class ProjectTest extends TestCase
             "project_id" => $project
         ]);
 
-        $this->assertCount(2, $project->items);
+        $this->assertCount(2, $project->projectItems);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Alert;
 use App\Models\Project;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -17,7 +18,13 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = auth()->user()->projects()->paginate();
+        $projects = auth()->user()->projects()
+            ->withCount([
+                "projectItems",
+                "projectItems as completed_project_items_count" => fn(Builder $query) => $query
+                    ->where("complete", 1)
+            ])
+            ->paginate();
 
         return view("projects.index", compact("projects"));
     }

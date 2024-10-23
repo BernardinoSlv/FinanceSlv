@@ -143,7 +143,7 @@ Route::middleware('checkAuth')->group(function () {
     // projects
     Route::resource('projetos.itens', ProjectItemController::class)
         ->parameter('projetos', 'project')
-        ->parameter('itens', 'item')
+        ->parameter('itens', 'projectItem')
         ->names([
             'index' => 'projects.items.index',
             'create' => 'projects.items.create',

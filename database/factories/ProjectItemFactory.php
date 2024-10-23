@@ -21,10 +21,7 @@ class ProjectItemFactory extends Factory
     {
         return [
             "project_id" => Project::factory()->create(),
-            "identifier_id" => null,
-            "debt_id" => null,
             "name" => fake()->word() . time() . rand(0, 1000),
-            "amount" => rand(10, 100),
             "complete" => 0,
             "description" => fake()->text(100)
         ];

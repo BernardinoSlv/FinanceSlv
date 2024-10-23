@@ -164,6 +164,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Nome</th>
+                                <th>Progresso</th>
                                 <th>Data</th>
                                 <th>Ações</th>
                             </tr>
@@ -175,6 +176,11 @@
                                         <strong>{{ $project->id }}</strong>
                                     </td>
                                     <td>{{ $project->name }}</td>
+                                    <th>
+                                        <span class="badge text-bg-primary">
+                                            {{ $project->completed_items_count }} /
+                                            {{ $project->items_count }}</span>
+                                    </th>
                                     <td>
                                         {{ $project->created_at->format('d/m/Y H:i') }}
                                     </td>

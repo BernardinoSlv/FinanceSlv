@@ -169,8 +169,6 @@
                             <tr>
                                 <th>#</th>
                                 <th>Nome</th>
-                                <th>Valor</th>
-                                <th>Identificador</th>
                                 <th>Status</th>
                                 <th>Ações</th>
                             </tr>
@@ -182,16 +180,6 @@
                                         <strong>{{ $projectItem->id }}</strong>
                                     </td>
                                     <td>{{ $projectItem->name }}</td>
-                                    <td>
-                                        @if ($projectItem->amount)
-                                            @amount($projectItem->amount)
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <a href="#">
-                                            {{ $projectItem->identifier?->name }}
-                                        </a>
-                                    </td>
                                     <td>
                                         @if ($projectItem->complete)
                                             <p class="badge text-bg-success">Completo</p>
@@ -206,7 +194,11 @@
                                                 data-config="{{ json_encode([
                                                     'name' => $projectItem->name,
                                                     'description' => $projectItem->description,
-                                                    'action' => route('projects.update', $projectItem),
+                                                    'complete' => $projectItem->complete,
+                                                    'action' => route('projects.items.update', [
+                                                        'project' => $project,
+                                                        'projectItem' => $projectItem,
+                                                    ]),
                                                 ]) }}">
                                                 <i class="bi bi-pencil-square"></i>
                                             </button>
@@ -252,22 +244,6 @@
                             <div class="invalid-feedback"></div>
                         </div>
                         <div class="mb-3">
-                            <label for="" class="form-label fw-bold">Valor <small>(opcional)</small></label>
-                            <input type="text" name="amount" class="form-control" data-js-mask="money">
-                            <div class="invalid-feedback"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="" class="form-label fw-bold">Identificador
-                                <small>(opcional)</small></label>
-                            <select name="identifier_id" class="form-control">
-                                <option value=""></option>
-                                @foreach ($identifiers as $identifier)
-                                    <option value="{{ $identifier->id }}">{{ $identifier->name }}</option>
-                                @endforeach
-                            </select>
-                            <div class="invalid-feedback"></div>
-                        </div>
-                        <div class="mb-3">
                             <label for="" class="form-label fw-bold">Descrição</label>
                             <textarea name="description" class="form-control"></textarea>
                         </div>
@@ -300,6 +276,10 @@
                             <label for="" class="form-label fw-bold">Descrição</label>
                             <textarea name="description" class="form-control"></textarea>
                         </div>
+                        <div class="form-check form-switch">
+                            <input type="checkbox" class="form-check-input" name="complete" id="form-check-complete" />
+                            <label for="form-check-complete" class="form-check-label">completo</label>
+                        </div>
                         <div class="text-end">
                             <button class="btn btn-primary">Enviar</button>
                         </div>
@@ -321,6 +301,8 @@
                 modalEdit.querySelector("form").setAttribute("action", config.action);
                 modalEdit.querySelector('input[name=name]').value = config.name;
                 modalEdit.querySelector('textarea[name=description]').textContent = config.description;
+
+                modalEdit.querySelector("#form-check-complete").checked = config.complete;
             });
         });
     </script>

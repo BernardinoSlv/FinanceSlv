@@ -9,13 +9,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProjectItem extends Model
 {
-    use HasFactory, HasMovements;
+    use HasFactory;
 
     protected $fillable = [
-        "identifier_id",
-        "debt_id",
+        'project_id',
         "name",
-        "amount",
         "complete",
         "description",
     ];
@@ -23,15 +21,5 @@ class ProjectItem extends Model
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class, "project_id", "id")->withTrashed();
-    }
-
-    public function debt(): BelongsTo
-    {
-        return $this->belongsTo(Debt::class, "debt_id", "id")->withTrashed();
-    }
-
-    public function identifier(): BelongsTo
-    {
-        return $this->belongsTo(Identifier::class, "identifier_id", "id")->withTrashed();
     }
 }

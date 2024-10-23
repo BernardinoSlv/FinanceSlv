@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class ProjectItemControllerTest extends TestCase
@@ -38,7 +39,7 @@ class ProjectItemControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $project = Project::factory()->for($user)
-            ->has(ProjectItem::factory(5), "items")
+            ->has(ProjectItem::factory(5))
             ->create();
 
         $this->actingAs($user)->get(route("projects.items.index", $project))
@@ -47,7 +48,6 @@ class ProjectItemControllerTest extends TestCase
             ->assertViewHas([
                 "project",
                 "projectItems",
-                "identifiers"
             ]);
     }
 
@@ -60,35 +60,6 @@ class ProjectItemControllerTest extends TestCase
         $this->actingAs($user)->postJson(route("projects.items.store", $project))
             ->assertJsonValidationErrors([
                 "name",
-            ])
-            ->assertJsonMissingValidationErrors([
-                "identifier_id",
-                "amount",
-                "description"
-            ]);
-    }
-
-    /** deve ter status 422 */
-    public function test_store_action_duplicated_name(): void
-    {
-        $user = User::factory()->create();
-        $project = Project::factory()
-            ->for($user)
-            ->has(ProjectItem::factory(2), "items")
-            ->create();
-        $data = ProjectItem::factory()->make([
-            "name" => $project->items->get(0)->name,
-            "amount" => "500,00"
-        ])->toArray();
-
-        $this->actingAs($user)->postJson(route("projects.items.store", $project), $data)
-            ->assertJsonValidationErrors([
-                "name",
-            ])
-            ->assertJsonMissingValidationErrors([
-                "identifier_id",
-                "amount",
-                "description"
             ]);
     }
 
@@ -98,9 +69,7 @@ class ProjectItemControllerTest extends TestCase
         $user = User::factory()->create();
         $project = Project::factory()
             ->create();
-        $data = ProjectItem::factory()->make([
-            "amount" => "500,00"
-        ])->toArray();
+        $data = ProjectItem::factory()->make()->toArray();
 
         $this->actingAs($user)->postJson(route("projects.items.store", $project), $data)
             ->assertForbidden();
@@ -113,9 +82,7 @@ class ProjectItemControllerTest extends TestCase
         $project = Project::factory()
             ->for($user)
             ->create();
-        $data = ProjectItem::factory()->make([
-            "amount" => "500,00"
-        ])->toArray();
+        $data = ProjectItem::factory()->make()->toArray();
 
         $this->actingAs($user)->postJson(route("projects.items.store", $project), $data)
             ->assertCreated()
@@ -129,23 +96,66 @@ class ProjectItemControllerTest extends TestCase
         ])->first());
     }
 
-    /** deve ter status 201 */
-    public function test_store_action_same_name_that_another_project(): void
+    /** deve ter status 422 */
+    public function test_update_action_without_data(): void
+    {
+        $user = User::factory()
+            ->has(Project::factory()
+                ->has(ProjectItem::factory(2)))
+            ->create();
+        $project = $user->projects->first();
+        $projectItem = $project->projectItems->first();
+
+        $this->actingAs($user)->putJson(route("projects.items.update", [
+            "project" => $project,
+            "projectItem" => $projectItem
+        ]))
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors([
+                "name"
+            ])
+            ->assertJsonMissingValidationErrors([
+                "description"
+            ]);
+    }
+
+    /** deve ter status 403 */
+    public function test_update_action_doesnt_own_from_project(): void
     {
         $user = User::factory()->create();
-        $project = Project::factory()
-            ->for($user)
-            ->create();
-        $data = ProjectItem::factory()->make([
-            "name" => ProjectItem::factory()->create()->name,
-            "amount" => "500,00"
-        ])->toArray();
+        $projectItem = ProjectItem::factory()->create();
+        $data = ProjectItem::factory()->make()->toArray();
 
-        $this->actingAs($user)->postJson(route("projects.items.store", $project), $data)
-            ->assertCreated()
-            ->assertJson([
-                "message" => "Item criado."
-            ])
+        $this->actingAs($user)->putJson(route("projects.items.update", [
+            "project" => $projectItem->project_id,
+            "projectItem" => $projectItem
+        ]), $data)
+            ->assertForbidden();
+    }
+
+    /** deve ter status 200 */
+    public function test_update_action(): void
+    {
+        $user = User::factory()
+            ->has(Project::factory()
+                ->has(ProjectItem::factory(2)))
+            ->create();
+        $project = $user->projects->first();
+        $projectItem = $project->projectItems->first();
+        $data = ProjectItem::factory()->make(["complete" => 1])->toArray();
+
+        $this->actingAs($user)->putJson(route("projects.items.update", [
+            "project" => $project,
+            "projectItem" => $projectItem
+        ]), $data)
+            ->assertOk()
+            ->assertJson(
+                fn(AssertableJson $json) => $json->has("message")
+            )
             ->assertSessionHas("alert_type", "success");
+        $this->assertNotNull($actualProjectItem = ProjectItem::query()->where([
+            ...Arr::except($data, ["project_id"]),
+            "project_id" => $project->id
+        ])->first());
     }
 }
