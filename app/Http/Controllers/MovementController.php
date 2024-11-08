@@ -98,8 +98,9 @@ class MovementController extends Controller
             return response()->json([
                 "message" => "Não é permitido atualizar movimentações já fechadas."
             ], 400);
+
         $movement->fill([
-            "fees_amount" => intval($request->fees_amount) ?? null,
+            "fees_amount" => $request->fees_amount ? RealToFloatParser::parse($request->fees_amount) : null,
             "closed_date" => intval($request->status) ? now() : null,
         ]);
         if ($movement->movementable->is_variable)

@@ -51,7 +51,7 @@ class OrderByPipe implements PipeContract
                 break;
             default:
                 $query->orderBy(
-                    DB::raw('COALESCE(movements.closed_date, movements.effetive_date)'),
+                    DB::raw('COALESCE(movements.closed_date, now(), movements.effetive_date)'),
                     $orderType
                 );
         }

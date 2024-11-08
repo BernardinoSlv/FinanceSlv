@@ -117,7 +117,7 @@ class DebtPaymentControllerTest extends TestCase
     public function test_store_acton_is_not_owner(): void
     {
         $user = User::factory()->create();
-        $debt = Debt::factory()->create();
+        $debt = Debt::factory()->create(["amount" => 1000]);
         $data = Movement::factory()->make([
             'amount' => '39,90',
         ])->toArray();

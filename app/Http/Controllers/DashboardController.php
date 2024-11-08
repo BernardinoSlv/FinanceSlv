@@ -17,11 +17,11 @@ class DashboardController extends Controller
 
         $totalEntry = (float) $user->movements()
             ->where('type', MovementTypeEnum::IN->value)
-            ->sum('amount');
+            ->sum("amount");
         $totalExit = (float) $user->movements()
             ->where('type', MovementTypeEnum::OUT->value)
             ->whereNotNull("closed_date")
-            ->sum('amount');
+            ->sum(DB::raw('amount + fees_amount'));
         $totalDebts = (float) $user->debts()->sum('debts.amount') - $user->movements()->where([
             'movementable_type' => Debt::class,
             "type" => MovementTypeEnum::OUT->value
@@ -41,7 +41,7 @@ class DashboardController extends Controller
             ) as entry_amount,
             sum(
                 case
-                    when movements.type = "out" then amount
+                    when movements.type = "out" then amount + fees_amount
                     else 0
                 end
             ) as exit_amount'))
@@ -70,7 +70,13 @@ class DashboardController extends Controller
                 }],
                 'amount'
             )
-            ->orderBy('movements_sum_amount', 'desc')
+            ->withSum(
+                ['movements' => function (Builder $query) {
+                    $query->where('movements.type', MovementTypeEnum::OUT->value);
+                }],
+                'fees_amount'
+            )
+            ->orderBy(DB::raw('movements_sum_amount + movements_sum_fees_amount'), 'desc')
             ->limit(5)
             ->get();
         $topDebts = $user->debts()

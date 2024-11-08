@@ -596,6 +596,16 @@
                         <div class="menu-title">Movimentações</div>
                     </a>
                 </li>
+                <li class="menu-label">Meus</li>
+                <li>
+                    <a href="{{ route('projects.index') }}" class="">
+                        <div class="parent-icon"><span class="material-symbols-outlined">
+                                menu_book
+                            </span>
+                        </div>
+                        <div class="menu-title">Projetos</div>
+                    </a>
+                </li>
                 {{-- <li>
                     <a href="javascript:;" class="has-arrow">
                         <div class="parent-icon"><span class="material-symbols-outlined ">
