@@ -75,4 +75,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Expense::class, 'user_id', 'id');
     }
+
+    public function projects(): HasMany
+    {
+        return $this->hasMany(Project::class, "user_id", "id");
+    }
 }

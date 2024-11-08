@@ -7,6 +7,7 @@ use App\Models\Expense;
 use App\Models\File;
 use App\Models\Identifier;
 use App\Models\Movement;
+use App\Models\Project;
 use App\Models\Quick;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -199,8 +200,29 @@ class UserTest extends TestCase
         $this->assertCount(
             2,
             $user->expenses->filter(
-                fn (Expense $expense) => in_array($expense->id, [$expenses->get(0)->id, $expenses->get(1)->id])
+                fn(Expense $expense) => in_array($expense->id, [$expenses->get(0)->id, $expenses->get(1)->id])
             )
         );
+    }
+
+    /** deve retornar um coleção vazia */
+    public function test_projects_relation_missing_projects(): void
+    {
+        Project::factory(2)->create();
+
+        $user = User::factory()->create();
+
+        $this->assertCount(0, $user->projects);
+    }
+
+    /** deve retornar 3 Project  */
+    public function test_projects_relation(): void
+    {
+        Project::factory(2)->create();
+
+        $user = User::factory()->create();
+        Project::factory(3)->create(["user_id" => $user]);
+
+        $this->assertCount(3, $user->projects);
     }
 }

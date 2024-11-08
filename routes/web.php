@@ -8,7 +8,10 @@ use App\Http\Controllers\DebtPaymentController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\IdentifierController;
 use App\Http\Controllers\MovementController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectItemController;
 use App\Http\Controllers\QuickController;
+use App\Models\ProjectItem;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -124,6 +127,33 @@ Route::middleware('checkAuth')->group(function () {
             'update' => 'expenses.update',
             'destroy' => 'expenses.destroy',
         ]);
+
+    // projects
+    Route::resource('projetos', ProjectController::class)
+        ->parameter('projetos', 'project')
+        ->names([
+            'index' => 'projects.index',
+            'create' => 'projects.create',
+            'store' => 'projects.store',
+            'show' => 'projects.show',
+            'edit' => 'projects.edit',
+            'update' => 'projects.update',
+            'destroy' => 'projects.destroy',
+        ]);
+    // projects
+    Route::resource('projetos.itens', ProjectItemController::class)
+        ->parameter('projetos', 'project')
+        ->parameter('itens', 'projectItem')
+        ->names([
+            'index' => 'projects.items.index',
+            'create' => 'projects.items.create',
+            'store' => 'projects.items.store',
+            'show' => 'projects.items.show',
+            'edit' => 'projects.items.edit',
+            'update' => 'projects.items.update',
+            'destroy' => 'projects.items.destroy',
+        ])
+        ->scoped();
 });
 
 

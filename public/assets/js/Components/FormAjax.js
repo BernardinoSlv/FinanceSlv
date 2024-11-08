@@ -15,7 +15,12 @@ export default class {
       });
 
       const req = await fetch(url, {headers, body, method: "POST"});
-      const resp = await req.json();
+      let resp = {};
+      try {
+        resp = await req.json();
+      } catch ($e) {
+        resp = {};
+      }
 
       if (req.ok) {
         document.location.reload();
