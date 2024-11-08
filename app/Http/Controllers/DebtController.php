@@ -56,9 +56,11 @@ class DebtController extends Controller
      */
     public function store(StoreDebtRequest $request)
     {
+
         $debt = new Debt([
             ...$request->validated(),
             'amount' => RealToFloatParser::parse($request->input('amount')),
+            'installments' => intval($request->installments) > 0 ? $request->installments : 1,
         ]);
         $debt->user_id = auth()->id();
         $debt->save();
@@ -139,6 +141,13 @@ class DebtController extends Controller
                 ]);
             else
                 $debt->movements()->where("type", "in")->delete();
+        }
+
+        // atualiza o valor da entrada
+        if ($debt->to_balance) {
+            $debt->movements()->where("type", "in")->update([
+                "amount" => $debt->amount
+            ]);
         }
         $debt->save();
         $debt->movements()->update([

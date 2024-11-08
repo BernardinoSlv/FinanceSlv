@@ -203,7 +203,7 @@
                                 <div class="flex-grow-1">
                                     <h6 class="mb-1 fw-bold">{{ $identifier->name }}</h6>
                                     <span
-                                        class="badge bg-danger bg-danger-subtle text-danger border border-opacity-25 border-danger fw-bold">@amount($identifier->movements_sum_amount)</span>
+                                        class="badge bg-danger bg-danger-subtle text-danger border border-opacity-25 border-danger fw-bold">@amount($identifier->movements_sum_amount + floatval($identifier->movements_sum_fees_amount))</span>
                                 </div>
                             </div>
                             <hr>
