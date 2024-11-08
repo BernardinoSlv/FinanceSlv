@@ -158,4 +158,38 @@ class ProjectItemControllerTest extends TestCase
             "project_id" => $project->id
         ])->first());
     }
+
+    /** deve ter status 403 */
+    public function test_destroy_action_is_not_owner(): void
+    {
+        $projectItem = ProjectItem::factory()->create();
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->delete(route("projects.items.destroy", [
+            "project" => $projectItem->project,
+            "projectItem" => $projectItem
+        ]))
+            ->assertForbidden();
+    }
+
+    /** deve redirecionar com mensagem de sucesso */
+    public function test_destroy_action(): void
+    {
+        $user = User::factory()->create();
+        $project = Project::factory()
+            ->for($user)
+            ->has(ProjectItem::factory())
+            ->create();
+
+        $this->actingAs($user)->delete(route("projects.items.destroy", [
+            "project" => $project,
+            "projectItem" => $project->projectItems->first()
+        ]))
+            ->assertRedirect(route("projects.items.index", $project))
+            ->assertSessionHas("alert_type", "success");
+
+        $this->assertDatabaseMissing("project_items", [
+            "id" => $project->projectItems->first()->id
+        ]);
+    }
 }

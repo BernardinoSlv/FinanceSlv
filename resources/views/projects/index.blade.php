@@ -177,9 +177,10 @@
                                     </td>
                                     <td>{{ $project->name }}</td>
                                     <th>
-                                        <span class="badge text-bg-primary">
-                                            {{ $project->completed_items_count }} /
-                                            {{ $project->items_count }}</span>
+                                        <span class="badge text-bg-primary" style="scale: 1.3">
+
+                                            {{ intval($project->completed_project_items_count) }} /
+                                            {{ intval($project->project_items_count) }}</span>
                                     </th>
                                     <td>
                                         {{ $project->created_at->format('d/m/Y H:i') }}

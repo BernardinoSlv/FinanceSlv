@@ -202,7 +202,9 @@
                                                 ]) }}">
                                                 <i class="bi bi-pencil-square"></i>
                                             </button>
-                                            <form action="{{ route('projects.destroy', $projectItem) }}" method="POST">
+                                            <form action="{{ route('projects.items.destroy', [
+                                            "project" => $project,
+                                            "projectItem" => $projectItem]) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
 

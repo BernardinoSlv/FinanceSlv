@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Validation\Rule;
 use Src\Parsers\RealToFloatParser;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -117,8 +118,13 @@ class ProjectItemController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ProjectItem $projectItem)
+    public function destroy(Project $project, ProjectItem $projectItem)
     {
-        //
+        if (Gate::denies("is-owner", $project))
+            abort(403);
+        $projectItem->forceDelete();
+
+        return redirect()->route("projects.items.index", $project)
+            ->with(Alert::success("Item removido."));
     }
 }
