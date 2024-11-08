@@ -213,11 +213,11 @@
                                                 'bg-success' =>
                                                     floatval($debt->movements_paid_sum_amount) >= floatval($debt->amount),
                                             ]) role="progressbar"
-                                                style="width: {{ intval((100 / ($debt->amount ?? 1)) * intval($debt->movements_paid_sum_amount)) }}%;"
+                                                style="width: {{ floatval((100 / ($debt->amount ?? 1)) * floatval($debt->movements_paid_sum_amount)) }}%;"
                                                 aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
                                         </div>
                                         <div class="text-end fw-bold">
-                                            {{ intval((100 / ($debt->amount ?? 1)) * intval($debt->movements_paid_sum_amount)) }}%
+                                            {{ floatval((100 / ($debt->amount ?? 1)) * floatval($debt->movements_paid_sum_amount)) }}%
                                         </div>
                                     </td>
                                     <td>{{ $debt->installments }}</td>
