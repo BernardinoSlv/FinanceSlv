@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers;
 
+use App\Enums\LogTypeEnum;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -75,6 +76,7 @@ class AuthControllerTest extends TestCase
         $this->post(route("auth.attempt"), ["email" => $user->email, "password" => "password"])
             ->assertRedirect(route("dashboard.index"));
         $this->assertAuthenticated();
+        $this->assertCount(1, $user->logs()->where("type", LogTypeEnum::INFO->value)->get());
     }
 
     /** deve redirecionar para dashboard */
@@ -134,6 +136,7 @@ class AuthControllerTest extends TestCase
             ->assertRedirect(route("auth.index"))
             ->assertSessionHas("message_type", "success");
         $this->assertNotNull($user = User::query()->where(Arr::only($data, ["name", "email"]))->first());
+        $this->assertCount(1, $user->logs()->where("type", LogTypeEnum::INFO->value)->get());
     }
 
     /** deve redirecionar para página de login  */

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\LogTypeEnum;
 use App\Support\Message;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryContract;
@@ -38,6 +39,13 @@ class AuthController extends Controller
             )->withInput();
         }
 
+        /** @var User */
+        $user = auth()->user();
+        $user->logs()->create([
+            "type" => LogTypeEnum::INFO->value,
+            "description" => "Login realizado.",
+        ]);
+
         return redirect()->route('dashboard.index');
     }
 
@@ -60,7 +68,12 @@ class AuthController extends Controller
             'terms' => ['required'],
         ]);
 
-        User::query()->create($data);
+        $user = User::query()->create($data);
+        $user->logs()->create([
+            "user_id" => $user->id,
+            "type" => LogTypeEnum::INFO->value,
+            "description" => "Cadastro realizado."
+        ]);
 
         return redirect()->route('auth.index')->with(
             Message::success('Cadastro realizado com sucesso.')
