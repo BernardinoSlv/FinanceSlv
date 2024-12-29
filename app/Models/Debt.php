@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Models\Traits\HasLogs;
 use App\Support\Models\Traits\HasMovements as TraitsHasMovements;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Debt extends Model
 {
-    use HasFactory, SoftDeletes, TraitsHasMovements;
+    use HasFactory, SoftDeletes, TraitsHasMovements, HasLogs;
 
     protected $fillable = [
         'identifier_id',

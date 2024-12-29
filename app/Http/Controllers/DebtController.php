@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\LogTypeEnum;
 use App\Enums\MovementTypeEnum;
 use App\Support\Message;
 use App\Http\Requests\StoreDebtRequest;
@@ -90,6 +91,11 @@ class DebtController extends Controller
             ]);
         }
 
+        $debt->logs()->create([
+            "type" => LogTypeEnum::CREATE->value,
+            "description" => "Dívida criada."
+        ]);
+
         return redirect()->route('debts.index')->with(
             Message::success('Dívida criada com sucesso.')
         );
@@ -155,6 +161,11 @@ class DebtController extends Controller
         ]);
         DB::commit();
 
+        $debt->logs()->create([
+            "type" => LogTypeEnum::UPDATE->value,
+            "description" => "Dívida atualizada."
+        ]);
+
         return redirect()->route('debts.edit', $debt)
             ->with(Message::success('Dívida atualizada com sucesso.'));
     }
@@ -167,6 +178,11 @@ class DebtController extends Controller
         if (Gate::denies('is-owner', $debt)) {
             abort(403);
         }
+
+        $debt->logs()->create([
+            "type" => LogTypeEnum::DELETE->value,
+            "description" => "Dívida deletada."
+        ]);
 
         $debt->delete();
         $debt->movements()->delete();

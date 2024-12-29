@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers;
 
+use App\Enums\LogTypeEnum;
 use App\Models\Debt;
 use App\Models\Identifier;
 use App\Models\Movement;
@@ -112,12 +113,13 @@ class DebtControllerTest extends TestCase
         $this->actingAs($user)->post(route('debts.store'), $data)
             ->assertFound()
             ->assertSessionHas('message_type', 'success');
-        $this->assertDatabaseHas('debts', [
+        $this->assertNotNull($debt = Debt::query()->where([
             ...$data,
             'amount' => 200,
             'user_id' => $user->id,
             'due_date' => now()->addMonth()->format("Y-m-d")
-        ]);
+        ])->first());
+        $this->assertCount(1, $debt->logs()->where("type", LogTypeEnum::CREATE->value)->get());
     }
 
     /**
@@ -328,12 +330,13 @@ class DebtControllerTest extends TestCase
         $this->actingAs($user)->put(route('debts.update', $debt), $data)
             ->assertRedirect(route('debts.edit', $debt))
             ->assertSessionHas('message_type', 'success');
-        $this->assertDatabaseHas('debts', [
+        $this->assertNotNull($debt = Debt::query()->where([
             ...$data,
             'amount' => 500,
             'user_id' => $user->id,
             'id' => $debt->id,
-        ]);
+        ])->first());
+        $this->assertCount(1, $debt->logs()->where("type", LogTypeEnum::UPDATE->value)->get());
     }
 
     /** deve redirecionar com mensagem de sucesso */
@@ -506,6 +509,7 @@ class DebtControllerTest extends TestCase
             ->assertRedirect(route('debts.index'))
             ->assertSessionHas('message_type', 'success');
         $this->assertSoftDeleted($debt);
+        $this->assertCount(1, $debt->logs()->where("type", LogTypeEnum::DELETE->value)->get());
     }
 
     /**
