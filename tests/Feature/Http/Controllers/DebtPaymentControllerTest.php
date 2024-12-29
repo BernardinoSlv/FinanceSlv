@@ -140,7 +140,7 @@ class DebtPaymentControllerTest extends TestCase
         $this->actingAs($user)->postJson(route('debts.payments.store', $debt), $data)
             ->assertUnprocessable()
             ->assertJson(
-                fn (AssertableJson $json) => $json->has('message')
+                fn(AssertableJson $json) => $json->has('message')
                     ->where('errors.amount', ['O valor do pagamento excedeu o total da dívida.'])
             );
     }
@@ -337,7 +337,7 @@ class DebtPaymentControllerTest extends TestCase
         ]), $data)
             ->assertUnprocessable()
             ->assertJson(
-                fn (AssertableJson $json) => $json->has('message')
+                fn(AssertableJson $json) => $json->has('message')
                     ->where('errors.amount', ['O valor do pagamento excedeu o total da dívida.'])
             );
     }
@@ -494,7 +494,7 @@ class DebtPaymentControllerTest extends TestCase
             'movement' => $movement,
         ]))
             ->assertRedirect(route('debts.payments.index', $debt))
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $this->assertSoftDeleted($movement);
     }
 }

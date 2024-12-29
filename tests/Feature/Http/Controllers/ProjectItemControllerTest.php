@@ -89,7 +89,7 @@ class ProjectItemControllerTest extends TestCase
             ->assertJson([
                 "message" => "Item criado."
             ])
-            ->assertSessionHas("alert_type", "success");
+            ->assertSessionHas("message_type", "success");
         $this->assertNotNull($projectItem = ProjectItem::query()->where([
             ...Arr::except($data, ["amount", "project_id"]),
             "project_id" => $project->id,
@@ -152,7 +152,7 @@ class ProjectItemControllerTest extends TestCase
             ->assertJson(
                 fn(AssertableJson $json) => $json->has("message")
             )
-            ->assertSessionHas("alert_type", "success");
+            ->assertSessionHas("message_type", "success");
         $this->assertNotNull($actualProjectItem = ProjectItem::query()->where([
             ...Arr::except($data, ["project_id"]),
             "project_id" => $project->id
@@ -186,7 +186,7 @@ class ProjectItemControllerTest extends TestCase
             "projectItem" => $project->projectItems->first()
         ]))
             ->assertRedirect(route("projects.items.index", $project))
-            ->assertSessionHas("alert_type", "success");
+            ->assertSessionHas("message_type", "success");
 
         $this->assertDatabaseMissing("project_items", [
             "id" => $project->projectItems->first()->id

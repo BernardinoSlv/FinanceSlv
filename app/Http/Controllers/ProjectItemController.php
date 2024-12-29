@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\Alert;
+use App\Support\Message;
 use App\Models\Project;
 use App\Models\ProjectItem;
 use App\Rules\Amount;
@@ -60,7 +60,7 @@ class ProjectItemController extends Controller
             ...$attributes,
             "complete" => 0
         ]);
-        Alert::flashSuccess("Item criado.");
+        Message::flashSuccess("Item criado.");
 
         return response()->json([
             "message" => "Item criado."
@@ -108,7 +108,7 @@ class ProjectItemController extends Controller
         ]);
         $projectItem->save();
 
-        Alert::flashSuccess("Item atualizado.");
+        Message::flashSuccess("Item atualizado.");
 
         return response()->json([
             "message" => "Item atualizado."
@@ -125,6 +125,6 @@ class ProjectItemController extends Controller
         $projectItem->forceDelete();
 
         return redirect()->route("projects.items.index", $project)
-            ->with(Alert::success("Item removido."));
+            ->with(Message::success("Item removido."));
     }
 }

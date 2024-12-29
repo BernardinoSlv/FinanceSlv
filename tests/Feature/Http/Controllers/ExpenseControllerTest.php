@@ -112,7 +112,7 @@ class ExpenseControllerTest extends TestCase
 
         $this->actingAs($user)->post(route('expenses.store'), $data)
             ->assertRedirect(route('expenses.index'))
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $this->assertNotNull($expense = Expense::query()->where([
             ...Arr::except($data, 'user_id'),
             'amount' => 200,
@@ -137,7 +137,7 @@ class ExpenseControllerTest extends TestCase
         ])->toArray();
         $this->actingAs($user)->post(route('expenses.store'), $data)
             ->assertRedirect(route('expenses.index'))
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $expense = Expense::query()->where([
             ...Arr::except($data, 'user_id'),
             'amount' => 200,
@@ -168,7 +168,7 @@ class ExpenseControllerTest extends TestCase
 
         $this->actingAs($user)->post(route('expenses.store'), $data)
             ->assertRedirect(route('expenses.index'))
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $this->assertNotNull($expense = Expense::query()->where([
             ...Arr::except($data, 'user_id'),
             'amount' => 0,
@@ -266,7 +266,7 @@ class ExpenseControllerTest extends TestCase
         $expense->refresh();
         $this->actingAs($user)->put(route('expenses.update', $expense), $data)
             ->assertRedirect(route('expenses.edit', $expense))
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $this->assertDatabaseHas('expenses', [
             ...Arr::except($data, ['user_id']),
             'amount' => 500.00,
@@ -294,7 +294,7 @@ class ExpenseControllerTest extends TestCase
         ])->toArray();
 
         $this->actingAs($user)->put(route('expenses.update', $expense), $data)
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $this->assertCount(1, $expense->movements);
         $this->assertCount(1, $expense->movements()->where([
             'identifier_id' => $data['identifier_id'],
@@ -339,7 +339,7 @@ class ExpenseControllerTest extends TestCase
         ])->toArray();
 
         $this->actingAs($user)->put(route('expenses.update', $expense), $data)
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $expense->refresh();
         $this->assertCount(1, $expense->movements);
         $this->assertEquals($movement->id, $expense->movements->first()->id);
@@ -379,7 +379,7 @@ class ExpenseControllerTest extends TestCase
         ])->toArray();
 
         $this->actingAs($user)->put(route('expenses.update', $expense), $data)
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $expense->refresh();
         $this->assertCount(1, $expense->movements()->withTrashed()->get());
         $this->assertEquals($movement->id, $expense->movements()->withTrashed()->first()->id);
@@ -417,7 +417,7 @@ class ExpenseControllerTest extends TestCase
         ])->toArray();
 
         $this->actingAs($user)->put(route('expenses.update', $expense), $data)
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $expense->refresh();
         $this->assertCount(1, $expense->movements);
         $this->assertEquals($movement->id, $expense->movements->first()->id);
@@ -453,7 +453,7 @@ class ExpenseControllerTest extends TestCase
         ])->toArray();
 
         $this->actingAs($user)->put(route('expenses.update', $expense), $data)
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $expense->refresh();
         $this->assertCount(1, $expense->movements);
         $this->assertEquals($movement->id, $expense->movements->first()->id);
@@ -489,7 +489,7 @@ class ExpenseControllerTest extends TestCase
         ])->toArray();
 
         $this->actingAs($user)->put(route('expenses.update', $expense), $data)
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $expense->refresh();
         $this->assertCount(2, $expense->movements);
         $this->assertCount(
@@ -528,7 +528,7 @@ class ExpenseControllerTest extends TestCase
 
         $this->actingAs($user)->delete(route('expenses.destroy', $expense))
             ->assertRedirect(route('expenses.index'))
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $this->assertSoftDeleted($expense);
     }
 
@@ -545,7 +545,7 @@ class ExpenseControllerTest extends TestCase
 
         $this->actingAs($user)->delete(route('expenses.destroy', $expense))
             ->assertRedirect(route('expenses.index'))
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $expense->refresh();
         $this->assertSoftDeleted($expense);
         $this->assertCount(2, $expense->movements);

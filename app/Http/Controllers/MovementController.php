@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\MovementableEnum;
-use App\Helpers\Alert;
+use App\Support\Message;
 use App\Http\Requests\StoreMovementRequest;
 use App\Http\Requests\UpdateMovementRequest;
 use App\Models\Debt;
@@ -129,6 +129,6 @@ class MovementController extends Controller
         }
 
         return redirect()->route('movements.index')
-            ->with(Alert::success('Movimentação deletada com sucesso.'));
+            ->with(Message::success('Movimentação deletada com sucesso.'));
     }
 }

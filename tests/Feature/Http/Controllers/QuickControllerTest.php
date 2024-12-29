@@ -160,7 +160,7 @@ class QuickControllerTest extends TestCase
 
         $this->actingAs($user)->post(route('quicks.store'), $data)
             ->assertRedirect(route('quicks.index'))
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
 
         $this->assertDatabaseHas('quicks', [
             ...Arr::except($data, ['type', 'amount']),
@@ -236,7 +236,7 @@ class QuickControllerTest extends TestCase
             ->assertOk()
             ->assertViewIs('quicks.edit')
             ->assertViewHas('identifiers')
-            ->assertViewHas('quick', fn (Quick $actualQuick): bool => $quick->id === $actualQuick->id);
+            ->assertViewHas('quick', fn(Quick $actualQuick): bool => $quick->id === $actualQuick->id);
     }
 
     /**deve redirecionar para login */
@@ -312,7 +312,7 @@ class QuickControllerTest extends TestCase
 
         $this->actingAs($user)->put(route('quicks.update', $quick), $data)
             ->assertRedirectToRoute('quicks.edit', $quick)
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $this->assertDatabaseHas('quicks', [
             'id' => $quick->id,
             ...Arr::only($data, ['identifier_id', 'title', 'description']),
@@ -377,7 +377,7 @@ class QuickControllerTest extends TestCase
 
         $this->actingAs($user)->delete(route('quicks.destroy', $quick))
             ->assertRedirect(route('quicks.index'))
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $this->assertSoftDeleted($quick);
         $this->assertSoftDeleted($movement);
     }

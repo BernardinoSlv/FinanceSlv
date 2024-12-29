@@ -40,7 +40,7 @@
                     <div class="form-text">Deve conter no mínimo 8 caracteres</div>
                 </div>
                 <div class="mb-3 form-floating">
-                    <input type="password" name="confirm_password" class="form-control" placeholder="">
+                    <input type="password" name="password_confirmation" class="form-control" placeholder="">
                     <label for="">Confirme sua senha</label>
                 </div>
                 <div class="mb-3 form-check">
@@ -52,7 +52,7 @@
                     <button class="btn btn-primary">Cadastrar</button>
                 </div>
             </form>
-            <p>Já tem conta? <a href="{{ route("auth.index") }}">clique aqui</a></p>
+            <p>Já tem conta? <a href="{{ route('auth.index') }}">clique aqui</a></p>
         </div>
     </div>
 

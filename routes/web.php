@@ -31,7 +31,7 @@ Route::controller(AuthController::class)
     ->name('auth.')
     ->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::post('/', 'indexStore')->name('index_store');
+        Route::post('/', 'attempt')->name('attempt');
         Route::get('cadastrar', 'create')->name('create');
         Route::post('cadastrar', 'store')->name('store');
         Route::get('/sair', 'logout')->name('logout');

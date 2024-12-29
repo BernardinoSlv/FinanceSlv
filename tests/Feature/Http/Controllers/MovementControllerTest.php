@@ -262,7 +262,7 @@ class MovementControllerTest extends TestCase
 
         $this->actingAs($user)->delete(route('movements.destroy', $movement))
             ->assertRedirect(route('movements.index'))
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $this->assertSoftDeleted($movement);
     }
 
@@ -279,7 +279,7 @@ class MovementControllerTest extends TestCase
 
         $this->actingAs($user)->delete(route('movements.destroy', $movement))
             ->assertRedirect(route('movements.index'))
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $this->assertSoftDeleted($movement);
         $this->assertSoftDeleted($movement->movementable);
     }

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\MovementTypeEnum;
-use App\Helpers\Alert;
+use App\Support\Message;
 use App\Http\Requests\StoreDebtPaymentRequest;
 use App\Http\Requests\UpdateDebtPaymentRequest;
 use App\Models\Debt;
@@ -23,7 +23,7 @@ class DebtPaymentController extends Controller
             abort(403);
         }
 
-        $debt->loadSum(['movements' => fn (Builder $query) => $query->where(
+        $debt->loadSum(['movements' => fn(Builder $query) => $query->where(
             'movements.type',
             MovementTypeEnum::OUT->value
         )], 'amount');
@@ -120,7 +120,7 @@ class DebtPaymentController extends Controller
         $movement->delete();
 
         return redirect()->route('debts.payments.index', $debt)->with(
-            Alert::success('Pagamento deletado com sucesso.')
+            Message::success('Pagamento deletado com sucesso.')
         );
     }
 }

@@ -17,6 +17,13 @@ class Log extends Model
         "data"
     ];
 
+    public function __construct(array $attributes = [])
+    {
+        $this->attributes["ip_address"] = request()->ip();
+        if (auth()->check())
+            $this->attributes["user_id"] = auth()->id();
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, "user_id", "id")->withTrashed();

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\Alert;
+use App\Support\Message;
 use App\Http\Requests\StoreQuickRequest;
 use App\Http\Requests\UpdateQuickRequest;
 use App\Models\Quick;
@@ -73,15 +73,13 @@ class QuickController extends Controller
         DB::commit();
 
         return redirect()->route('quicks.index')
-            ->with(Alert::success('Registro criado.'));
+            ->with(Message::success('Registro criado.'));
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Quick $quick)
-    {
-    }
+    public function show(Quick $quick) {}
 
     /**
      * Show the form for editing the specified resource.
@@ -125,7 +123,7 @@ class QuickController extends Controller
         DB::commit();
 
         return redirect()->route('quicks.edit', $quick)
-            ->with(Alert::success('Registro atualizado com sucesso'));
+            ->with(Message::success('Registro atualizado com sucesso'));
     }
 
     /**
@@ -143,6 +141,6 @@ class QuickController extends Controller
         DB::commit();
 
         return redirect()->route('quicks.index')
-            ->with(Alert::success('Registro deletado com suceso.'));
+            ->with(Message::success('Registro deletado com suceso.'));
     }
 }

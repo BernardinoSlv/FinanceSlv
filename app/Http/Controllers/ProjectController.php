@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\Alert;
+use App\Support\Message;
 use App\Models\Project;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -51,7 +51,7 @@ class ProjectController extends Controller
             "description" => ["nullable"]
         ]);
         $project = auth()->user()->projects()->create($attributes);
-        Alert::flashSuccess("Projeto criado com sucesso.");
+        Message::flashSuccess("Projeto criado com sucesso.");
 
         return response()->json([
             "message" => "Projeto criado com sucesso."
@@ -91,7 +91,7 @@ class ProjectController extends Controller
 
         $project->fill($attributes);
         $project->save();
-        Alert::flashSuccess("Projeto atualizado.");
+        Message::flashSuccess("Projeto atualizado.");
 
         return response()->json([
             "message" => "Projeto atualizado."
@@ -108,7 +108,7 @@ class ProjectController extends Controller
         $project->delete();
 
         return redirect()->route("projects.index")->with(
-            Alert::success("Projeto deletado.")
+            Message::success("Projeto deletado.")
         );
     }
 }

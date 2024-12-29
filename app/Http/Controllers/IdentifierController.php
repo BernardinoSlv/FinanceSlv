@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\Alert;
+use App\Support\Message;
 use App\Http\Requests\StoreIdentifierRequest;
 use App\Http\Requests\UpdateIdentifierRequest;
 use App\Models\Identifier;
@@ -13,8 +13,7 @@ class IdentifierController extends Controller
 {
     public function __construct(
         protected IdentifierRepositoryContract $_identifierRepository
-    ) {
-    }
+    ) {}
 
     /**
      * Display a listing of the resource.
@@ -51,7 +50,7 @@ class IdentifierController extends Controller
         $this->_identifierRepository->create(auth()->id(), $data);
 
         return redirect()->route('identifiers.index')->with(
-            Alert::success('Entidade criada com sucesso.')
+            Message::success('Entidade criada com sucesso.')
         );
     }
 
@@ -94,7 +93,7 @@ class IdentifierController extends Controller
         $this->_identifierRepository->update($identifier->id, $data);
 
         return redirect()->route('identifiers.edit', $identifier)->with(
-            Alert::success('Entidade atualizada com sucesso.')
+            Message::success('Entidade atualizada com sucesso.')
         );
     }
 
@@ -110,7 +109,7 @@ class IdentifierController extends Controller
         $this->_identifierRepository->delete($identifier->id);
 
         return redirect()->route('identifiers.index')->with(
-            Alert::success('Entidade removida com sucesso.')
+            Message::success('Entidade removida com sucesso.')
         );
     }
 }

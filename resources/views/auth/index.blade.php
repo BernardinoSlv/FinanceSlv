@@ -18,7 +18,7 @@
         <div class="m-auto" style="max-width: 600px; width: 100%;">
             <h1 class="fs-4 text-center">Quase lá! <i class="fas fa-sign-in-alt"></i></h1>
             <h2 class="fs-5 mb-4 text-muted text-center">Basta informar seu e-mail e senha</h2>
-            <form action="{{ route('auth.index_store') }}" method="POST">
+            <form action="{{ route('auth.attempt') }}" method="POST">
                 @csrf
                 @include('includes.alerts')
 

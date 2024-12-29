@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\MovementTypeEnum;
-use App\Helpers\Alert;
+use App\Support\Message;
 use App\Http\Requests\StoreDebtRequest;
 use App\Http\Requests\UpdateDebtRequest;
 use App\Models\Debt;
@@ -91,7 +91,7 @@ class DebtController extends Controller
         }
 
         return redirect()->route('debts.index')->with(
-            Alert::success('Dívida criada com sucesso.')
+            Message::success('Dívida criada com sucesso.')
         );
     }
 
@@ -156,7 +156,7 @@ class DebtController extends Controller
         DB::commit();
 
         return redirect()->route('debts.edit', $debt)
-            ->with(Alert::success('Dívida atualizada com sucesso.'));
+            ->with(Message::success('Dívida atualizada com sucesso.'));
     }
 
     /**
@@ -172,6 +172,6 @@ class DebtController extends Controller
         $debt->movements()->delete();
 
         return redirect()->route('debts.index')
-            ->with(Alert::success('Dívida deletada com sucesso.'));
+            ->with(Message::success('Dívida deletada com sucesso.'));
     }
 }

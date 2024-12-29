@@ -73,7 +73,7 @@ class ProjectControllerTest extends TestCase
             ->assertJson([
                 "message" => "Projeto criado com sucesso."
             ])
-            ->assertSessionHas("alert_type", "success");
+            ->assertSessionHas("message_type", "success");
         $this->assertNotNull($project = Project::query()->where([
             ...Arr::only($data, ["name", "description"]),
             "user_id" => $user->id
@@ -146,7 +146,7 @@ class ProjectControllerTest extends TestCase
             ->assertJson([
                 "message" => "Projeto atualizado."
             ])
-            ->assertSessionHas("alert_type", "success");
+            ->assertSessionHas("message_type", "success");
         $this->assertNotNull($updatedProject = Project::query()->where([
             ...Arr::only($data, ["name", "description"]),
             "user_id" => $user->id,
@@ -168,7 +168,7 @@ class ProjectControllerTest extends TestCase
             ->assertJson([
                 "message" => "Projeto atualizado."
             ])
-            ->assertSessionHas("alert_type", "success");
+            ->assertSessionHas("message_type", "success");
         $this->assertNotNull($updatedProject = Project::query()->where([
             ...Arr::only($data, ["name", "description"]),
             "user_id" => $user->id,
@@ -194,7 +194,7 @@ class ProjectControllerTest extends TestCase
 
         $this->actingAs($user)->delete(route("projects.destroy", $project))
             ->assertRedirect(route("projects.index"))
-            ->assertSessionHas("alert_type", "success");
+            ->assertSessionHas("message_type", "success");
         $this->assertSoftDeleted($project);
     }
 }

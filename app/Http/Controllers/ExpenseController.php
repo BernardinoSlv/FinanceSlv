@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\MovementTypeEnum;
-use App\Helpers\Alert;
+use App\Support\Message;
 use App\Http\Requests\StoreExpenseRequest;
 use App\Http\Requests\UpdateExpenseRequest;
 use App\Models\Expense;
@@ -61,7 +61,7 @@ class ExpenseController extends Controller
         }
 
         return redirect()->route('expenses.index')
-            ->with(Alert::success('Despesa criada com sucesso.'));
+            ->with(Message::success('Despesa criada com sucesso.'));
     }
 
     /**
@@ -137,7 +137,7 @@ class ExpenseController extends Controller
         }
 
         return redirect()->route('expenses.edit', $expense)
-            ->with(Alert::success('Despesa atualizada com sucesso.'));
+            ->with(Message::success('Despesa atualizada com sucesso.'));
     }
 
     /**
@@ -151,6 +151,6 @@ class ExpenseController extends Controller
         $expense->delete();
 
         return redirect()->route('expenses.index')
-            ->with(Alert::success('Despesa removida com sucesso.'));
+            ->with(Message::success('Despesa removida com sucesso.'));
     }
 }

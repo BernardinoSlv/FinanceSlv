@@ -2,34 +2,34 @@
 
 namespace Tests\Feature\Helpers;
 
-use App\Helpers\Alert;
+use App\Support\Message;
 use Tests\TestCase;
 
 class AlertTest extends TestCase
 {
     /**
-     * deve retornar o array com alert_type successo
+     * deve retornar o array com message_type successo
      */
     public function test_success_method(): void
     {
         $expect = [
-            'alert_type' => 'success',
-            'alert_text' => 'apenas teste.',
+            'message_type' => 'success',
+            'message_text' => 'apenas teste.',
         ];
 
-        $this->assertEquals($expect, Alert::success('apenas teste.'));
+        $this->assertEquals($expect, Message::success('apenas teste.'));
     }
 
     /**
-     * deve retornar o array com alert_type danger
+     * deve retornar o array com message_type danger
      */
     public function test_danger_method(): void
     {
         $expect = [
-            'alert_type' => 'danger',
-            'alert_text' => 'apenas teste.',
+            'message_type' => 'danger',
+            'message_text' => 'apenas teste.',
         ];
 
-        $this->assertEquals($expect, Alert::danger('apenas teste.'));
+        $this->assertEquals($expect, Message::danger('apenas teste.'));
     }
 }

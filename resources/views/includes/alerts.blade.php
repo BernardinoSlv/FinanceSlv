@@ -1,8 +1,8 @@
 @if ($errors->all())
     <div class="alert alert-danger">{{ $errors->first() }}</div>
 @endif
-@if (session()->has('alert_type'))
-    <div class="alert alert-{{ session()->get('alert_type') }}">
-        {{ session()->get('alert_text') }}
+@if (session()->has('message_type'))
+    <div class="alert alert-{{ session()->get('message_type') }}">
+        {{ session()->get('message_text') }}
     </div>
 @endif

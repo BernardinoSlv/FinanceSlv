@@ -111,7 +111,7 @@ class DebtControllerTest extends TestCase
 
         $this->actingAs($user)->post(route('debts.store'), $data)
             ->assertFound()
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $this->assertDatabaseHas('debts', [
             ...$data,
             'amount' => 200,
@@ -134,7 +134,7 @@ class DebtControllerTest extends TestCase
 
         $this->actingAs($user)->post(route('debts.store'), $data)
             ->assertFound()
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $this->assertNotNull($debt = Debt::query()->where([
             ...$data,
             'amount' => 200,
@@ -160,7 +160,7 @@ class DebtControllerTest extends TestCase
 
         $this->actingAs($user)->post(route('debts.store'), $data)
             ->assertFound()
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $debt = Debt::query()->where([
             ...$data,
             "due_date" => now()->addMonth()->format("Y-m-d"),
@@ -185,7 +185,7 @@ class DebtControllerTest extends TestCase
 
         $this->actingAs($user)->post(route('debts.store'), $data)
             ->assertFound()
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $debt = Debt::query()->where([
             ...$data,
             "due_date" => now()->addDay()->format("Y-m-d"),
@@ -327,7 +327,7 @@ class DebtControllerTest extends TestCase
 
         $this->actingAs($user)->put(route('debts.update', $debt), $data)
             ->assertRedirect(route('debts.edit', $debt))
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $this->assertDatabaseHas('debts', [
             ...$data,
             'amount' => 500,
@@ -352,7 +352,7 @@ class DebtControllerTest extends TestCase
 
         $this->actingAs($user)->put(route('debts.update', $debt), $data)
             ->assertRedirect(route('debts.edit', $debt))
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $this->assertNotNull($debt = Debt::query()->where([
             ...$data,
             'amount' => 500,
@@ -402,7 +402,7 @@ class DebtControllerTest extends TestCase
 
         $this->actingAs($user)->put(route('debts.update', $debt), $data)
             ->assertRedirect(route('debts.edit', $debt))
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $this->assertNotNull($debt = Debt::query()->where([
             ...$data,
             'amount' => 500,
@@ -445,7 +445,7 @@ class DebtControllerTest extends TestCase
 
         $this->actingAs($user)->put(route('debts.update', $debt), $data)
             ->assertRedirect(route('debts.edit', $debt))
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $this->assertDatabaseHas('movements', [
             'id' => $movements->first()->id,
             'movementable_type' => Debt::class,
@@ -504,7 +504,7 @@ class DebtControllerTest extends TestCase
 
         $this->actingAs($user)->delete(route('debts.destroy', $debt))
             ->assertRedirect(route('debts.index'))
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $this->assertSoftDeleted($debt);
     }
 
@@ -524,7 +524,7 @@ class DebtControllerTest extends TestCase
 
         $this->actingAs($user)->delete(route('debts.destroy', $debt))
             ->assertRedirect(route('debts.index'))
-            ->assertSessionHas('alert_type', 'success');
+            ->assertSessionHas('message_type', 'success');
         $this->assertSoftDeleted($debt);
         $this->assertCount(0, $debt->movements);
     }
