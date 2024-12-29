@@ -41,16 +41,20 @@ class AuthController extends Controller
 
     public function create()
     {
+        if (auth()->check())
+            return redirect(route("dashboard.index"));
         return view('auth.create');
     }
 
     public function store(Request $request)
     {
+        if (auth()->check())
+            abort(403);
+
         $data = $request->validate([
             'name' => ['required', 'min:3', 'max:256', "regex:/\w+ \w+/i"],
             'email' => ['required', 'email', 'unique:users'],
-            'password' => ['required', 'min:8', 'max:256'],
-            'confirm_password' => ['required', 'same:password'],
+            'password' => ['required', 'min:8', 'max:256', 'confirmed'],
             'terms' => ['required'],
         ]);
 

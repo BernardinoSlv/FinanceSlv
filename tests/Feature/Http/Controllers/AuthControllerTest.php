@@ -5,11 +5,22 @@ namespace Tests\Feature\Http\Controllers;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Arr;
 use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
 {
     use RefreshDatabase;
+
+    /** deve redirecionar para o dashboard */
+    public function test_index_action_when_authenticated(): void
+    {
+        $user = User::factory()->create();
+        $this->be($user);
+
+        $this->get(route("auth.index"))
+            ->assertRedirect(route("dashboard.index"));
+    }
 
     /** deve ter status 200 */
     public function test_index_action(): void
@@ -19,14 +30,15 @@ class AuthControllerTest extends TestCase
             ->assertViewIs("auth.index");
     }
 
-    /** deve redirecionar para o dashboard */
-    public function test_index_action_authenticated(): void
+    /** deve redirecionar com erros de validação */
+    public function test_attempt_action_without_data(): void
     {
-        $user = User::factory()->create();
-        $this->be($user);
-
-        $this->get(route("auth.index"))
-            ->assertRedirect(route("dashboard.index"));
+        $this->post(route("auth.attempt"), [])
+            ->assertFound()
+            ->assertSessionHasErrors([
+                "email",
+                "password"
+            ]);
     }
 
     /** deve redirecionar com mensagem de erro */
@@ -63,5 +75,64 @@ class AuthControllerTest extends TestCase
         $this->post(route("auth.attempt"), ["email" => $user->email, "password" => "password"])
             ->assertRedirect(route("dashboard.index"));
         $this->assertAuthenticated();
+    }
+
+    /** deve redirecionar para dashboard */
+    public function test_create_action_when_authenticated(): void
+    {
+        $user = User::factory()->create();
+        $this->be($user);
+
+        $this->get(route("auth.create"))
+            ->assertRedirect(route("dashboard.index"));
+    }
+
+    /** deve ter status 200 */
+    public function test_create_action(): void
+    {
+        $this->get(route("auth.create"))
+            ->assertOk()
+            ->assertViewIs("auth.create");
+    }
+
+    /** deve redirecionar com erros de validação */
+    public function test_store_action_without_data(): void
+    {
+        $this->post(route("auth.store"), [])
+            ->assertFound()
+            ->assertSessionHasErrors([
+                "name",
+                "email",
+                "password",
+                "terms"
+            ]);
+    }
+
+    /** deve ter status 403 */
+    public function test_store_action_when_autenticated(): void
+    {
+        $user = User::factory()->create();
+        $this->be($user);
+        $data = User::factory()->make()->toArray();
+        $data["password"] = "password";
+        $data["password_confirmation"] = "password";
+        $data["terms"] = "on";
+
+        $this->post(route("auth.store"), $data)
+            ->assertForbidden();
+    }
+
+    /** deve redirecionar para tela de login  */
+    public function test_store_action(): void
+    {
+        $data = User::factory()->make()->toArray();
+        $data["password"] = "password";
+        $data["password_confirmation"] = "password";
+        $data["terms"] = "on";
+
+        $this->post(route("auth.store"), $data)
+            ->assertRedirect(route("auth.index"))
+            ->assertSessionHas("message_type", "success");
+        $this->assertNotNull($user = User::query()->where(Arr::only($data, ["name", "email"]))->first());
     }
 }
