@@ -5,19 +5,21 @@ namespace App\Http\Controllers;
 use App\Support\Message;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryContract;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class AuthController extends Controller
 {
-    public function index()
+    public function index(): RedirectResponse|View
     {
         if (auth()->check())
             return redirect(route("dashboard.index"));
         return view('auth.index');
     }
 
-    public function attempt(Request $request)
+    public function attempt(Request $request): RedirectResponse
     {
         if (auth::check())
             abort(403);
@@ -39,14 +41,14 @@ class AuthController extends Controller
         return redirect()->route('dashboard.index');
     }
 
-    public function create()
+    public function create(): RedirectResponse|View
     {
         if (auth()->check())
             return redirect(route("dashboard.index"));
         return view('auth.create');
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         if (auth()->check())
             abort(403);
@@ -65,14 +67,14 @@ class AuthController extends Controller
         );
     }
 
-    public function logout()
+    public function logout(): RedirectResponse
     {
-        if (Auth::check()) {
-            Auth::logout();
-        }
+        if (!Auth::check())
+            return redirect()->route("auth.index");
 
+        auth()->logout();
         return redirect()->route('auth.index')->with(
-            Message::success('Volte sempre.')
+            Message::primary('Volte sempre.')
         );
     }
 }

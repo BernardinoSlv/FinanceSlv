@@ -135,4 +135,23 @@ class AuthControllerTest extends TestCase
             ->assertSessionHas("message_type", "success");
         $this->assertNotNull($user = User::query()->where(Arr::only($data, ["name", "email"]))->first());
     }
+
+    /** deve redirecionar para página de login  */
+    public function test_logout_action(): void
+    {
+        $user = User::factory()->create();
+        $this->be($user);
+
+        $this->get(route("auth.logout"))
+            ->assertRedirect(route("auth.index"))
+            ->assertSessionHas("message_type", "primary");
+        $this->assertGuest();
+    }
+
+    public function test_logout_action_when_unauthenticated(): void
+    {
+        $this->get(route("auth.logout"))
+            ->assertRedirect(route("auth.index"))
+            ->assertSessionMissing("message_type");
+    }
 }
