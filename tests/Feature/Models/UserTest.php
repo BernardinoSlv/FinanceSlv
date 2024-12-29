@@ -6,6 +6,7 @@ use App\Models\Debt;
 use App\Models\Expense;
 use App\Models\File;
 use App\Models\Identifier;
+use App\Models\Log;
 use App\Models\Movement;
 use App\Models\Project;
 use App\Models\Quick;
@@ -16,6 +17,25 @@ use Tests\TestCase;
 class UserTest extends TestCase
 {
     use RefreshDatabase;
+
+    /** deve retornar uma coleção vazia */
+    public function test_my_logs_relation_empty(): void
+    {
+        $user = User::factory()->create();
+
+        $this->assertCount(0, $user->myLogs);
+    }
+
+    /** deve retornar 2 logs */
+    public function test_my_logs_relation(): void
+    {
+        $user = User::factory()->create();
+        Log::factory(2)->create([
+            "user_id" => $user
+        ]);
+
+        $this->assertCount(2, $user->myLogs);
+    }
 
     /**
      * deve retornar uma coleção vazia
